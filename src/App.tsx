@@ -10,6 +10,7 @@ function App() {
     <>
       <div className="title">Any ideas?</div>
       <p>testテスト</p>
+      <p>test2テスト２</p>
     </>
   )
 }
