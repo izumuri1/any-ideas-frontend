@@ -1,0 +1,85 @@
+// src/index.scss
+// このファイルは、アプリケーション全体のスタイルを定義
+
+@import './styles/variables';
+
+//////////////////////////////////////////////////////////////
+// スタイルリセット
+//////////////////////////////////////////////////////////////
+
+/* ボックスサイジングをborder-boxに統一 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* マージン・パディングをリセット */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* ルート要素の設定 */
+html {
+  font-size: 16px;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+/* body の基本設定 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #333333;
+}
+
+/* リンクのデフォルトスタイルをリセット */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* リストのスタイルをリセット */
+ul,
+ol {
+  list-style: none;
+}
+
+/* 画像の設定 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ボタンのリセット */
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* フォーム要素のリセット */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+//////////////////////////////////////////////////////////////
+// グローバルスタイル
+//////////////////////////////////////////////////////////////
+body {
+  background-color: $bg-color; // 全体の背景色
+  color: #000000; // 全体の文字色
+  font-family: $body-font; // 全体のフォント
+  font-size: $font-size; // 全体のフォントサイズ
+  font-weight: normal; // 全体のフォントウェイト
+} 

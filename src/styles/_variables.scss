@@ -1,0 +1,84 @@
+// 変数とmixinを定義するSCSSファイル
+// src/styles/_variables.scss
+// このファイルは、アプリケーション全体で使用されるスタイルの変数とmixinを定義
+
+//////////////////////////////////////////////////////////////
+/// 変数定義
+//////////////////////////////////////////////////////////////
+ 
+// カラー
+$bg-color:             #F4C14E; // 背景色
+$btnp-color:           #000000; // ボタン(positive)の背景色
+$btnn-color:           #828282; // ボタン(negative)の背景色
+$input-text-color:     #828282; // 入力欄の説明テキストの色
+
+// フォントスタイル
+$theme-font:          'Montserrat', sans-serif; // タイトルフォント
+$body-font:           'Noto sans JP', sans-serif; // 本文フォント
+
+// フォントサイズ(最小値:14px-0.875rem ～ 最大値:40px-2.5rem）
+$logo-font-size:        2.25rem;  // ロゴのフォントサイズ(36px)
+$title-font-size:       1.5rem;   // タイトルのフォントサイズ(24px)
+$subtitle-font-size:    1rem;     // サブタイトルのフォントサイズ(16px)
+$font-size:             0.875rem; // 基本フォントサイズ（14px）
+
+// フォントウェイト
+$logo-font-weight:      bold;     // ロゴのフォントウェイト
+$title-font-weight:     bold;     // タイトルのフォントウェイト
+$subtitle-font-weight:  bold;     // サブタイトルのフォントウェイト
+$btn-font-weight:       medium;   // ボタンのフォントウェイト
+$like-font-weight:      medium;   // いいねのフォントウェイト
+
+//////////////////////////////////////////////////////////////
+/// mixin定義（ @include logo-style;　のように使用する）
+//////////////////////////////////////////////////////////////
+
+// ロゴスタイル
+@mixin logo-style {
+  font-family: $theme-font;
+  font-size: $logo-font-size;
+  font-weight: $logo-font-weight;
+  color:#000000;
+}
+
+// タイトルスタイル
+@mixin title-style {
+  font-family: $theme-font;
+  font-size: $title-font-size;
+  font-weight: $title-font-weight;
+  color:#000000;
+}
+
+// サブタイトルスタイル
+@mixin subtitle-style {
+  font-family: $theme-font;
+  font-size: $subtitle-font-size;
+  font-weight: $subtitle-font-weight;
+  color:#000000;
+}
+
+// ボタン(positive)スタイル
+@mixin btnp-style {
+  font-family: $body-font;
+  font-size: $btn-font-size;
+  font-weight: $btn-font-weight;
+  color: white;
+  background-color: $btnp-color;
+}
+
+// ボタン(negative)スタイル
+@mixin btnn-style {
+  font-family: $body-font;
+  font-size: $btn-font-size;
+  font-weight: $btn-font-weight;
+  color: black;
+  background-color: $btnn-color;
+} 
+
+// いいねスタイル
+@mixin like-style {
+  font-family: $body-font;
+  font-size: $font-size;
+  font-weight: $like-font-weight;
+  color: black;
+}

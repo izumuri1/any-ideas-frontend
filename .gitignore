@@ -1,0 +1,69 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment variables (重要！)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# Supabase (もし使用する場合)
+.supabase
+
+# Cache directories
+.cache
+.parcel-cache
+.eslintcache
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
+# Temporary folders
+tmp/
+temp/
+
+# OS generated files
+Thumbs.db
+
+# IDE specific files
+*.swp
+*.swo
+*~
+
+# Package manager lock files (プロジェクトによって選択)
+# yarn.lock  # yarnを使わない場合はコメントアウト
+# pnpm-lock.yaml  # pnpmを使わない場合はコメントアウト
+# package-lock.json  # npmを使わない場合はコメントアウト
