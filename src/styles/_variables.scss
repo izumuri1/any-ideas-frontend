@@ -21,7 +21,7 @@ $logo-font-size:        2.25rem;  // ロゴのフォントサイズ(36px)
 $title-font-size:       1.5rem;   // タイトルのフォントサイズ(24px)
 $subtitle-font-size:    1rem;     // サブタイトルのフォントサイズ(16px)
 $font-size:             0.875rem; // 基本フォントサイズ（14px）
-$btn-font-size:         1rem;     // ボタンのフォントサイズ(16px) ← 追加
+$btn-font-size:         1rem;     // ボタンのフォントサイズ(16px)
 
 // フォントウェイト
 $logo-font-weight:      bold;     // ロゴのフォントウェイト
@@ -30,8 +30,19 @@ $subtitle-font-weight:  bold;     // サブタイトルのフォントウェイ�
 $btn-font-weight:       500;      // ボタンのフォントウェイト（mediumは500）
 $like-font-weight:      500;      // いいねのフォントウェイト（mediumは500）
 
+// レイアウト関連変数
+$card-border-radius:    12px;     // カードの角丸
+$input-border-radius:   6px;      // 入力フィールドの角丸
+$btn-border-radius:     6px;      // ボタンの角丸
+$card-shadow:           0 2px 8px rgba(0, 0, 0, 0.1); // カードの影
+$mobile-breakpoint:     768px;    // モバイルブレークポイント
+
 //////////////////////////////////////////////////////////////
-/// mixin定義（ @include logo-style;　のように使用する）
+/// mixin
+//////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////
+// ◆　テキスト
 //////////////////////////////////////////////////////////////
 
 // ロゴスタイル
@@ -39,7 +50,7 @@ $like-font-weight:      500;      // いいねのフォントウェイト（medi
   font-family: $theme-font;
   font-size: $logo-font-size;
   font-weight: $logo-font-weight;
-  color:#000000;
+  color: #000000;
 }
 
 // タイトルスタイル
@@ -47,7 +58,7 @@ $like-font-weight:      500;      // いいねのフォントウェイト（medi
   font-family: $theme-font;
   font-size: $title-font-size;
   font-weight: $title-font-weight;
-  color:#000000;
+  color: #000000;
 }
 
 // サブタイトルスタイル
@@ -55,7 +66,14 @@ $like-font-weight:      500;      // いいねのフォントウェイト（medi
   font-family: $theme-font;
   font-size: $subtitle-font-size;
   font-weight: $subtitle-font-weight;
-  color:#000000;
+  color: #000000;
+}
+
+// セクションタイトル
+@mixin section-title {
+  @include title-style;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 // テキストスタイル
@@ -64,6 +82,21 @@ $like-font-weight:      500;      // いいねのフォントウェイト（medi
   font-size: $font-size;
   color: #000000;
 }
+
+// エラーメッセージ
+@mixin error-message {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: $font-size;
+  text-align: left;
+}
+
+//////////////////////////////////////////////////////////////
+// ◆　ボタン
+//////////////////////////////////////////////////////////////
 
 // ボタン(positive)スタイル
 @mixin btnp-style {
@@ -83,10 +116,203 @@ $like-font-weight:      500;      // いいねのフォントウェイト（medi
   background-color: $btnn-color;
 } 
 
+// ボタンの基本スタイル
+@mixin button-base {
+  border: none;
+  border-radius: $btn-border-radius;
+  cursor: pointer;
+  padding: 0.75rem;
+  transition: opacity 0.2s;
+  font-family: $body-font;
+
+  &:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+// プライマリボタン（ログイン、アイデア登録など）
+@mixin primary-button {
+  @include button-base;
+  @include btnp-style;
+  width: 100%;
+}
+
+// セカンダリボタン（ワークスペース選択など）
+@mixin secondary-button {
+  @include button-base;
+  @include btnn-style;
+}
+
 // いいねスタイル
 @mixin like-style {
   font-family: $body-font;
   font-size: $font-size;
   font-weight: $like-font-weight;
   color: black;
+}
+
+//////////////////////////////////////////////////////////////
+// ◆　レイアウト
+//////////////////////////////////////////////////////////////
+
+// フルスクリーンコンテナ（ログイン、ローディングなど）
+@mixin fullscreen-container {
+  // #rootの制約を無効化して完全にフルスクリーンにする
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: $bg-color;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  
+  // レスポンシブ対応
+  @media (max-width: $mobile-breakpoint) {
+    padding: 0.5rem;
+  }
+}
+
+// カードスタイル（フォーム、アイデアカードなど）
+@mixin card-style($background: white) {
+  background: $background;
+  border-radius: $card-border-radius;
+  box-shadow: $card-shadow;
+  padding: 1.5rem;
+  
+  // レスポンシブ対応
+  @media (max-width: $mobile-breakpoint) {
+    padding: 1rem;
+  }
+}
+
+// 大きなカードスタイル（ログインなど）
+@mixin large-card-style($background: $bg-color) {
+  @include card-style($background);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+  
+  // レスポンシブ対応
+  @media (max-width: $mobile-breakpoint) {
+    padding: 2rem;
+    max-width: 100%;
+    min-height: calc(100vh - 1rem);
+    width: calc(100vw - 1rem);
+  }
+}
+
+// 入力フィールドスタイル
+@mixin input-field-style {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: $input-border-radius;
+  font-size: $font-size;
+  font-family: $body-font;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: $btnp-color;
+  }
+
+  &:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
+    cursor: not-allowed;
+  }
+
+  &::placeholder {
+    color: $input-text-color;
+  }
+}
+
+// フォームグループスタイル
+@mixin form-group-style {
+  text-align: left;
+
+  label {
+    display: block;
+    @include text-style;
+    margin-bottom: 0.5rem;
+  }
+
+  input {
+    @include input-field-style;
+  }
+
+  .field-error {
+    display: block;
+    color: #dc2626;
+    font-size: $font-size;
+    margin-top: 0.25rem;
+  }
+}
+
+// ページヘッダースタイル（Home画面のheader）
+@mixin page-header {
+  background: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  // レスポンシブ対応
+  @media (max-width: $mobile-breakpoint) {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+
+// メインコンテンツエリア
+@mixin main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+
+  // レスポンシブ対応
+  @media (max-width: $mobile-breakpoint) {
+    padding: 1rem;
+  }
+}
+
+// レスポンシブグリッドレイアウト
+@mixin responsive-grid($min-width: 300px) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: 1.5rem;
+
+  // モバイルでは1列
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+// フレックスコンテナ（ボタン群など）
+@mixin flex-container($gap: 1rem, $direction: row) {
+  display: flex;
+  gap: $gap;
+  flex-direction: $direction;
+  
+  @media (max-width: $mobile-breakpoint) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

@@ -2,28 +2,11 @@
 @use '../styles/variables' as *;
 
 .login-container {
-  min-height: 100vh;
-  background-color: $bg-color;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
+  @include fullscreen-container;
 }
 
 .login-card {
-  background: $bg-color;
-  border-radius: 6px;
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 480px;
-  height: 100vh;  // 画面いっぱいの高さ
-  max-height: calc(100vh - 2rem);  // paddingを考慮
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.541);
-  text-align: center;
-
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  justify-content: center;
+  @include large-card-style($bg-color);
 
   .logo {
     @include logo-style;
@@ -33,19 +16,13 @@
     @include subtitle-style;
   }
 
-.introduction {
+  .introduction {
     @include text-style;
   }
 }
 
 .error-message {
-  background-color: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  padding: 0.75rem;
-  font-size: $font-size;
-  text-align: left;
+  @include error-message;
 }
 
 .auth-form {
@@ -54,87 +31,11 @@
   gap: 1.5rem;
 
   .form-group {
-    text-align: left;
-
-    label {
-      display: block;
-      @include text-style
-    }
-
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: $font-size;
-      transition: border-color 0.2s;
-
-      &:focus {
-        outline: none;
-        border-color: $btnp-color;
-      }
-
-      &:disabled {
-        background-color: #f9fafb;
-        color: #6b7280;
-        cursor: not-allowed;
-      }
-
-      &::placeholder {
-        color: $input-text-color;
-      }
-    }
-
-    // フィールドエラーのスタイル
-    .field-error {
-      display: block;
-      color: #dc2626;
-      font-size: $font-size;
-    }
+    @include form-group-style;
   }
 
   .btn-primary {
-    @include btnp-style;
-    width: 100%;
-    padding: 0.875rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    &:hover:not(:disabled) {
-      transform: translateY(-1px);
-    }
-
-    &:disabled {
-      background-color: $btnn-color;
-      cursor: not-allowed;
-      transform: none;
-    }
-  }
-
-  .btn-google {
-    width: 100%;
-    padding: 0.875rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    background: white;
-    color: #374151;
-    cursor: pointer;
-    font-size: $subtitle-font-size;
-    font-weight: 600;
-    transition: all 0.2s;
-    
-    &:hover:not(:disabled) {
-      border-color: #d1d5db;
-      transform: translateY(-1px);
-    }
-
-    &:disabled {
-      background-color: #f9fafb;
-      color: #6b7280;
-      cursor: not-allowed;
-      transform: none;
-    }
+    @include primary-button;
   }
 }
 
@@ -157,14 +58,9 @@
   }
 }
 
-// レスポンシブ対応
-@media (max-width: 480px) {
-  .login-card {
-    padding: 2rem 1.5rem;
-    margin: 0 1rem;
-  }
-  
+// モバイル用ロゴサイズのカスタマイズ
+@media (max-width: $mobile-breakpoint) {
   .logo {
-    font-size: 2rem;
+    font-size: 2rem; // モバイル専用サイズ
   }
 }
