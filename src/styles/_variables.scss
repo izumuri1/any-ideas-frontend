@@ -21,13 +21,14 @@ $logo-font-size:        2.25rem;  // ロゴのフォントサイズ(36px)
 $title-font-size:       1.5rem;   // タイトルのフォントサイズ(24px)
 $subtitle-font-size:    1rem;     // サブタイトルのフォントサイズ(16px)
 $font-size:             0.875rem; // 基本フォントサイズ（14px）
+$btn-font-size:         1rem;     // ボタンのフォントサイズ(16px) ← 追加
 
 // フォントウェイト
 $logo-font-weight:      bold;     // ロゴのフォントウェイト
 $title-font-weight:     bold;     // タイトルのフォントウェイト
 $subtitle-font-weight:  bold;     // サブタイトルのフォントウェイト
-$btn-font-weight:       medium;   // ボタンのフォントウェイト
-$like-font-weight:      medium;   // いいねのフォントウェイト
+$btn-font-weight:       500;      // ボタンのフォントウェイト（mediumは500）
+$like-font-weight:      500;      // いいねのフォントウェイト（mediumは500）
 
 //////////////////////////////////////////////////////////////
 /// mixin定義（ @include logo-style;　のように使用する）
