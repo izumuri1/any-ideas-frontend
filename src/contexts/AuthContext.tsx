@@ -153,7 +153,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signIn,
     signOut,
-    signInWithGoogle
+    // signInWithGoogle
   }
 
 // 5. 子コンポーネントにデータを提供
