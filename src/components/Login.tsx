@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import './Login.scss'
 
 
@@ -21,18 +22,12 @@ interface LoginFormData {
   password: string
 }
 
-// Loginコンポーネントが受け取るprops（データ）の型を定義
-// onSignUpClick: 新規登録画面に切り替えるための関数
-// onSignUpClickは引数なし・戻り値なしの関数と定義
-interface LoginProps {
-  onSignUpClick: () => void
-}
 
 // 2. 状態管理・フック初期化
 // ログイン画面を表示するためのコンポーネントを作成
-// Loginは、親からpropsとしてonSignUpClick（サインアップボタンが押された時の処理）を受け取る
-export function Login({ onSignUpClick }: LoginProps) {
+export function Login() {
   const { signIn, loading } = useAuth()
+  const navigate = useNavigate()
   const [submitError, setSubmitError] = useState('')
 
 // ログインフォーム
@@ -57,6 +52,12 @@ export function Login({ onSignUpClick }: LoginProps) {
       setSubmitError('ログインに失敗しました。メールアドレスとパスワードを確認してください。')
     }
   }
+
+  const handleSignUpClick = () => {
+    // signupページに遷移
+    navigate('/signup')
+}
+
 
 // 4. レンダリング（画面処理）
   return (
@@ -140,7 +141,7 @@ export function Login({ onSignUpClick }: LoginProps) {
             アカウントをお持ちでない方は
             <button 
               type="button"
-              onClick={onSignUpClick}
+              onClick={handleSignUpClick}
               className="link-button"
             >
               新規アカウント登録
