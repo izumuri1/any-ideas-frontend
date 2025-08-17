@@ -4,31 +4,37 @@
 .login-container {
   min-height: 100vh;
   background-color: $bg-color;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   padding: 1rem;
 }
 
 .login-card {
-  background: white;
-  border-radius: 12px;
+  background: $bg-color;
+  border-radius: 6px;
   padding: 2.5rem;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 480px;
+  height: 100vh;  // 画面いっぱいの高さ
+  max-height: calc(100vh - 2rem);  // paddingを考慮
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.541);
   text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
 
   .logo {
     @include logo-style;
-    margin-bottom: 0.5rem;
   }
 
   .subtitle {
     @include subtitle-style;
-    color: #666;
-    margin-bottom: 2rem;
-    font-weight: normal;
+  }
+
+.introduction {
+    @include text-style;
   }
 }
 
@@ -38,7 +44,6 @@
   border: 1px solid #fecaca;
   border-radius: 8px;
   padding: 0.75rem;
-  margin-bottom: 1.5rem;
   font-size: $font-size;
   text-align: left;
 }
@@ -53,10 +58,7 @@
 
     label {
       display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: #374151;
-      font-size: $font-size;
+      @include text-style
     }
 
     input {
@@ -87,27 +89,19 @@
     .field-error {
       display: block;
       color: #dc2626;
-      font-size: 0.75rem;
-      margin-top: 0.25rem;
-      font-weight: 500;
+      font-size: $font-size;
     }
   }
 
   .btn-primary {
+    @include btnp-style;
     width: 100%;
     padding: 0.875rem;
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    font-size: $subtitle-font-size;
-    font-weight: 600;
     transition: all 0.2s;
-    font-family: $body-font;
-    color: white;
-    background-color: $btnp-color;
-
     &:hover:not(:disabled) {
-      background-color: #1f2937;
       transform: translateY(-1px);
     }
 
@@ -145,7 +139,6 @@
 }
 
 .auth-switch {
-  margin-top: 1rem;
   font-size: $font-size;
   color: #6b7280;
 

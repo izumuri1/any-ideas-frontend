@@ -1,16 +1,14 @@
 // src/contexts/AuthContext.tsx
 
-
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-
-// Supabaseライブラリから3つの型定義をインポート
+// 自分で設定したSupabaseとの接続設定をインポート
+import { supabase } from '../lib/supabase'
+// auth.ts から3つの型定義をインポート
 // User = ログインしたユーザーの情報の構造を表す型（設計図）
 // Session = ログイン状態・セッション情報の構造を表す型（設計図）
 // AuthError = 認証でエラーが起きた時のエラー情報の構造を表す型（設計図）
-import { User, Session, AuthError } from '@supabase/supabase-js'
+import type { User, Session, AuthError } from '@supabase/auth-js'
 
-// 自分で設定したSupabaseとの接続設定をインポート
-import { supabase } from '../lib/supabase'
 
 //////////////////////////////////////////////////////////////
 // このファイルの仕組み
@@ -28,11 +26,8 @@ import { supabase } from '../lib/supabase'
 // 1. Context の型定義(interfaceは型定義の宣言)。型安全性を確保するためにまず型を定義
 // 自作変数としてAuthContextを作成。userなどの中身も自作
 interface AuthContextType {
-  // ログアウト中や初期状態ではnull 
   user: User | null
-  // nullはセッションが未確立または切れている状態 
   session: Session | null
-  // 認証処理中など「読み込み状態」を示すフラグ。true = 処理中、false = 処理完了または未処理 
   loading: boolean
   signUp: (email: string, password: string, username: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>

@@ -65,7 +65,7 @@ export function Login() {
       <div className="login-card">
         <h1 className="logo">Any ideas?</h1>
         <p className="subtitle">おかえりなさい</p>
-        <p>アカウントにログインして始めましょう</p>
+        <p className="introduction">アカウントにログインして始めましょう</p>
 
         {/* エラーメッセージ */}
         {/* &&の左側が truthy なら右側<div xxx /div>を返す */}

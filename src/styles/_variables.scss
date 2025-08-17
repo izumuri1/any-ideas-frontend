@@ -58,6 +58,13 @@ $like-font-weight:      500;      // いいねのフォントウェイト（medi
   color:#000000;
 }
 
+// テキストスタイル
+@mixin text-style {
+  font-family: $body-font;
+  font-size: $font-size;
+  color: #000000;
+}
+
 // ボタン(positive)スタイル
 @mixin btnp-style {
   font-family: $body-font;

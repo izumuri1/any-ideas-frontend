@@ -1,0 +1,300 @@
+// src/components/Home.scss
+@use '../styles/variables' as *;
+
+.home-container {
+  min-height: 100vh;
+  background-color: $bg-color;
+  display: flex;
+  flex-direction: column;
+}
+
+// ヘッダー
+.home-header {
+  background: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    .logo {
+      @include logo-style;
+      margin: 0;
+    }
+
+    .workspace-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .workspace-name {
+        @include subtitle-style;
+        font-size: $font-size;
+        font-weight: $subtitle-font-weight;
+      }
+
+      .invite-token {
+        font-size: 0.75rem;
+        color: #666;
+        font-family: $body-font;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    gap: 1rem;
+
+    .btn-workspace {
+      @include btnn-style;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    .btn-logout {
+      @include btnp-style;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+// メインコンテンツ
+.home-main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+// ウェルカムセクション
+.welcome-section {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .welcome-title {
+    @include title-style;
+    margin-bottom: 0.5rem;
+  }
+
+  .welcome-message {
+    color: #666;
+    font-family: $body-font;
+    font-size: $subtitle-font-size;
+  }
+}
+
+// アイデア登録フォーム
+.idea-form-section {
+  margin-bottom: 2rem;
+
+  .section-title {
+    @include title-style;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .idea-form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .input-field {
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: $font-size;
+        font-family: $body-font;
+
+        &:focus {
+          outline: none;
+          border-color: $btnp-color;
+        }
+
+        &::placeholder {
+          color: $input-text-color;
+        }
+      }
+    }
+
+    .btn-primary {
+      @include btnp-style;
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+// アイデア表示エリア
+.ideas-section {
+  margin-bottom: 2rem;
+
+  .ideas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+
+    .ideas-zone {
+      .zone-title {
+        @include subtitle-style;
+        margin-bottom: 1rem;
+        text-align: center;
+        padding: 0.5rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .ideas-cards {
+        min-height: 200px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 8px;
+        padding: 1rem;
+
+        .idea-card {
+          background: white;
+          padding: 1rem;
+          border-radius: 8px;
+          margin-bottom: 0.75rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+          .idea-text {
+            font-family: $body-font;
+            font-size: $font-size;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+          }
+
+          .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+
+            button {
+              font-family: $body-font;
+              font-size: 0.75rem;
+              padding: 0.25rem 0.5rem;
+              border-radius: 4px;
+              border: none;
+              cursor: pointer;
+              transition: opacity 0.2s;
+
+              &:hover {
+                opacity: 0.8;
+              }
+            }
+
+            .btn-like {
+              @include like-style;
+              background: #f3f4f6;
+              border: 1px solid #d1d5db;
+            }
+
+            .btn-proceed, .btn-detail {
+              @include btnp-style;
+              font-size: 0.75rem;
+            }
+
+            .btn-delete {
+              @include btnn-style;
+              font-size: 0.75rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// メンバーセクション
+.members-section {
+  text-align: center;
+
+  .section-title {
+    @include subtitle-style;
+    margin-bottom: 1rem;
+  }
+
+  .members-list {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    .member-name {
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-family: $body-font;
+      font-size: $font-size;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// レスポンシブ対応
+@media (max-width: 768px) {
+  .home-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+
+    .header-left {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .header-right {
+      justify-content: center;
+    }
+  }
+
+  .home-main {
+    padding: 1rem;
+  }
+
+  .idea-form .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ideas-grid {
+    grid-template-columns: 1fr;
+  }
+}
