@@ -1,4 +1,3 @@
-// 変数とmixinを定義するSCSSファイル
 // src/styles/_variables.scss
 // このファイルは、アプリケーション全体で使用されるスタイルの変数とmixinを定義
 
@@ -36,6 +35,8 @@ $input-border-radius:   6px;      // 入力フィールドの角丸
 $btn-border-radius:     6px;      // ボタンの角丸
 $card-shadow:           0 2px 8px rgba(0, 0, 0, 0.1); // カードの影
 $mobile-breakpoint:     768px;    // モバイルブレークポイント
+
+
 
 //////////////////////////////////////////////////////////////
 /// mixin
