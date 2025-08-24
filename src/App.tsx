@@ -8,7 +8,7 @@ import { useAuth } from './contexts/AuthContext'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Home } from './pages/Home'
 import { Login } from './components/Login'
-// import { SignUp } from './components/SignUp'
+import { SignUp } from './components/SignUp'
 import { LoadingSpinner } from './components/LoadingSpinner'
 import './App.scss'
 
@@ -31,7 +31,6 @@ function App() {
             <Route path="/home" element={<Home user={user} />} />
             {/* 未ログイン用ページにアクセスしたらホームにリダイレクト */}
             <Route path="/login" element={<Navigate to="/" replace />} />
-            {/* <Route path="/signup" element={<Navigate to="/" replace />} /> */}
             {/* 将来追加予定のルート */}
             {/* <Route path="/workspace/:id" element={<Workspace user={user} />} /> */}
             {/* <Route path="/idea/:id" element={<IdeaDetail user={user} />} /> */}
@@ -41,7 +40,7 @@ function App() {
           <>
             {/* 認証が不要なルート */}
             <Route path="/login" element={<Login />} />
-            {/* <Route path="/signup" element={<SignUp />} /> */}
+            <Route path="/signup" element={<SignUp />} />
             {/* ログイン画面以外にアクセスしたらログインにリダイレクト */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </>

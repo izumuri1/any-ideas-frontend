@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import './Login.scss'
 
-
 ////////////////////////////////////////////////////////////////
 // ◆ 実行時の流れ
 // ページ読み込み → コンポーネントが表示される
@@ -21,7 +20,6 @@ interface LoginFormData {
   email: string
   password: string
 }
-
 
 // 2. 状態管理・フック初期化
 // ログイン画面を表示するためのコンポーネントを作成
@@ -57,7 +55,6 @@ export function Login() {
     // signupページに遷移
     navigate('/signup')
 }
-
 
 // 4. レンダリング（画面処理）
   return (
