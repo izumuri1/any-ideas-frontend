@@ -1,0 +1,42 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <!-- 角丸四角形背景 -->
+  <rect x="12" y="12" width="168" height="168" rx="30" ry="30" fill="#F4C14E"/>
+  
+  <!-- 影効果 -->
+  <defs>
+    <filter id="textShadow">
+      <feDropShadow dx="0.5" dy="1" stdDeviation="1" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- 吹き出しアイコン（中央配置・光線分離版） -->
+  <g transform="translate(46, 60)">
+    <!-- メイン吹き出し -->
+    <path d="M0 20 Q0 0 20 0 L80 0 Q100 0 100 20 L100 50 Q100 70 80 70 L35 70 L15 85 L25 70 Q0 70 0 50 Z" 
+          fill="white" fill-opacity="0.95" stroke="#000000" stroke-width="2"/>
+    
+    <!-- 吹き出し内の電球（中央配置・光線分離版） -->
+    <g transform="translate(50, 45)">
+      <!-- 電球本体（丸みのある形状） -->
+      <path d="M0 -12 C-6 -12, -10 -8, -10 -3 C-10 2, -7 6, -4 8 L-4 10 L4 10 L4 8 C7 6, 10 2, 10 -3 C10 -8, 6 -12, 0 -12 Z" 
+            fill="white" stroke="#000000" stroke-width="1.8"/>
+      
+      <!-- ソケット部分 -->
+      <rect x="-4" y="10" width="8" height="6" fill="white" stroke="#000000" stroke-width="1.8"/>
+      <g stroke="#000000" stroke-width="1">
+        <line x1="-4" y1="11.5" x2="4" y2="11.5" />
+        <line x1="-4" y1="13.5" x2="4" y2="13.5" />
+      </g>
+      
+      <!-- 光の線（3本、完全等距離・等長・60度傾斜） -->
+      <g stroke="#000000" stroke-width="1.5" stroke-linecap="round">
+        <!-- 真上（中心軸） -->
+        <line x1="0" y1="-18" x2="0" y2="-22" />
+        <!-- 左上60度（電球から6px等距離） -->
+        <line x1="-8" y1="-14" x2="-10" y2="-17" />
+        <!-- 右上60度（左と完全対称、電球から6px等距離） -->
+        <line x1="8" y1="-14" x2="10" y2="-17" />
+      </g>
+    </g>
+  </g>
+</svg>
