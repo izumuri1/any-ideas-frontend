@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: {
         name: 'Any Ideas? - アイデア共有ツール',
         short_name: 'Any Ideas',
-        description: '親しい人とのアイデア共有ツール',
+        description: '今度何する？から始めるアイデア共有ツール',
         theme_color: '#F4C14E',
         background_color: '#F4C14E',
         display: 'standalone',

@@ -1,51 +1,66 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- 角丸四角形背景 -->
+  <!-- 背景 -->
   <rect x="32" y="32" width="448" height="448" rx="80" ry="80" fill="#F4C14E"/>
   
-  <!-- 影効果 -->
+  <!-- 定義（シャドウを追加） -->
   <defs>
+    <!-- テキストの影 -->
     <filter id="textShadow">
-      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.2"/>
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+    </filter>
+    <!-- 電球の影 -->
+    <filter id="bulbShadow">
+      <feDropShadow dx="3" dy="5" stdDeviation="4" flood-opacity="0.2"/>
     </filter>
   </defs>
 
-  <!-- 上部：Any ideas? テキストのみ（吹き出しなし） -->
-  <text x="256" y="180" 
-        text-anchor="middle" 
-        font-family="'Montserrat', sans-serif" 
-        font-size="36" 
-        font-weight="700" 
-        fill="#000000" 
-        filter="url(#textShadow)">Any ideas?</text>
-
-  <!-- 下部：小さなアイコンと同じ吹き出し（中に電球） -->
-  <g transform="translate(156, 280)">
-    <!-- 吹き出し -->
-    <path d="M0 20 Q0 0 20 0 L180 0 Q200 0 200 20 L200 60 Q200 80 180 80 L70 80 L30 110 L50 80 Q0 80 0 60 Z" 
-          fill="white" fill-opacity="0.95" stroke="#000000" stroke-width="3"/>
+  <!-- メイン電球（さらに大きく6倍） -->
+  <g transform="translate(256, 310)">
+    <!-- 電球本体（6倍に拡大、線を細く） -->
+    <path d="M0 -14.4 C-7.2 -14.4, -12 -9.6, -12 -3.6 C-12 2.4, -8.4 7.2, -4.8 9.6 L-4.8 12 L4.8 12 L4.8 9.6 C8.4 7.2, 12 2.4, 12 -3.6 C12 -9.6, 7.2 -14.4, 0 -14.4 Z" 
+          fill="white" 
+          stroke="#000000" 
+          stroke-width="0.5"
+          filter="url(#bulbShadow)"
+          transform="scale(6)"/>
     
-    <!-- 吹き出し内の電球（完全中央配置） -->
-    <g transform="translate(100, 40)">
-      <!-- 電球本体（丸みのある形状） -->
-      <path d="M0 -12 C-6 -12, -10 -8, -10 -3 C-10 2, -7 6, -4 8 L-4 10 L4 10 L4 8 C7 6, 10 2, 10 -3 C10 -8, 6 -12, 0 -12 Z" 
-            fill="white" stroke="#000000" stroke-width="2"/>
-      
-      <!-- ソケット部分 -->
-      <rect x="-4" y="10" width="8" height="6" fill="white" stroke="#000000" stroke-width="2"/>
-      <g stroke="#000000" stroke-width="1">
-        <line x1="-4" y1="11.5" x2="4" y2="11.5" />
-        <line x1="-4" y1="13.5" x2="4" y2="13.5" />
-      </g>
-      
-      <!-- 光の線（3本、完全等距離・等長・60度傾斜） -->
-      <g stroke="#000000" stroke-width="2" stroke-linecap="round">
-        <!-- 真上（中心軸） -->
-        <line x1="0" y1="-18" x2="0" y2="-22" />
-        <!-- 左上60度（電球から等距離） -->
-        <line x1="-8" y1="-14" x2="-10" y2="-17" />
-        <!-- 右上60度（左と完全対称、電球から等距離） -->
-        <line x1="8" y1="-14" x2="10" y2="-17" />
-      </g>
+    <!-- ソケット部分（大きく） -->
+    <rect x="-28.8" y="72" width="57.6" height="36" 
+          fill="white" 
+          stroke="#000000" 
+          stroke-width="3"
+          filter="url(#bulbShadow)"/>
+    
+    <!-- ソケットの横線 -->
+    <g stroke="#000000" stroke-width="2">
+      <line x1="-28.8" y1="84" x2="28.8" y2="84" />
+      <line x1="-28.8" y1="96" x2="28.8" y2="96" />
     </g>
+    
+    <!-- 電球内のテキスト（二段組み） -->
+    <text x="0" y="-35" 
+          text-anchor="middle" 
+          font-family="'Montserrat', sans-serif" 
+          font-size="24" 
+          font-weight="700" 
+          fill="#000000" 
+          filter="url(#textShadow)">Any</text>
+    <text x="0" y="-10" 
+          text-anchor="middle" 
+          font-family="'Montserrat', sans-serif" 
+          font-size="24" 
+          font-weight="700" 
+          fill="#000000" 
+          filter="url(#textShadow)">ideas?</text>
+  </g>
+
+  <!-- 光線（全て電球から18pxの等距離で配置） -->
+  <g stroke="#000000" stroke-width="3" stroke-linecap="round">
+    <!-- 真上（電球から18px距離） -->
+    <line x1="256" y1="208" x2="256" y2="185" />
+    <!-- 左上60度（電球から18px等距離で離す） -->
+    <line x1="213" y1="225" x2="198" y2="202" />
+    <!-- 右上60度（電球から18px等距離で離す） -->
+    <line x1="299" y1="225" x2="314" y2="202" />
   </g>
 </svg>

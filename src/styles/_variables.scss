@@ -316,48 +316,48 @@ $app-padding-desktop:     2rem;
 /// 後方互換性のための旧変数名（段階的に削除予定）
 //////////////////////////////////////////////////////////////
 
-// 将来的に削除予定 - 既存コードで使用されている変数
-$bg-color: $app-bg-color !default;
-$btnp-color: $app-btn-primary !default;
-$btnn-color: $app-btn-secondary !default;
-$input-text-color: $app-gray-dark !default;
-$theme-font: $app-font-theme !default;
-$body-font: $app-font-body !default;
-$logo-font-size: $app-font-logo !default;
-$title-font-size: $app-font-title !default;
-$subtitle-font-size: $app-font-subtitle !default;
-$font-size: $app-font-body !default;
-$btn-font-size: $app-font-button !default;
-$logo-font-weight: $app-weight-bold !default;
-$title-font-weight: $app-weight-bold !default;
-$subtitle-font-weight: $app-weight-bold !default;
-$btn-font-weight: $app-weight-medium !default;
-$like-font-weight: $app-weight-medium !default;
-$card-border-radius: $app-radius-card !default;
-$input-border-radius: $app-radius-input !default;
-$btn-border-radius: $app-radius-button !default;
-$card-shadow: $app-shadow-card !default;
-$mobile-breakpoint: $app-breakpoint-mobile !default;
+// // 将来的に削除予定 - 既存コードで使用されている変数
+// $bg-color: $app-bg-color !default;
+// $btnp-color: $app-btn-primary !default;
+// $btnn-color: $app-btn-secondary !default;
+// $input-text-color: $app-gray-dark !default;
+// $theme-font: $app-font-theme !default;
+// $body-font: $app-font-body !default;
+// $logo-font-size: $app-font-logo !default;
+// $title-font-size: $app-font-title !default;
+// $subtitle-font-size: $app-font-subtitle !default;
+// $font-size: $app-font-body !default;
+// $btn-font-size: $app-font-button !default;
+// $logo-font-weight: $app-weight-bold !default;
+// $title-font-weight: $app-weight-bold !default;
+// $subtitle-font-weight: $app-weight-bold !default;
+// $btn-font-weight: $app-weight-medium !default;
+// $like-font-weight: $app-weight-medium !default;
+// $card-border-radius: $app-radius-card !default;
+// $input-border-radius: $app-radius-input !default;
+// $btn-border-radius: $app-radius-button !default;
+// $card-shadow: $app-shadow-card !default;
+// $mobile-breakpoint: $app-breakpoint-mobile !default;
 
-// 旧mixin名（段階的に削除予定）
-@mixin logo-style { @include app-logo-style; }
-@mixin title-style { @include app-title-style; }
-@mixin subtitle-style { @include app-subtitle-style; }
-@mixin section-title { @include app-section-title; }
-@mixin text-style { @include app-text-style; }
-@mixin error-message { @include app-error-message; }
-@mixin button-base { @include app-button-base; }
-@mixin btnp-style { @include app-button-primary; color: $app-white; background-color: $app-btn-primary; width: auto; }
-@mixin btnn-style { @include app-button-base; color: $app-text-color; background-color: $app-btn-secondary; }
-@mixin primary-button { @include app-button-primary; }
-@mixin secondary-button { @include app-button-secondary; }
-@mixin like-style { @include app-button-like; }
-@mixin fullscreen-container { @include app-fullscreen-container; }
-@mixin card-style($background: $app-white) { @include app-card-style($background); }
-@mixin large-card-style($background: $app-bg-color) { @include app-large-card-style($background); }
-@mixin input-field-style { @include app-input-field-style; }
-@mixin form-group-style { @include app-form-group-style; }
-@mixin page-header { @include app-page-header; }
-@mixin main-content { @include app-main-content; }
-@mixin responsive-grid($min-width: 300px) { @include app-responsive-grid($min-width); }
-@mixin flex-container($gap: 1rem, $direction: row) { @include app-flex-container($gap, $direction); }
+// // 旧mixin名（段階的に削除予定）
+// @mixin logo-style { @include app-logo-style; }
+// @mixin title-style { @include app-title-style; }
+// @mixin subtitle-style { @include app-subtitle-style; }
+// @mixin section-title { @include app-section-title; }
+// @mixin text-style { @include app-text-style; }
+// @mixin error-message { @include app-error-message; }
+// @mixin button-base { @include app-button-base; }
+// @mixin btnp-style { @include app-button-primary; color: $app-white; background-color: $app-btn-primary; width: auto; }
+// @mixin btnn-style { @include app-button-base; color: $app-text-color; background-color: $app-btn-secondary; }
+// @mixin primary-button { @include app-button-primary; }
+// @mixin secondary-button { @include app-button-secondary; }
+// @mixin like-style { @include app-button-like; }
+// @mixin fullscreen-container { @include app-fullscreen-container; }
+// @mixin card-style($background: $app-white) { @include app-card-style($background); }
+// @mixin large-card-style($background: $app-bg-color) { @include app-large-card-style($background); }
+// @mixin input-field-style { @include app-input-field-style; }
+// @mixin form-group-style { @include app-form-group-style; }
+// @mixin page-header { @include app-page-header; }
+// @mixin main-content { @include app-main-content; }
+// @mixin responsive-grid($min-width: 300px) { @include app-responsive-grid($min-width); }
+// @mixin flex-container($gap: 1rem, $direction: row) { @include app-flex-container($gap, $direction); }
