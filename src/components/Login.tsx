@@ -47,7 +47,31 @@ export function Login() {
     
     const { error } = await signIn(data.email, data.password)
     if (error) {
-      setSubmitError('ログインに失敗しました。メールアドレスとパスワードを確認してください。')
+      switch (error.code) {
+        case 'invalid_credentials':
+          setSubmitError('メールアドレスまたはパスワードが正しくありません。')
+          break
+        case 'email_not_confirmed':
+          setSubmitError('メールアドレスの確認が完了していません。確認メールをご確認ください。')
+          break
+        case 'user_not_found':
+          setSubmitError('アカウントが見つかりません。メールアドレスを確認してください。')
+          break
+        case 'over_request_rate_limit':
+          setSubmitError('ログイン試行回数が多すぎます。数分待ってから再度お試しください。')
+          break
+        case 'user_banned':
+          setSubmitError('このアカウントは一時的に利用が制限されています。')
+          break
+        case 'email_address_invalid':
+          setSubmitError('正しいメールアドレスを入力してください。')
+          break
+        case 'validation_failed':
+          setSubmitError('入力内容に誤りがあります。確認してください。')
+          break
+        default:
+          setSubmitError('ログインに失敗しました。メールアドレスとパスワードを確認してください。')
+      }
     }
   }
 
@@ -80,10 +104,10 @@ export function Login() {
               id="email"
               {...register('email', {
                 required: 'メールアドレスは必須です',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: '正しいメールアドレスを入力してください'
-                }
+                // pattern: {
+                //   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                //   message: '正しいメールアドレスを入力してください'
+                // }
               })}
               placeholder="メールアドレスを入力"
             // ローディング中（loadingがtrue）はボタンを無効化
@@ -103,10 +127,10 @@ export function Login() {
               id="password"
               {...register('password', {
                 required: 'パスワードは必須です',
-                minLength: {
-                  value: 8,
-                  message: 'パスワードは8文字以上で入力してください'
-                }
+                // minLength: {
+                //   value: 8,
+                //   message: 'パスワードは8文字以上で入力してください'
+                // }
               })}
               placeholder="パスワードを入力"
               disabled={loading}

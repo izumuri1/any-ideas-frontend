@@ -20,7 +20,7 @@
     <path d="M0 -14.4 C-7.2 -14.4, -12 -9.6, -12 -3.6 C-12 2.4, -8.4 7.2, -4.8 9.6 L-4.8 12 L4.8 12 L4.8 9.6 C8.4 7.2, 12 2.4, 12 -3.6 C12 -9.6, 7.2 -14.4, 0 -14.4 Z" 
           fill="white" 
           stroke="#000000" 
-          stroke-width="0.5"
+          stroke-width="1"
           filter="url(#bulbShadow)"
           transform="scale(6)"/>
     
@@ -55,7 +55,7 @@
   </g>
 
   <!-- 光線（全て電球から18pxの等距離で配置） -->
-  <g stroke="#000000" stroke-width="3" stroke-linecap="round">
+  <g stroke="#000000" stroke-width="6" stroke-linecap="round">
     <!-- 真上（電球から18px距離） -->
     <line x1="256" y1="208" x2="256" y2="185" />
     <!-- 左上60度（電球から18px等距離で離す） -->

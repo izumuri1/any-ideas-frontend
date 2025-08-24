@@ -18,8 +18,8 @@
     gap: 2rem;
 
     .logo {
-      @include app-logo-style;
       margin: 0;
+      @include app-logo-style;
     }
 
     .workspace-info {
@@ -28,9 +28,9 @@
       gap: 0.25rem;
 
       .workspace-name {
-        @include app-subtitle-style;
         font-size: $app-font-body;
         font-weight: $app-weight-bold;
+        @include app-subtitle-style;
       }
 
       .invite-token {
@@ -46,13 +46,13 @@
     gap: 1rem;
 
     .btn-workspace {
-      @include app-button-secondary;
       padding: 0.5rem 1rem;
+      @include app-button-secondary;
     }
 
     .btn-logout {
-      @include app-button-primary;
       padding: 0.5rem 1rem;
+      @include app-button-primary;
     }
   }
 }
@@ -68,8 +68,8 @@
   margin-bottom: 2rem;
 
   .welcome-title {
-    @include app-title-style;
     margin-bottom: 0.5rem;
+    @include app-title-style;
   }
 
   .welcome-message {
@@ -88,9 +88,9 @@
   }
 
   .idea-form-card {
-    @include app-card-style;
     max-width: 600px;
     margin: 0 auto;
+    @include app-card-style;
 
     .idea-form {
       display: flex;
@@ -106,16 +106,16 @@
         }
 
         .form-group {
-          @include app-form-group-style;
           flex: 1;
+          @include app-form-group-style;
         }
       }
 
       .btn-submit {
-        @include app-button-primary;
         align-self: flex-end;
         width: auto;
         min-width: 120px;
+        @include app-button-primary;
 
         @media (max-width: $app-breakpoint-mobile) {
           width: 100%;
@@ -135,10 +135,10 @@
     @include app-responsive-grid(300px);
 
     .idea-card {
-      @include app-card-style;
       text-align: left;
       position: relative;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      @include app-card-style;
 
       &:hover {
         transform: translateY(-2px);
@@ -147,15 +147,15 @@
 
       .idea-content {
         .idea-title {
-          @include app-subtitle-style;
           margin-bottom: 0.5rem;
+          @include app-subtitle-style;
         }
 
         .idea-description {
-          @include app-text-style;
           color: $app-gray-dark;
           margin-bottom: 1rem;
           line-height: 1.5;
+          @include app-text-style;
         }
 
         .idea-details {
@@ -189,12 +189,12 @@
           gap: 0.5rem;
 
           .btn-like {
-            @include app-button-like;
             padding: 0.25rem 0.5rem;
             border: 1px solid $app-gray-light;
             border-radius: $app-radius-button;
             background: transparent;
             transition: all 0.2s ease;
+            @include app-button-like;
 
             &:hover {
               background: $app-gray-light;
@@ -208,8 +208,8 @@
           }
 
           .like-count {
-            @include app-text-style;
             font-weight: $app-weight-medium;
+            @include app-text-style;
           }
         }
 
@@ -218,9 +218,9 @@
           gap: 0.5rem;
 
           .btn-move {
-            @include app-button-secondary;
             padding: 0.25rem 0.5rem;
             font-size: 0.75rem;
+            @include app-button-secondary;
           }
 
           .btn-delete {
@@ -246,8 +246,8 @@
 
 // エラーメッセージ
 .error-message {
-  @include app-error-message;
   margin-bottom: 1rem;
+  @include app-error-message;
 }
 
 // 空の状態
@@ -262,14 +262,14 @@
   }
 
   .empty-title {
-    @include app-subtitle-style;
     color: $app-gray-medium;
     margin-bottom: 0.5rem;
+    @include app-subtitle-style;
   }
 
   .empty-message {
-    @include app-text-style;
     color: $app-gray-medium;
+    @include app-text-style;
   }
 }
 

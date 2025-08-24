@@ -2,11 +2,11 @@
 @use '../styles/variables' as *;
 
 .loading-container {
-  @include app-fullscreen-container; // variables.scssのmixinを活用
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  @include app-fullscreen-container; // variables.scssのmixinを活用
 
   .loading-spinner {
     width: 40px;

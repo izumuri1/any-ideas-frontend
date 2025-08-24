@@ -101,9 +101,9 @@ $app-padding-desktop:     2rem;
 }
 
 @mixin app-section-title {
-  @include app-title-style;
   margin-bottom: 1rem;
   text-align: center;
+  @include app-title-style;
 }
 
 @mixin app-text-style {
@@ -147,16 +147,16 @@ $app-padding-desktop:     2rem;
 }
 
 @mixin app-button-primary {
-  @include app-button-base;
   color: $app-white;
   background-color: $app-btn-primary;
   width: 100%;
+  @include app-button-base;
 }
 
 @mixin app-button-secondary {
-  @include app-button-base;
   color: $app-text-color;
   background-color: $app-btn-secondary;
+  @include app-button-base;
 }
 
 @mixin app-button-like {
@@ -198,7 +198,6 @@ $app-padding-desktop:     2rem;
 }
 
 @mixin app-large-card-style($background: $app-bg-color) {
-  @include app-card-style($background);
   padding: 2.5rem;
   width: 100%;
   max-width: $app-card-max-width;
@@ -208,6 +207,7 @@ $app-padding-desktop:     2rem;
   flex-direction: column;
   gap: 1.5rem;
   justify-content: center;
+  @include app-card-style($background);
   
   @media (max-width: $app-breakpoint-mobile) {
     padding: $app-padding-desktop;
@@ -247,8 +247,8 @@ $app-padding-desktop:     2rem;
 
   label {
     display: block;
-    @include app-text-style;
     margin-bottom: 0.5rem;
+    @include app-text-style;
   }
 
   input {

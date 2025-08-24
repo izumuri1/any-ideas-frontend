@@ -22,7 +22,7 @@ interface SignUpFormData {
   password: string
   confirmPassword: string
   username: string
-  inviteCode?: string // 任意項目
+  inviteCode?: string // ★★★要修正
 }
 
 
@@ -56,18 +56,20 @@ export function SignUp() {
     
     const { error } = await signUp(data.email, data.password, data.username)
     if (error) {
-      // エラーメッセージをユーザーフレンドリーに変換
-      let errorMessage = 'アカウント登録に失敗しました。'
-      
-      if (error.message.includes('already registered')) {
-        errorMessage = 'このメールアドレスは既に登録されています。'
-      } else if (error.message.includes('Invalid email')) {
-        errorMessage = '正しいメールアドレスを入力してください。'
-      } else if (error.message.includes('Password should be')) {
-        errorMessage = 'パスワードは6文字以上で入力してください。'
+      // エラーコードで判定（推奨方法）
+      switch (error.code) {
+        case 'user_already_exists':  // 正しいエラーコード
+          setSubmitError('このメールアドレスは既に登録されています。')
+          break
+        case 'weak_password':
+          setSubmitError('パスワードは8文字以上で入力してください。')
+          break
+        case 'email_address_invalid':
+          setSubmitError('正しいメールアドレスを入力してください。')
+          break
+        default:
+          setSubmitError('アカウント登録に失敗しました。')
       }
-      
-      setSubmitError(errorMessage)
     }
   }
 
@@ -83,7 +85,7 @@ export function SignUp() {
       <div className="login-card">
         <h1 className="logo">Any ideas?</h1>
         <p className="subtitle">はじめまして</p>
-        <p className="introduction">新しいアカウントを作成して始めましょう</p>
+        <p className="introduction">アカウントを作成して始めましょう</p>
 
         {/* エラーメッセージ */}
         {/* &&の左側が truthy なら右側<div xxx /div>を返す */}
