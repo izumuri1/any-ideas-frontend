@@ -1,5 +1,5 @@
 // src/index.scss
-// このファイルは、アプリケーション全体のスタイルを定義
+// Any Ideas? アプリケーション全体のグローバルスタイル
 
 @use './styles/variables' as *;
 
@@ -27,15 +27,13 @@ html {
   scroll-behavior: smooth;
 }
 
-/* body の基本設定 */
+/* body の基本設定 - Any Ideas! 専用 */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: $app-font-body;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #ffffff;
-  color: #333333;
+  background-color: $app-bg-color;
+  color: $app-text-color;
 }
 
 /* リンクのデフォルトスタイルをリセット */
@@ -74,137 +72,56 @@ select {
 }
 
 //////////////////////////////////////////////////////////////
-// Any Ideas? 専用スタイル
+// Any Ideas! アプリケーション専用スタイル
 //////////////////////////////////////////////////////////////
 
-/* CSS変数定義（Any Ideas? 用） */
-:root {
-  // カラーパレット
-  --ai-bg-color: #F4C14E;           // メインイエロー（背景色）
-  --ai-text-color: #000000;         // 黒色テキスト
-  --ai-speech-bubble: #FFFFFF;      // 吹き出し背景（白）
-  --ai-speech-border: #000000;      // 吹き出し枠線（黒）
-  
-  // フォント設定
-  --ai-theme-font: 'Montserrat', sans-serif;
-  --ai-font-weight-bold: 700;
-  --ai-font-weight-black: 900;
-  
-  // 旧変数との互換性維持（必要に応じて）
-  --theme-color: var(--ai-bg-color);
-  --primary-color: var(--ai-bg-color);
-}
-
-//////////////////////////////////////////////////////////////
-// グローバルスタイル（Any Ideas? 用に更新）
-//////////////////////////////////////////////////////////////
-
-/* bodyスタイルの上書き */
-body {
-  background-color: var(--ai-bg-color); // Any Ideas? のメインカラー
-  color: var(--ai-text-color); // 黒色テキスト
-  font-family: var(--ai-theme-font); // Montserrat フォント
-}
-
-/* アプリ全体のコンテナ（Any Ideas? 用に調整） */
+/* アプリ全体のコンテナ */
 #root {
-  max-width: 1280px;
+  max-width: $app-max-width;
   margin: 0 auto;
-  padding: 2rem;
+  padding: $app-padding-desktop;
   text-align: center;
   min-height: 100vh;
-  background-color: var(--ai-bg-color); // 確実に背景色を適用
-}
+  background-color: $app-bg-color;
 
-//////////////////////////////////////////////////////////////
-// Any Ideas? 専用コンポーネントスタイル
-//////////////////////////////////////////////////////////////
-
-/* 吹き出しベーススタイル */
-.speech-bubble {
-  background-color: var(--ai-speech-bubble);
-  border: 2px solid var(--ai-speech-border);
-  border-radius: 20px;
-  padding: 1rem;
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 30px;
-    width: 0;
-    height: 0;
-    border: 10px solid transparent;
-    border-top-color: var(--ai-speech-bubble);
-  }
-}
-
-/* 電球アイコンベーススタイル */
-.lightbulb-icon {
-  display: inline-block;
-  
-  svg {
-    width: 100%;
-    height: 100%;
-  }
-  
-  &--small {
-    width: 24px;
-    height: 24px;
-  }
-  
-  &--medium {
-    width: 48px;
-    height: 48px;
-  }
-  
-  &--large {
-    width: 72px;
-    height: 72px;
-  }
-}
-
-/* Any Ideas? ブランドテキスト */
-.brand-text {
-  font-family: var(--ai-theme-font);
-  font-weight: var(--ai-font-weight-bold);
-  color: var(--ai-text-color);
-}
-
-/* PWA関連のスタイル */
-@media (display-mode: standalone) {
-  body {
-    /* PWAとして表示される場合の調整 */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
+  @media (max-width: $app-breakpoint-mobile) {
+    padding: $app-padding-mobile;
   }
 }
 
 //////////////////////////////////////////////////////////////
-// 既存のグローバルスタイル（SCSS変数使用）
+// CSS変数エクスポート（JavaScript連携用）
 //////////////////////////////////////////////////////////////
 
-/* 既存のSCSS変数を使用している部分は維持 */
-body {
-  font-size: $font-size; // 既存の変数
-  // background-color は上で Any Ideas? 用に上書き済み
+:root {
+  // Any Ideas! のカラーパレット
+  --app-bg-color: #{$app-bg-color};
+  --app-text-color: #{$app-text-color};
+  --app-btn-primary: #{$app-btn-primary};
+  --app-white: #{$app-white};
+  
+  // フォント設定
+  --app-font-theme: #{$app-font-theme};
+  --app-font-body: #{$app-font-body};
 }
 
-/* レスポンシブ対応 */
-@media (max-width: 768px) {
-  #root {
-    padding: 1rem;
-  }
+//////////////////////////////////////////////////////////////
+// デバッグ用（開発環境でのみ表示）
+//////////////////////////////////////////////////////////////
+
+.debug-info {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  z-index: 9999;
   
-  .speech-bubble {
-    padding: 0.75rem;
-    border-radius: 15px;
-    
-    &::after {
-      border-width: 8px;
-      bottom: -8px;
-      left: 20px;
-    }
+  // プロダクション環境では非表示
+  .production & {
+    display: none;
   }
 }

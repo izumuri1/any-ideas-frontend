@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'Any Ideas? - 旅行計画コミュニケーション',
+        name: 'Any Ideas? - アイデア共有ツール',
         short_name: 'Any Ideas',
-        description: '親しい人との旅行計画を円滑に進めるアイデア共有ツール',
+        description: '親しい人とのアイデア共有ツール',
         theme_color: '#F4C14E',
         background_color: '#F4C14E',
         display: 'standalone',
