@@ -1,319 +1,48 @@
 // src/styles/_variables.scss
-// このファイルは、アプリケーション全体で使用されるスタイルの変数とmixinを定義
 
 //////////////////////////////////////////////////////////////
-/// 変数定義
-//////////////////////////////////////////////////////////////
- 
-// カラー
-$bg-color:             #F4C14E; // 背景色
-$btnp-color:           #000000; // ボタン(positive)の背景色
-$btnn-color:           #828282; // ボタン(negative)の背景色
-$input-text-color:     #828282; // 入力欄の説明テキストの色
-
-// フォントスタイル
-$theme-font:          'Montserrat', sans-serif; // タイトルフォント
-$body-font:           'Noto sans JP', sans-serif; // 本文フォント
-
-// フォントサイズ(最小値:14px-0.875rem ～ 最大値:40px-2.5rem）
-$logo-font-size:        2.25rem;  // ロゴのフォントサイズ(36px)
-$title-font-size:       1.5rem;   // タイトルのフォントサイズ(24px)
-$subtitle-font-size:    1rem;     // サブタイトルのフォントサイズ(16px)
-$font-size:             0.875rem; // 基本フォントサイズ（14px）
-$btn-font-size:         1rem;     // ボタンのフォントサイズ(16px)
-
-// フォントウェイト
-$logo-font-weight:      bold;     // ロゴのフォントウェイト
-$title-font-weight:     bold;     // タイトルのフォントウェイト
-$subtitle-font-weight:  bold;     // サブタイトルのフォントウェイト
-$btn-font-weight:       500;      // ボタンのフォントウェイト（mediumは500）
-$like-font-weight:      500;      // いいねのフォントウェイト（mediumは500）
-
-// レイアウト関連変数
-$card-border-radius:    12px;     // カードの角丸
-$input-border-radius:   6px;      // 入力フィールドの角丸
-$btn-border-radius:     6px;      // ボタンの角丸
-$card-shadow:           0 2px 8px rgba(0, 0, 0, 0.1); // カードの影
-$mobile-breakpoint:     768px;    // モバイルブレークポイント
-
-
-
-//////////////////////////////////////////////////////////////
-/// mixin
+// 既存の変数
 //////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////
-// ◆　テキスト
-//////////////////////////////////////////////////////////////
-
-// ロゴスタイル
-@mixin logo-style {
-  font-family: $theme-font;
-  font-size: $logo-font-size;
-  font-weight: $logo-font-weight;
-  color: #000000;
-}
-
-// タイトルスタイル
-@mixin title-style {
-  font-family: $theme-font;
-  font-size: $title-font-size;
-  font-weight: $title-font-weight;
-  color: #000000;
-}
-
-// サブタイトルスタイル
-@mixin subtitle-style {
-  font-family: $theme-font;
-  font-size: $subtitle-font-size;
-  font-weight: $subtitle-font-weight;
-  color: #000000;
-}
-
-// セクションタイトル
-@mixin section-title {
-  @include title-style;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-// テキストスタイル
-@mixin text-style {
-  font-family: $body-font;
-  font-size: $font-size;
-  color: #000000;
-}
-
-// エラーメッセージ
-@mixin error-message {
-  background-color: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  padding: 0.75rem;
-  font-size: $font-size;
-  text-align: left;
-}
+// （ここに既存の変数があると仮定）
+$font-size: 16px !default;
+$body-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !default;
 
 //////////////////////////////////////////////////////////////
-// ◆　ボタン
+// Any Ideas? 専用変数
 //////////////////////////////////////////////////////////////
 
-// ボタン(positive)スタイル
-@mixin btnp-style {
-  font-family: $body-font;
-  font-size: $btn-font-size;
-  font-weight: $btn-font-weight;
-  color: white;
-  background-color: $btnp-color;
-}
+// カラーパレット
+$ai-bg-color: #F4C14E !default;           // メインイエロー（背景色）
+$ai-text-color: #000000 !default;         // 黒色テキスト
+$ai-speech-bubble: #FFFFFF !default;      // 吹き出し背景（白）
+$ai-speech-border: #000000 !default;      // 吹き出し枠線（黒）
 
-// ボタン(negative)スタイル
-@mixin btnn-style {
-  font-family: $body-font;
-  font-size: $btn-font-size;
-  font-weight: $btn-font-weight;
-  color: black;
-  background-color: $btnn-color;
-} 
+// フォント設定
+$ai-theme-font: 'Montserrat', sans-serif !default;
+$ai-font-weight-normal: 400 !default;
+$ai-font-weight-bold: 700 !default;
+$ai-font-weight-black: 900 !default;
 
-// ボタンの基本スタイル
-@mixin button-base {
-  border: none;
-  border-radius: $btn-border-radius;
-  cursor: pointer;
-  padding: 0.75rem;
-  transition: opacity 0.2s;
-  font-family: $body-font;
+// 電球デザイン仕様
+$ai-bulb-body: #FFFFFF !default;          // 電球本体（白）
+$ai-bulb-outline: #000000 !default;       // 電球輪郭（黒）
+$ai-light-rays: #000000 !default;         // 光線（黒）
 
-  &:hover:not(:disabled) {
-    opacity: 0.8;
-  }
+// アイコンサイズ
+$ai-icon-size-small: 48px !default;       // 小アイコン
+$ai-icon-size-medium: 192px !default;     // 中アイコン  
+$ai-icon-size-large: 512px !default;      // 大アイコン
 
-  &:disabled {
-    cursor: not-allowed;
-  }
-}
+// レイアウト
+$ai-max-width: 1280px !default;           // 最大コンテナ幅
+$ai-padding-mobile: 1rem !default;        // モバイル用パディング
+$ai-padding-desktop: 2rem !default;       // デスクトップ用パディング
 
-// プライマリボタン（ログイン、アイデア登録など）
-@mixin primary-button {
-  @include button-base;
-  @include btnp-style;
-  width: 100%;
-}
+// ブレークポイント
+$ai-breakpoint-mobile: 768px !default;    // モバイルブレークポイント
+$ai-breakpoint-tablet: 1024px !default;   // タブレットブレークポイント
 
-// セカンダリボタン（ワークスペース選択など）
-@mixin secondary-button {
-  @include button-base;
-  @include btnn-style;
-}
-
-// いいねスタイル
-@mixin like-style {
-  font-family: $body-font;
-  font-size: $font-size;
-  font-weight: $like-font-weight;
-  color: black;
-}
-
-//////////////////////////////////////////////////////////////
-// ◆　レイアウト
-//////////////////////////////////////////////////////////////
-
-// フルスクリーンコンテナ（ログイン、ローディングなど）
-@mixin fullscreen-container {
-  // #rootの制約を無効化して完全にフルスクリーンにする
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: $bg-color;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-  
-  // レスポンシブ対応
-  @media (max-width: $mobile-breakpoint) {
-    padding: 0.5rem;
-  }
-}
-
-// カードスタイル（フォーム、アイデアカードなど）
-@mixin card-style($background: white) {
-  background: $background;
-  border-radius: $card-border-radius;
-  box-shadow: $card-shadow;
-  padding: 1.5rem;
-  
-  // レスポンシブ対応
-  @media (max-width: $mobile-breakpoint) {
-    padding: 1rem;
-  }
-}
-
-// 大きなカードスタイル（ログインなど）
-@mixin large-card-style($background: $bg-color) {
-  @include card-style($background);
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 480px;
-  text-align: center;
-  
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  justify-content: center;
-  
-  // レスポンシブ対応
-  @media (max-width: $mobile-breakpoint) {
-    padding: 2rem;
-    max-width: 100%;
-    min-height: calc(100vh - 1rem);
-    width: calc(100vw - 1rem);
-  }
-}
-
-// 入力フィールドスタイル
-@mixin input-field-style {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: $input-border-radius;
-  font-size: $font-size;
-  font-family: $body-font;
-  transition: border-color 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: $btnp-color;
-  }
-
-  &:disabled {
-    background-color: #f9fafb;
-    color: #6b7280;
-    cursor: not-allowed;
-  }
-
-  &::placeholder {
-    color: $input-text-color;
-  }
-}
-
-// フォームグループスタイル
-@mixin form-group-style {
-  text-align: left;
-
-  label {
-    display: block;
-    @include text-style;
-    margin-bottom: 0.5rem;
-  }
-
-  input {
-    @include input-field-style;
-  }
-
-  .field-error {
-    display: block;
-    color: #dc2626;
-    font-size: $font-size;
-    margin-top: 0.25rem;
-  }
-}
-
-// ページヘッダースタイル（Home画面のheader）
-@mixin page-header {
-  background: white;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  // レスポンシブ対応
-  @media (max-width: $mobile-breakpoint) {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
-}
-
-// メインコンテンツエリア
-@mixin main-content {
-  flex: 1;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-
-  // レスポンシブ対応
-  @media (max-width: $mobile-breakpoint) {
-    padding: 1rem;
-  }
-}
-
-// レスポンシブグリッドレイアウト
-@mixin responsive-grid($min-width: 300px) {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
-  gap: 1.5rem;
-
-  // モバイルでは1列
-  @media (max-width: $mobile-breakpoint) {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-}
-
-// フレックスコンテナ（ボタン群など）
-@mixin flex-container($gap: 1rem, $direction: row) {
-  display: flex;
-  gap: $gap;
-  flex-direction: $direction;
-  
-  @media (max-width: $mobile-breakpoint) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
+// 既存変数との統合（互換性のため）
+$bg-color: $ai-bg-color !default;         // 既存コードとの互換性
+$theme-color: $ai-bg-color !default;      // 既存コードとの互換性
