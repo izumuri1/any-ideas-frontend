@@ -2,27 +2,27 @@
 @use '../styles/variables' as *;
 
 .login-container {
-  @include fullscreen-container;
+  @include app-fullscreen-container;
 }
 
 .login-card {
-  @include large-card-style($bg-color);
+  @include app-large-card-style($app-bg-color);
 
   .logo {
-    @include logo-style;
+    @include app-logo-style;
   }
 
   .subtitle {
-    @include subtitle-style;
+    @include app-subtitle-style;
   }
 
   .introduction {
-    @include text-style;
+    @include app-text-style;
   }
 }
 
 .error-message {
-  @include error-message;
+  @include app-error-message;
 }
 
 .auth-form {
@@ -31,35 +31,35 @@
   gap: 1.5rem;
 
   .form-group {
-    @include form-group-style;
+    @include app-form-group-style;
   }
 
   .btn-primary {
-    @include primary-button;
+    @include app-button-primary;
   }
 }
 
 .auth-switch {
-  font-size: $font-size;
-  color: #6b7280;
+  font-size: $app-font-body;
+  color: $app-gray-medium;
 
   .link-button {
     background: none;
     border: none;
-    color: $btnp-color;
+    color: $app-btn-primary;
     cursor: pointer;
     text-decoration: underline;
     font-size: inherit;
     margin-left: 0.25rem;
 
     &:hover {
-      color: #1f2937;
+      color: $app-gray-dark;
     }
   }
 }
 
 // モバイル用ロゴサイズのカスタマイズ
-@media (max-width: $mobile-breakpoint) {
+@media (max-width: $app-breakpoint-mobile) {
   .logo {
     font-size: 2rem; // モバイル専用サイズ
   }

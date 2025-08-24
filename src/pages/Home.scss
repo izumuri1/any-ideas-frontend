@@ -1,21 +1,16 @@
-// src/components/Home.scss
+// src/pages/Home.scss
 @use '../styles/variables' as *;
 
 .home-container {
   min-height: 100vh;
-  background-color: $bg-color;
+  background-color: $app-bg-color;
   display: flex;
   flex-direction: column;
 }
 
 // ヘッダー
 .home-header {
-  background: white;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  @include app-page-header;
 
   .header-left {
     display: flex;
@@ -23,7 +18,7 @@
     gap: 2rem;
 
     .logo {
-      @include logo-style;
+      @include app-logo-style;
       margin: 0;
     }
 
@@ -33,15 +28,15 @@
       gap: 0.25rem;
 
       .workspace-name {
-        @include subtitle-style;
-        font-size: $font-size;
-        font-weight: $subtitle-font-weight;
+        @include app-subtitle-style;
+        font-size: $app-font-body;
+        font-weight: $app-weight-bold;
       }
 
       .invite-token {
         font-size: 0.75rem;
-        color: #666;
-        font-family: $body-font;
+        color: $app-gray-medium;
+        font-family: $app-font-body;
       }
     }
   }
@@ -51,40 +46,20 @@
     gap: 1rem;
 
     .btn-workspace {
-      @include btnn-style;
+      @include app-button-secondary;
       padding: 0.5rem 1rem;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.2s;
-
-      &:hover {
-        opacity: 0.8;
-      }
     }
 
     .btn-logout {
-      @include btnp-style;
+      @include app-button-primary;
       padding: 0.5rem 1rem;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.2s;
-
-      &:hover {
-        opacity: 0.8;
-      }
     }
   }
 }
 
 // メインコンテンツ
 .home-main {
-  flex: 1;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+  @include app-main-content;
 }
 
 // ウェルカムセクション
@@ -93,14 +68,14 @@
   margin-bottom: 2rem;
 
   .welcome-title {
-    @include title-style;
+    @include app-title-style;
     margin-bottom: 0.5rem;
   }
 
   .welcome-message {
-    color: #666;
-    font-family: $body-font;
-    font-size: $subtitle-font-size;
+    color: $app-gray-medium;
+    font-family: $app-font-body;
+    font-size: $app-font-subtitle;
   }
 }
 
@@ -109,131 +84,158 @@
   margin-bottom: 2rem;
 
   .section-title {
-    @include title-style;
-    margin-bottom: 1rem;
-    text-align: center;
+    @include app-section-title;
   }
 
-  .idea-form {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  .idea-form-card {
+    @include app-card-style;
+    max-width: 600px;
+    margin: 0 auto;
 
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    .idea-form {
+      display: flex;
+      flex-direction: column;
       gap: 1rem;
-      margin-bottom: 1rem;
 
-      .input-field {
-        padding: 0.75rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 6px;
-        font-size: $font-size;
-        font-family: $body-font;
+      .form-row {
+        display: flex;
+        gap: 1rem;
 
-        &:focus {
-          outline: none;
-          border-color: $btnp-color;
+        @media (max-width: $app-breakpoint-mobile) {
+          flex-direction: column;
         }
 
-        &::placeholder {
-          color: $input-text-color;
+        .form-group {
+          @include app-form-group-style;
+          flex: 1;
         }
       }
-    }
 
-    .btn-primary {
-      @include btnp-style;
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.2s;
+      .btn-submit {
+        @include app-button-primary;
+        align-self: flex-end;
+        width: auto;
+        min-width: 120px;
 
-      &:hover {
-        opacity: 0.8;
+        @media (max-width: $app-breakpoint-mobile) {
+          width: 100%;
+        }
       }
     }
   }
 }
 
-// アイデア表示エリア
+// アイデア一覧セクション
 .ideas-section {
-  margin-bottom: 2rem;
+  .section-title {
+    @include app-section-title;
+  }
 
   .ideas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+    @include app-responsive-grid(300px);
 
-    .ideas-zone {
-      .zone-title {
-        @include subtitle-style;
-        margin-bottom: 1rem;
-        text-align: center;
-        padding: 0.5rem;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    .idea-card {
+      @include app-card-style;
+      text-align: left;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
       }
 
-      .ideas-cards {
-        min-height: 200px;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 8px;
-        padding: 1rem;
+      .idea-content {
+        .idea-title {
+          @include app-subtitle-style;
+          margin-bottom: 0.5rem;
+        }
 
-        .idea-card {
-          background: white;
-          padding: 1rem;
-          border-radius: 8px;
-          margin-bottom: 0.75rem;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .idea-description {
+          @include app-text-style;
+          color: $app-gray-dark;
+          margin-bottom: 1rem;
+          line-height: 1.5;
+        }
 
-          .idea-text {
-            font-family: $body-font;
-            font-size: $font-size;
-            margin-bottom: 0.75rem;
-            line-height: 1.4;
+        .idea-details {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          font-size: 0.75rem;
+          color: $app-gray-medium;
+
+          .idea-author {
+            font-weight: $app-weight-medium;
           }
 
-          .card-actions {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
+          .idea-date {
+            font-style: italic;
+          }
+        }
+      }
 
-            button {
-              font-family: $body-font;
-              font-size: 0.75rem;
-              padding: 0.25rem 0.5rem;
-              border-radius: 4px;
-              border: none;
-              cursor: pointer;
-              transition: opacity 0.2s;
+      .idea-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid $app-gray-light;
 
-              &:hover {
-                opacity: 0.8;
-              }
+        .like-section {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .btn-like {
+            @include app-button-like;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid $app-gray-light;
+            border-radius: $app-radius-button;
+            background: transparent;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: $app-gray-light;
             }
 
-            .btn-like {
-              @include like-style;
-              background: #f3f4f6;
-              border: 1px solid #d1d5db;
+            &.liked {
+              background: $app-btn-primary;
+              color: $app-white;
+              border-color: $app-btn-primary;
             }
+          }
 
-            .btn-proceed, .btn-detail {
-              @include btnp-style;
-              font-size: 0.75rem;
-            }
+          .like-count {
+            @include app-text-style;
+            font-weight: $app-weight-medium;
+          }
+        }
 
-            .btn-delete {
-              @include btnn-style;
-              font-size: 0.75rem;
+        .idea-actions-right {
+          display: flex;
+          gap: 0.5rem;
+
+          .btn-move {
+            @include app-button-secondary;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+          }
+
+          .btn-delete {
+            background: none;
+            border: 1px solid $app-error-color;
+            color: $app-error-color;
+            padding: 0.25rem 0.5rem;
+            border-radius: $app-radius-button;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: $app-error-color;
+              color: $app-white;
             }
           }
         }
@@ -242,59 +244,60 @@
   }
 }
 
-// メンバーセクション
-.members-section {
-  text-align: center;
+// エラーメッセージ
+.error-message {
+  @include app-error-message;
+  margin-bottom: 1rem;
+}
 
-  .section-title {
-    @include subtitle-style;
+// 空の状態
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+
+  .empty-icon {
+    font-size: 3rem;
+    color: $app-gray-light;
     margin-bottom: 1rem;
   }
 
-  .members-list {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+  .empty-title {
+    @include app-subtitle-style;
+    color: $app-gray-medium;
+    margin-bottom: 0.5rem;
+  }
 
-    .member-name {
-      background: white;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-family: $body-font;
-      font-size: $font-size;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+  .empty-message {
+    @include app-text-style;
+    color: $app-gray-medium;
   }
 }
 
-// レスポンシブ対応
-@media (max-width: 768px) {
+// モバイル専用調整
+@media (max-width: $app-breakpoint-mobile) {
   .home-header {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-
     .header-left {
-      flex-direction: column;
-      gap: 0.5rem;
-      text-align: center;
+      gap: 1rem;
+
+      .logo {
+        font-size: 1.5rem;
+      }
     }
 
     .header-right {
-      justify-content: center;
+      flex-direction: column;
+      width: 100%;
+      gap: 0.5rem;
     }
   }
 
-  .home-main {
-    padding: 1rem;
-  }
-
-  .idea-form .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .ideas-grid {
-    grid-template-columns: 1fr;
+  .idea-form-section {
+    .idea-form-card {
+      margin: 0;
+      border-radius: 0;
+      box-shadow: none;
+      border-top: 1px solid $app-gray-light;
+      border-bottom: 1px solid $app-gray-light;
+    }
   }
 }
