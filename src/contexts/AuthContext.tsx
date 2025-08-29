@@ -1,13 +1,16 @@
 // src/contexts/AuthContext.tsx
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+
 // 自分で設定したSupabaseとの接続設定をインポート
 import { supabase } from '../lib/supabase'
+
 // auth.ts から3つの型定義をインポート
 // User = ログインしたユーザーの情報の構造を表す型（設計図）
 // Session = ログイン状態・セッション情報の構造を表す型（設計図）
 // AuthError = 認証でエラーが起きた時のエラー情報の構造を表す型（設計図）
-import type { User, Session, AuthError } from '@supabase/auth-js'
+// AuthChangeEvent = 認証状態の変化を表す型（設計図）
+import type { User, Session, AuthError, AuthChangeEvent} from '@supabase/auth-js'
 
 
 //////////////////////////////////////////////////////////////
@@ -89,7 +92,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // 3. ページを閉じる時
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
         // asyncはなくても良いが、将来の拡張性確保のため記載
-      async (event, session) => {
+      async (_: AuthChangeEvent, session: Session | null) => {
         setSession(session)
         setUser(session?.user ?? null)
         setLoading(false)
