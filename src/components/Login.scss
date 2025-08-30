@@ -1,47 +1,210 @@
 // src/components/Login.scss
+// スマホ向けアプリ特化版
 @use '../styles/variables' as *;
+
+//////////////////////////////////////////////////////////////
+// ログインコンテナ（スマホ特化）
+//////////////////////////////////////////////////////////////
 
 .login-container {
   @include app-fullscreen-container;
+  
+  // スマホ用の追加最適化
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  // セーフエリア対応の強化
+  padding-left: max($app-padding-mobile, env(safe-area-inset-left));
+  padding-right: max($app-padding-mobile, env(safe-area-inset-right));
 }
+
+//////////////////////////////////////////////////////////////
+// ログインカード（スマホ最適化）
+//////////////////////////////////////////////////////////////
 
 .login-card {
   @include app-large-card-style($app-bg-color);
+  
+  // スマホ用の最適化
+  max-width: none;
+  width: 100%;
+  min-height: auto;
+  margin: 0;
+  
+  // 縦画面での中央配置調整
+  justify-content: flex-start;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 
   .logo {
     @include app-logo-style;
+    
+    // スマホ用ロゴの調整
+    font-size: $app-font-logo;
+    margin-bottom: 0.5rem;
+    
+    // アニメーション効果追加
+    animation: logoFadeIn 0.6s ease-out;
   }
 
   .subtitle {
     @include app-subtitle-style;
+    
+    // スマホ用サブタイトルの調整
+    font-size: $app-font-subtitle;
+    margin-bottom: 0.5rem;
+    color: $app-text-color;
+    
+    // フェードインアニメーション
+    animation: fadeInUp 0.8s ease-out 0.2s both;
   }
 
   .introduction {
     @include app-text-style;
+    
+    // スマホ用説明文の調整
+    font-size: $app-font-body;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: $app-gray-dark;
+    
+    // フェードインアニメーション
+    animation: fadeInUp 0.8s ease-out 0.4s both;
   }
 }
 
+//////////////////////////////////////////////////////////////
+// エラーメッセージ（スマホ最適化）
+//////////////////////////////////////////////////////////////
+
 .error-message {
   @include app-error-message;
+  
+  // スマホ用の調整
+  margin-bottom: 1.5rem;
+  padding: $app-padding-mobile;
+  border-radius: $app-radius-card;
+  
+  // エラー表示のアニメーション
+  animation: errorSlideIn 0.3s ease-out;
+  
+  // アクセシビリティ向上
+  role: alert;
+  aria-live: polite;
 }
+
+//////////////////////////////////////////////////////////////
+// 認証フォーム（スマホ特化）
+//////////////////////////////////////////////////////////////
 
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  width: 100%;
+  
+  // フェードインアニメーション
+  animation: fadeInUp 0.8s ease-out 0.6s both;
 
   .form-group {
     @include app-form-group-style;
+    
+    // スマホ用のフォームグループ調整
+    margin-bottom: 1.5rem;
+
+    label {
+      // ラベルの視認性向上
+      font-weight: $app-weight-medium;
+      color: $app-text-color;
+      margin-bottom: 0.75rem;
+      
+      // ズーム防止確実化
+      font-size: $app-font-subtitle;
+    }
+
+    input {
+      // スマホ用入力フィールドの最適化
+      min-height: $app-button-height;
+      padding: 1rem;
+      font-size: $app-font-button;
+      
+      // タッチフィードバック追加
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+      
+      // フォーカス時の視覚的強調
+      &:focus {
+        border-color: $app-btn-primary;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+      
+      // 入力中のスタイル
+      &:valid {
+        border-color: $app-gray-medium;
+      }
+      
+      // プレースホルダーの調整
+      &::placeholder {
+        color: $app-gray-medium;
+        font-size: $app-font-body;
+      }
+    }
+
+    .field-error {
+      // エラーメッセージの視認性向上
+      font-size: $app-font-body;
+      color: $app-error-color;
+      margin-top: 0.75rem;
+      padding: 0.5rem;
+      background-color: $app-error-bg;
+      border-radius: $app-radius-input;
+      border-left: 3px solid $app-error-color;
+      
+      // エラー表示アニメーション
+      animation: errorShake 0.5s ease-out;
+    }
   }
 
   .btn-primary {
     @include app-button-primary;
+    
+    // スマホ用ボタンの最適化
+    min-height: $app-button-height;
+    font-size: $app-font-button;
+    font-weight: $app-weight-medium;
+    border-radius: $app-radius-button;
+    
+    // タッチフィードバック強化
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    &:disabled {
+      background-color: $app-gray-light;
+      color: $app-gray-medium;
+      cursor: not-allowed;
+      transform: none;
+    }
   }
 }
+
+//////////////////////////////////////////////////////////////
+// 認証切り替え（スマホ最適化）
+//////////////////////////////////////////////////////////////
 
 .auth-switch {
   font-size: $app-font-body;
   color: $app-gray-medium;
+  text-align: center;
+  line-height: 1.6;
+  
+  // スマホでの読みやすさ向上
+  margin-top: 1rem;
 
   .link-button {
     background: none;
@@ -49,18 +212,268 @@
     color: $app-btn-primary;
     cursor: pointer;
     text-decoration: underline;
-    font-size: inherit;
+    font-size: $app-font-body;
+    font-weight: $app-weight-medium;
     margin-left: 0.25rem;
+    
+    // スマホ用のタッチ対応
+    min-height: $app-touch-target-min;
+    padding: 0.5rem;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    touch-action: manipulation;
 
-    &:hover {
+    &:hover, &:active {
       color: $app-gray-dark;
+      background-color: rgba(0, 0, 0, 0.05);
+      border-radius: $app-radius-input;
+      text-decoration: none;
     }
   }
 }
 
-// モバイル用ロゴサイズのカスタマイズ
-@media (max-width: $app-breakpoint-mobile) {
-  .logo {
-    font-size: 2rem; // モバイル専用サイズ
+//////////////////////////////////////////////////////////////
+// 小さいスマホ画面用（375px以下）
+//////////////////////////////////////////////////////////////
+
+@media (max-width: 375px) {
+  .login-container {
+    padding: $app-padding-small;
+  }
+
+  .login-card {
+    padding: $app-padding-mobile;
+    gap: 1rem;
+    
+    .logo {
+      font-size: 1.5rem; // さらに小さく
+    }
+    
+    .subtitle {
+      font-size: 0.875rem;
+    }
+    
+    .introduction {
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+  }
+
+  .auth-form {
+    gap: 1rem;
+    
+    .form-group {
+      margin-bottom: 1rem;
+      
+      label {
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      input {
+        padding: 0.75rem;
+        min-height: 42px; // 少し小さく
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 標準スマホ画面用（376px-414px）
+//////////////////////////////////////////////////////////////
+
+@media (min-width: 376px) and (max-width: 414px) {
+  .login-card {
+    padding: $app-padding-large;
+    
+    .logo {
+      font-size: $app-font-logo;
+    }
+  }
+
+  .auth-form {
+    .form-group {
+      input {
+        padding: 1rem;
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 大きいスマホ画面用（415px以上）
+//////////////////////////////////////////////////////////////
+
+@media (min-width: 415px) {
+  .login-card {
+    padding: 2rem;
+    max-width: 400px;
+    
+    .logo {
+      font-size: 2rem;
+    }
+    
+    .subtitle {
+      font-size: $app-font-subtitle;
+    }
+  }
+
+  .auth-form {
+    .form-group {
+      input {
+        padding: 1.25rem;
+      }
+    }
+    
+    .btn-primary {
+      min-height: $app-button-height;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 横画面モード対応
+//////////////////////////////////////////////////////////////
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .login-container {
+    // 横画面では上下のパディングを削減
+    padding-top: $app-padding-small;
+    padding-bottom: $app-padding-small;
+  }
+
+  .login-card {
+    // 横画面でのコンパクト表示
+    padding: $app-padding-mobile;
+    gap: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    
+    .logo {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .subtitle {
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .introduction {
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .auth-form {
+    gap: 1rem;
+    
+    .form-group {
+      margin-bottom: 1rem;
+      
+      label {
+        margin-bottom: 0.5rem;
+      }
+      
+      input {
+        min-height: 40px;
+        padding: 0.75rem;
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アニメーション定義
+//////////////////////////////////////////////////////////////
+
+@keyframes logoFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes errorSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes errorShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// パフォーマンス最適化
+//////////////////////////////////////////////////////////////
+
+.login-card, .auth-form, .btn-primary {
+  // ハードウェアアクセラレーション有効化
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+//////////////////////////////////////////////////////////////
+// アクセシビリティ改善
+//////////////////////////////////////////////////////////////
+
+// フォーカス可能要素の視覚的強調
+.auth-form {
+  input, button {
+    &:focus-visible {
+      outline: 3px solid $app-btn-primary;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// 高コントラストモード対応
+@media (prefers-contrast: high) {
+  .login-card {
+    border: 2px solid $app-text-color;
+  }
+  
+  .auth-form {
+    input {
+      border-width: 3px;
+    }
+  }
+}
+
+// 動きを減らす設定に対応
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

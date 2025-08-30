@@ -1,30 +1,461 @@
 // src/components/LoadingSpinner.scss
+// スマホ向けアプリ特化版
 @use '../styles/variables' as *;
 
+//////////////////////////////////////////////////////////////
+// ローディングコンテナ（スマホ特化）
+//////////////////////////////////////////////////////////////
+
 .loading-container {
+  @include app-fullscreen-container;
+  
+  // スマホ用の最適化
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  @include app-fullscreen-container; // variables.scssのmixinを活用
+  gap: 2rem;
+  
+  // セーフエリア対応の強化
+  padding-left: max($app-padding-mobile, env(safe-area-inset-left));
+  padding-right: max($app-padding-mobile, env(safe-area-inset-right));
+  
+  // 背景の微調整（少し透明度を追加）
+  background-color: $app-bg-color;
+  
+  // スマホでのスクロール防止
+  overflow: hidden;
+  touch-action: none;
+
+  //////////////////////////////////////////////////////////////
+  // メインローディングスピナー
+  //////////////////////////////////////////////////////////////
 
   .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid $app-gray-light;
-    border-top: 4px solid $app-btn-primary;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    // スマホ用のサイズ調整
+    width: 60px;
+    height: 60px;
+    
+    // メインスピナー（外側の回転リング）
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 4px solid $app-gray-light;
+      border-top: 4px solid $app-btn-primary;
+      border-radius: 50%;
+      animation: spinMain 1.2s linear infinite;
+      
+      // GPU加速
+      will-change: transform;
+      transform: translateZ(0);
+    }
+    
+    // 内側のパルススピナー
+    &::after {
+      content: '';
+      position: absolute;
+      width: 70%;
+      height: 70%;
+      background-color: $app-btn-primary;
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+      opacity: 0.3;
+      
+      // GPU加速
+      will-change: transform, opacity;
+      transform: translateZ(0);
+    }
   }
 
-  p {
-    color: $app-gray-medium;
-    font-size: $app-font-subtitle;
+  //////////////////////////////////////////////////////////////
+  // ローディングテキスト
+  //////////////////////////////////////////////////////////////
+
+  .loading-text {
     @include app-text-style;
+    
+    // スマホ用のテキスト調整
+    color: $app-text-color;
+    font-size: $app-font-subtitle;
+    font-weight: $app-weight-medium;
+    text-align: center;
+    
+    // テキストアニメーション
+    animation: textFade 2s ease-in-out infinite;
+    
+    // 長いテキストの改行対応
+    word-break: keep-all;
+    line-height: 1.5;
+  }
+
+  //////////////////////////////////////////////////////////////
+  // プログレスドット（追加の視覚的要素）
+  //////////////////////////////////////////////////////////////
+
+  .loading-dots {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: $app-btn-primary;
+      border-radius: 50%;
+      animation: dotBounce 1.4s ease-in-out infinite;
+      
+      // 各ドットの遅延時間
+      &:nth-child(1) { animation-delay: 0s; }
+      &:nth-child(2) { animation-delay: 0.2s; }
+      &:nth-child(3) { animation-delay: 0.4s; }
+    }
   }
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+//////////////////////////////////////////////////////////////
+// アニメーション定義
+//////////////////////////////////////////////////////////////
+
+// メインスピナーの回転アニメーション
+@keyframes spinMain {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// 内側パルスアニメーション
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.1;
+  }
+}
+
+// テキストフェードアニメーション
+@keyframes textFade {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+// ドットバウンスアニメーション
+@keyframes dotBounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  40% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+// 登場アニメーション
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 小さいスマホ画面用（375px以下）
+//////////////////////////////////////////////////////////////
+
+@media (max-width: 375px) {
+  .loading-container {
+    gap: 1.5rem;
+    padding: $app-padding-small;
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      
+      &::before {
+        border-width: 3px;
+      }
+    }
+
+    .loading-text {
+      font-size: $app-font-body;
+      margin-bottom: 0.5rem;
+    }
+
+    .loading-dots {
+      margin-top: 0.5rem;
+      
+      .dot {
+        width: 6px;
+        height: 6px;
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 標準スマホ画面用（376px-414px）
+//////////////////////////////////////////////////////////////
+
+@media (min-width: 376px) and (max-width: 414px) {
+  .loading-container {
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+    }
+
+    .loading-text {
+      font-size: $app-font-subtitle;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 大きいスマホ画面用（415px以上）
+//////////////////////////////////////////////////////////////
+
+@media (min-width: 415px) {
+  .loading-container {
+    gap: 2.5rem;
+
+    .loading-spinner {
+      width: 70px;
+      height: 70px;
+      
+      &::before {
+        border-width: 5px;
+      }
+    }
+
+    .loading-text {
+      font-size: $app-font-title;
+      font-weight: $app-weight-medium;
+    }
+
+    .loading-dots {
+      .dot {
+        width: 10px;
+        height: 10px;
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 横画面モード対応
+//////////////////////////////////////////////////////////////
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .loading-container {
+    // 横画面では要素を横並びに
+    flex-direction: row;
+    gap: 2rem;
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .loading-text {
+      font-size: $app-font-body;
+      margin-bottom: 0;
+    }
+    
+    .loading-dots {
+      margin-top: 0;
+      margin-left: 1rem;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 高性能デバイス用（より滑らかなアニメーション）
+//////////////////////////////////////////////////////////////
+
+@media (prefers-reduced-motion: no-preference) {
+  .loading-container {
+    // 登場時のアニメーション
+    animation: fadeInScale 0.5s ease-out;
+  }
+  
+  .loading-spinner {
+    // より複雑なアニメーション効果
+    &::before {
+      animation: spinMain 1s linear infinite, 
+                 colorShift 3s ease-in-out infinite;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 動きを減らす設定への対応
+//////////////////////////////////////////////////////////////
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner {
+    &::before {
+      animation: none;
+      border-top-color: $app-btn-primary;
+    }
+    
+    &::after {
+      animation: none;
+      opacity: 0.5;
+    }
+  }
+  
+  .loading-text {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .loading-dots {
+    .dot {
+      animation: none;
+      opacity: 0.7;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 高コントラストモード対応
+//////////////////////////////////////////////////////////////
+
+@media (prefers-contrast: high) {
+  .loading-spinner {
+    &::before {
+      border-width: 6px;
+      border-color: $app-white;
+      border-top-color: $app-text-color;
+    }
+    
+    &::after {
+      background-color: $app-text-color;
+      opacity: 0.5;
+    }
+  }
+  
+  .loading-text {
+    color: $app-text-color;
+    font-weight: $app-weight-bold;
+  }
+  
+  .loading-dots {
+    .dot {
+      background-color: $app-text-color;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 追加アニメーション効果
+//////////////////////////////////////////////////////////////
+
+// カラーシフトアニメーション（高性能デバイス用）
+@keyframes colorShift {
+  0%, 100% {
+    border-top-color: $app-btn-primary;
+  }
+  33% {
+    border-top-color: $app-gray-dark;
+  }
+  66% {
+    border-top-color: $app-gray-medium;
+  }
+}
+
+// 背景のサブトルな変化
+@keyframes backgroundPulse {
+  0%, 100% {
+    background-color: $app-bg-color;
+  }
+  50% {
+    background-color: rgba(244, 193, 78, 0.95);
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// パフォーマンス最適化
+//////////////////////////////////////////////////////////////
+
+.loading-spinner {
+  // GPU層に配置してアニメーション最適化
+  will-change: transform;
+  transform: translateZ(0);
+  
+  &::before, &::after {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// スマホ用特別スタイル
+//////////////////////////////////////////////////////////////
+
+// バッテリー節約モード対応
+@media (prefers-reduced-motion: reduce) {
+  .loading-container {
+    .loading-spinner {
+      // シンプルな点滅エフェクト
+      &::before {
+        animation: simpleBlink 2s ease-in-out infinite;
+      }
+    }
+  }
+}
+
+@keyframes simpleBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アクセシビリティ強化
+//////////////////////////////////////////////////////////////
+
+.loading-container {
+  // スクリーンリーダー用の属性
+  [aria-label="読み込み中"] {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+}
+
+// 視覚的な代替表示
+.loading-spinner {
+  // アクセシビリティのための代替テキスト
+  &[aria-hidden="true"] + .sr-only {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
 }
