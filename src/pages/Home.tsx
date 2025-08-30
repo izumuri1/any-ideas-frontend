@@ -1,18 +1,8 @@
 // src/pages/Home.tsx
-import type { User } from '@supabase/auth-js'
-import { useAuth } from '../contexts/AuthContext'
 import './Home.scss'
 
-interface HomeProps {
-  user: User
-}
-
-export function Home({ user: userProp }: HomeProps) {
-  const { signOut } = useAuth()
-  // App.tsxから渡されたuserを使用
-  const user = userProp
-
-  // handleSignOut関数を削除
+export function Home() {
+  // 現在は認証機能を使用していないので、userプロパティも削除
 
   return (
     <div className="home-container">

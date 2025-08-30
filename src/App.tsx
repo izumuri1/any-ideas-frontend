@@ -21,8 +21,8 @@ function App() {
         {/* 認証されているユーザー（userが存在）なら、これらのページに移動できる */}
         {user ? (
           <>
-            <Route path="/" element={<Home user={user} />} />
-            <Route path="/home" element={<Home user={user} />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             {/* すでにログイン済みのユーザーをログインページから追い出したい場合 */}
             <Route path="/login" element={<Navigate to="/" replace />} />
             {/* 将来追加予定のルート */}
