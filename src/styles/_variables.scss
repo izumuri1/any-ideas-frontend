@@ -199,7 +199,7 @@ $app-button-height:       48px;   // ボタン高さ
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: $app-bg-color;
+  background-color: white;
   display: grid;
   place-items: center;
   padding: $app-padding-mobile;
@@ -295,7 +295,7 @@ $app-button-height:       48px;   // ボタン高さ
 //////////////////////////////////////////////////////////////
 
 @mixin app-page-header {
-  background: $app-white;
+  background: $app-gray-light;
   padding: $app-padding-mobile;
   display: flex;
   justify-content: space-between;

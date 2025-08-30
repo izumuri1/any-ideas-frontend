@@ -181,7 +181,8 @@ export function SignUp() {
             )}
           </div>
 
-          <div className="form-group">
+
+          {/* <div className="form-group">
             <label htmlFor="inviteCode">招待コード（任意）</label>
             <input
               type="text"
@@ -189,9 +190,9 @@ export function SignUp() {
               {...register('inviteCode')}
               placeholder="招待コードがあれば入力"
               disabled={loading}
-            />
+            /> */}
             {/* 招待コードは任意のためエラー表示なし */}
-          </div>
+          {/* </div> */}
 
           <button 
             type="submit" 

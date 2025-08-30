@@ -24,17 +24,11 @@ export function Home({ user: userProp }: HomeProps) {
     <div className="home-container">
       {/* 上部メニュー */}
       <header className="home-header">
-        <div className="header-left">
+        <div className="header">
           <div className="workspace-info">
             <span className="workspace-name">テストワークスペース</span>
-            <span className="invite-token">招待トークン: ABC123</span>
+            <span className="invite-token">招待URL: ABC123</span>
           </div>
-        </div>
-        <div className="header-right">
-          <button className="btn-workspace">ワークスペース選択</button>
-          <button className="btn-logout" onClick={handleSignOut}>
-            ログアウト
-          </button>
         </div>
       </header>
 
@@ -42,8 +36,8 @@ export function Home({ user: userProp }: HomeProps) {
       <main className="home-main">
         {/* 簡易アイデア登録セクション */}
         <section className="idea-form-section">
-          <h3 className="section-title">Any ideas?</h3>
           <div className="idea-form">
+          <h3 className="section-title">Any ideas?</h3>
             <div className="form-row">
               <input type="text" placeholder="いつ頃？" className="input-field" />
               <input type="text" placeholder="誰と？" className="input-field" />

@@ -36,7 +36,7 @@
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
 
-  .header-left {
+  .header {
     display: flex;
     align-items: center;
     flex: 1;
@@ -64,7 +64,7 @@
 
       .invite-token {
         font-size: 0.75rem;
-        color: $app-gray-medium;
+        color: $app-gray-dark;
         font-family: $app-font-body;
         
         // 長いトークンの省略対応
@@ -72,36 +72,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-    }
-  }
-
-  .header-right {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    
-    .btn-workspace, .btn-logout {
-      // スマホ用のコンパクトなボタン
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      white-space: nowrap;
-      min-height: $app-touch-target-min;
-      
-      // タッチフィードバック追加
-      transition: opacity 0.15s ease;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-      
-      &:active {
-        opacity: 0.7;
-      }
-    }
-
-    .btn-workspace {
-      @include app-button-secondary;
-    }
-
-    .btn-logout {
-      @include app-button-primary;
     }
   }
 }
@@ -139,7 +109,7 @@
   }
 
   .idea-form {
-    background: $app-white;
+    background: $app-bg-color;
     border-radius: $app-radius-card;
     box-shadow: $app-shadow-card;
     padding: $app-padding-large;
@@ -205,7 +175,7 @@
     @include app-mobile-grid(1.5rem);
 
     .ideas-zone {
-      background: $app-white;
+      background: $app-bg-color;
       border-radius: $app-radius-card;
       box-shadow: $app-shadow-card;
       padding: $app-padding-large;
@@ -224,7 +194,7 @@
         @include app-mobile-flex(1rem, column);
 
         .idea-card {
-          background: $app-bg-color; // 黄色背景でコントラスト
+          background: white; // 黄色背景でコントラスト
           padding: $app-padding-large;
           border-radius: $app-radius-card;
           border: 2px solid transparent;
@@ -401,7 +371,7 @@
 // 小さいスマホ画面用（iPhone SE、古いAndroid等）
 @media (max-width: 375px) {
   .home-header {
-    .header-left {
+    .header{
       .workspace-info {
         min-width: 150px;
         max-width: 50%;
@@ -413,16 +383,6 @@
         .invite-token {
           font-size: 0.7rem;
         }
-      }
-    }
-
-    .header-right {
-      gap: 0.25rem;
-      
-      .btn-workspace, .btn-logout {
-        padding: 0.5rem;
-        font-size: 0.75rem;
-        min-width: 60px;
       }
     }
   }
@@ -475,7 +435,7 @@
 // 大きめのスマホ画面用（iPhone Pro Max、大型Android等）
 @media (min-width: 414px) {
   .home-header {
-    .header-left {
+    .header {
       .workspace-info {
         min-width: 250px;
         max-width: 70%;
