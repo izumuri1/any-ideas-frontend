@@ -12,13 +12,7 @@ export function Home({ user: userProp }: HomeProps) {
   // App.tsxから渡されたuserを使用
   const user = userProp
 
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-    } catch (error) {
-      console.error('ログアウトエラー:', error)
-    }
-  }
+  // handleSignOut関数を削除
 
   return (
     <div className="home-container">
@@ -75,7 +69,7 @@ export function Home({ user: userProp }: HomeProps) {
                   <p className="idea-text">春休み・友人と・温泉旅行</p>
                   <div className="card-actions">
                     <button className="btn-like">♡ 1</button>
-                    <button className="btn-detail">検討</button>
+                    <button className="btn-proceed">進める</button>
                     <button className="btn-delete">削除</button>
                   </div>
                 </div>
@@ -87,23 +81,15 @@ export function Home({ user: userProp }: HomeProps) {
               <h4 className="zone-title">Ideas we're trying</h4>
               <div className="ideas-cards">
                 <div className="idea-card">
-                  <p className="idea-text">来月・恋人と・映画館デート</p>
+                  <p className="idea-text">年末・恋人と・温泉旅行</p>
                   <div className="card-actions">
                     <button className="btn-like">♡ 3</button>
-                    <button className="btn-detail">詳細</button>
+                    <button className="btn-proceed">進める</button>
+                    <button className="btn-delete">削除</button>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* メンバー表示 */}
-        <section className="members-section">
-          <h4 className="section-title">Members sharing ideas...</h4>
-          <div className="members-list">
-            <span className="member-name">{user?.email}</span>
-            <span className="member-name">テストユーザー2</span>
           </div>
         </section>
       </main>
