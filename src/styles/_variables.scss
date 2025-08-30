@@ -80,24 +80,24 @@ $app-padding-desktop:     2rem;
 //////////////////////////////////////////////////////////////
 
 @mixin app-logo-style {
-  font-family: $app-font-theme;
-  font-size: $app-font-logo;
-  font-weight: $app-weight-bold;
-  color: $app-text-color;
+  font-family: $app-font-theme;     // タイトル用フォント
+  font-size: $app-font-logo;        // ロゴ (36px)
+  font-weight: $app-weight-bold;    
+  color: $app-text-color;           // 黒色テキスト
 }
 
 @mixin app-title-style {
-  font-family: $app-font-theme;
-  font-size: $app-font-title;
+  font-family: $app-font-theme;     // タイトル用フォント
+  font-size: $app-font-title;       // タイトル (24px)
   font-weight: $app-weight-bold;
-  color: $app-text-color;
+  color: $app-text-color;           // 黒色テキスト
 }
 
 @mixin app-subtitle-style {
-  font-family: $app-font-theme;
-  font-size: $app-font-subtitle;
+  font-family: $app-font-theme;     // タイトル用フォント
+  font-size: $app-font-subtitle;    // サブタイトル (16px)
   font-weight: $app-weight-bold;
-  color: $app-text-color;
+  color: $app-text-color;           // 黒色テキスト
 }
 
 @mixin app-section-title {
@@ -107,18 +107,18 @@ $app-padding-desktop:     2rem;
 }
 
 @mixin app-text-style {
-  font-family: $app-font-body;
-  font-size: $app-font-body;
-  color: $app-text-color;
+  font-family: $app-font-body;      // 本文用フォント
+  font-size: $app-font-body;        // 本文 (14px)
+  color: $app-text-color;           // 黒色テキスト
 }
 
 @mixin app-error-message {
-  background-color: $app-error-bg;
-  color: $app-error-color;
-  border: 1px solid $app-error-border;
-  border-radius: $app-radius-error;
+  background-color: $app-error-bg;  // エラー背景（薄い赤）
+  color: $app-error-color;          // エラーテキスト（赤）
+  border: 1px solid $app-error-border;  // エラー枠線（赤）
+  border-radius: $app-radius-error;     // 角丸
   padding: 0.75rem;
-  font-size: $app-font-body;
+  font-size: $app-font-body;        // 本文 (14px)
   text-align: left;
 }
 
@@ -127,14 +127,14 @@ $app-padding-desktop:     2rem;
 //////////////////////////////////////////////////////////////
 
 @mixin app-button-base {
-  border: none;
-  border-radius: $app-radius-button;
+  border: none;                         // 枠線なし
+  border-radius: $app-radius-button;    // 角丸
   cursor: pointer;
   padding: 0.75rem;
-  transition: opacity 0.2s ease;
-  font-family: $app-font-body;
-  font-size: $app-font-button;
-  font-weight: $app-weight-medium;
+  transition: opacity 0.2s ease;          
+  font-family: $app-font-body;          // 本文用フォント
+  font-size: $app-font-button;          // ボタン (16px)
+  font-weight: $app-weight-medium;  
 
   &:hover:not(:disabled) {
     opacity: 0.8;
@@ -147,23 +147,23 @@ $app-padding-desktop:     2rem;
 }
 
 @mixin app-button-primary {
-  color: $app-white;
-  background-color: $app-btn-primary;
+  color: $app-white;                    // 白色テキスト
+  background-color: $app-btn-primary;   // プライマリボタン（黒）
   width: 100%;
   @include app-button-base;
 }
 
 @mixin app-button-secondary {
-  color: $app-text-color;
-  background-color: $app-btn-secondary;
+  color: $app-text-color;               // 黒色テキスト  
+  background-color: $app-btn-secondary; // セカンダリボタン（グレー）
   @include app-button-base;
 }
 
 @mixin app-button-like {
-  font-family: $app-font-body;
-  font-size: $app-font-body;
+  font-family: $app-font-body;          // 本文用フォント
+  font-size: $app-font-body;            // 本文 (14px)
   font-weight: $app-weight-medium;
-  color: $app-text-color;
+  color: $app-text-color;               // 黒色テキスト
 }
 
 //////////////////////////////////////////////////////////////
