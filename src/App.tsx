@@ -1,9 +1,3 @@
-// import { useState } from 'react'
-// import { supabase } from './lib/supabase'
-// import { createContext, useContext } from 'react'
-// import { type ReactNode } from 'react'
-// import { useEffect } from 'react'
-// import { useNavigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Home } from './pages/Home'
@@ -29,7 +23,7 @@ function App() {
           <>
             <Route path="/" element={<Home user={user} />} />
             <Route path="/home" element={<Home user={user} />} />
-            {/* 未ログイン用ページにアクセスしたらホームにリダイレクト */}
+            {/* すでにログイン済みのユーザーをログインページから追い出したい場合 */}
             <Route path="/login" element={<Navigate to="/" replace />} />
             {/* 将来追加予定のルート */}
             {/* <Route path="/workspace/:id" element={<Workspace user={user} />} /> */}
