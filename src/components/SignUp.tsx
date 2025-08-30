@@ -56,9 +56,9 @@ export function SignUp() {
     
     const { error } = await signUp(data.email, data.password, data.username)
     if (error) {
-      // エラーコードで判定（推奨方法）
+      // エラーコードで判定
       switch (error.code) {
-        case 'user_already_exists':  // 正しいエラーコード
+        case 'user_already_exists':
           setSubmitError('このメールアドレスは既に登録されています。')
           break
         case 'weak_password':
@@ -180,19 +180,6 @@ export function SignUp() {
               <span className="field-error">{errors.confirmPassword.message}</span>
             )}
           </div>
-
-
-          {/* <div className="form-group">
-            <label htmlFor="inviteCode">招待コード（任意）</label>
-            <input
-              type="text"
-              id="inviteCode"
-              {...register('inviteCode')}
-              placeholder="招待コードがあれば入力"
-              disabled={loading}
-            /> */}
-            {/* 招待コードは任意のためエラー表示なし */}
-          {/* </div> */}
 
           <button 
             type="submit" 
