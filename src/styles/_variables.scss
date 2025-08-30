@@ -1,6 +1,7 @@
 // src/styles/_variables.scss
 // Any Ideas? プロジェクトのスタイル変数とmixinを定義
 // 統一された命名規約を使用（app- プレフィックス）
+// スマホ特化版
 
 //////////////////////////////////////////////////////////////
 /// カラーパレット
@@ -25,19 +26,19 @@ $app-error-border:        #fecaca; // エラー枠線
 $app-disabled-bg:         #f9fafb; // 無効状態背景
 
 //////////////////////////////////////////////////////////////
-/// フォント設定
+/// フォント設定（スマホ最適化）
 //////////////////////////////////////////////////////////////
 
 // フォントファミリー
 $app-font-theme:          'Montserrat', sans-serif; // タイトル用フォント
 $app-font-body:           'Noto Sans JP', sans-serif; // 本文用フォント
 
-// フォントサイズ (rem単位で統一)
-$app-font-logo:           2.25rem;  // ロゴ (36px)
-$app-font-title:          1.5rem;   // タイトル (24px)
-$app-font-subtitle:       1rem;     // サブタイトル (16px)
+// フォントサイズ (スマホ用に調整済み・rem単位で統一)
+$app-font-logo:           1.75rem;  // ロゴ (28px) - スマホ用にサイズダウン
+$app-font-title:          1.25rem;  // タイトル (20px) - スマホ用にサイズダウン
+$app-font-subtitle:       1rem;     // サブタイトル (16px) - ズーム防止
 $app-font-body:           0.875rem; // 本文 (14px)
-$app-font-button:         1rem;     // ボタン (16px)
+$app-font-button:         1rem;     // ボタン (16px) - ズーム防止
 
 // フォントウェイト
 $app-weight-normal:       400;
@@ -46,33 +47,34 @@ $app-weight-bold:         700;
 $app-weight-black:        900;
 
 //////////////////////////////////////////////////////////////
-/// レイアウト設定
+/// レイアウト設定（スマホ特化）
 //////////////////////////////////////////////////////////////
 
-// 角丸
+// スペーシング（スマホ専用）
+$app-padding-mobile:      1rem;  // 基本パディング
+$app-padding-small:       0.5rem; // 小さなパディング
+$app-padding-large:       1.5rem; // 大きなパディング
+
+// カードサイズ（スマホ用に最適化）
+$app-card-padding:        1rem;   // カード内パディング
+$app-form-max-width:      100%;   // フォーム最大幅（画面幅を活用）
+
+// 角丸（タッチしやすいサイズに調整）
 $app-radius-card:         12px;
-$app-radius-input:        6px;
-$app-radius-button:       6px;
+$app-radius-input:        8px;    // タッチしやすく
+$app-radius-button:       8px;    // タッチしやすく
 $app-radius-error:        8px;
 
-// シャドウ
-$app-shadow-card:         0 2px 8px rgba(0, 0, 0, 0.1);
-$app-shadow-header:       0 2px 4px rgba(0, 0, 0, 0.1);
+// シャドウ（スマホ用に軽量化）
+$app-shadow-card:         0 1px 4px rgba(0, 0, 0, 0.1);
+$app-shadow-header:       0 1px 3px rgba(0, 0, 0, 0.1);
 
-// ブレークポイント
-$app-breakpoint-mobile:   768px;
-$app-breakpoint-tablet:   1024px;
-
-// コンテナサイズ
-$app-max-width:           1280px;
-$app-card-max-width:      480px;
-
-// スペーシング
-$app-padding-mobile:      1rem;
-$app-padding-desktop:     2rem;
+// タッチ対応サイズ
+$app-touch-target-min:    44px;   // 最小タッチ領域（Apple推奨）
+$app-button-height:       48px;   // ボタン高さ
 
 //////////////////////////////////////////////////////////////
-/// mixinライブラリ
+/// mixinライブラリ（スマホ特化）
 //////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////
@@ -81,16 +83,18 @@ $app-padding-desktop:     2rem;
 
 @mixin app-logo-style {
   font-family: $app-font-theme;     // タイトル用フォント
-  font-size: $app-font-logo;        // ロゴ (36px)
+  font-size: $app-font-logo;        // ロゴ (28px)
   font-weight: $app-weight-bold;    
   color: $app-text-color;           // 黒色テキスト
+  line-height: 1.2;                 // タイトル用行間
 }
 
 @mixin app-title-style {
   font-family: $app-font-theme;     // タイトル用フォント
-  font-size: $app-font-title;       // タイトル (24px)
+  font-size: $app-font-title;       // タイトル (20px)
   font-weight: $app-weight-bold;
   color: $app-text-color;           // 黒色テキスト
+  line-height: 1.3;                 // 読みやすい行間
 }
 
 @mixin app-subtitle-style {
@@ -98,6 +102,7 @@ $app-padding-desktop:     2rem;
   font-size: $app-font-subtitle;    // サブタイトル (16px)
   font-weight: $app-weight-bold;
   color: $app-text-color;           // 黒色テキスト
+  line-height: 1.4;                 // 読みやすい行間
 }
 
 @mixin app-section-title {
@@ -110,64 +115,82 @@ $app-padding-desktop:     2rem;
   font-family: $app-font-body;      // 本文用フォント
   font-size: $app-font-body;        // 本文 (14px)
   color: $app-text-color;           // 黒色テキスト
+  line-height: 1.6;                 // 読みやすい行間
 }
 
 @mixin app-error-message {
-  background-color: $app-error-bg;  // エラー背景（薄い赤）
-  color: $app-error-color;          // エラーテキスト（赤）
-  border: 1px solid $app-error-border;  // エラー枠線（赤）
+  background-color: $app-error-bg;  // エラー背景
+  color: $app-error-color;          // エラーテキスト
+  border: 1px solid $app-error-border; // エラー枠線
   border-radius: $app-radius-error;     // 角丸
-  padding: 0.75rem;
+  padding: $app-padding-mobile;
   font-size: $app-font-body;        // 本文 (14px)
   text-align: left;
+  line-height: 1.5;
 }
 
 //////////////////////////////////////////////////////////////
-// ◆ ボタンスタイル
+// ◆ ボタンスタイル（スマホ用タッチ対応）
 //////////////////////////////////////////////////////////////
 
 @mixin app-button-base {
-  border: none;                         // 枠線なし
-  border-radius: $app-radius-button;    // 角丸
+  border: none;
+  border-radius: $app-radius-button;
   cursor: pointer;
-  padding: 0.75rem;
-  transition: opacity 0.2s ease;          
-  font-family: $app-font-body;          // 本文用フォント
-  font-size: $app-font-button;          // ボタン (16px)
-  font-weight: $app-weight-medium;  
-
-  &:hover:not(:disabled) {
-    opacity: 0.8;
+  padding: 0.75rem 1rem;
+  min-height: $app-touch-target-min; // 最小タッチ領域確保
+  transition: all 0.2s ease;
+  font-family: $app-font-body;
+  font-size: $app-font-button;       // ズーム防止のため16px
+  font-weight: $app-weight-medium;
+  
+  // タッチ対応
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  
+  &:active {
+    transform: scale(0.98); // タッチフィードバック
   }
 
   &:disabled {
     cursor: not-allowed;
     opacity: 0.6;
+    transform: none;
   }
 }
 
 @mixin app-button-primary {
-  color: $app-white;                    // 白色テキスト
-  background-color: $app-btn-primary;   // プライマリボタン（黒）
+  color: $app-white;
+  background-color: $app-btn-primary;
   width: 100%;
   @include app-button-base;
+  
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 }
 
 @mixin app-button-secondary {
-  color: $app-text-color;               // 黒色テキスト  
-  background-color: $app-btn-secondary; // セカンダリボタン（グレー）
+  color: $app-text-color;
+  background-color: $app-btn-secondary;
   @include app-button-base;
+  
+  &:hover:not(:disabled) {
+    opacity: 0.8;
+  }
 }
 
 @mixin app-button-like {
-  font-family: $app-font-body;          // 本文用フォント
-  font-size: $app-font-body;            // 本文 (14px)
+  font-family: $app-font-body;
+  font-size: $app-font-body;
   font-weight: $app-weight-medium;
-  color: $app-text-color;               // 黒色テキスト
+  color: $app-text-color;
+  min-height: $app-touch-target-min; // タッチ領域確保
+  padding: 0.5rem;
 }
 
 //////////////////////////////////////////////////////////////
-// ◆ レイアウト
+// ◆ レイアウト（スマホ特化）
 //////////////////////////////////////////////////////////////
 
 @mixin app-fullscreen-container {
@@ -181,26 +204,25 @@ $app-padding-desktop:     2rem;
   place-items: center;
   padding: $app-padding-mobile;
   
-  @media (min-width: $app-breakpoint-mobile) {
-    padding: $app-padding-desktop;
-  }
+  // セーフエリア対応
+  padding-top: max($app-padding-mobile, env(safe-area-inset-top));
+  padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
 }
 
 @mixin app-card-style($background: $app-white) {
   background: $background;
   border-radius: $app-radius-card;
   box-shadow: $app-shadow-card;
-  padding: 1.5rem;
+  padding: $app-card-padding;
   
-  @media (max-width: $app-breakpoint-mobile) {
-    padding: $app-padding-mobile;
-  }
+  // スマホ用の最適化
+  width: 100%;
+  margin: 0 auto;
 }
 
 @mixin app-large-card-style($background: $app-bg-color) {
-  padding: 2.5rem;
+  padding: $app-padding-large;
   width: 100%;
-  max-width: $app-card-max-width;
   text-align: center;
   
   display: flex;
@@ -208,27 +230,29 @@ $app-padding-desktop:     2rem;
   gap: 1.5rem;
   justify-content: center;
   @include app-card-style($background);
-  
-  @media (max-width: $app-breakpoint-mobile) {
-    padding: $app-padding-desktop;
-    max-width: 100%;
-    min-height: calc(100vh - 1rem);
-    width: calc(100vw - 1rem);
-  }
 }
+
+//////////////////////////////////////////////////////////////
+// ◆ フォーム（スマホ最適化）
+//////////////////////////////////////////////////////////////
 
 @mixin app-input-field-style {
   width: 100%;
-  padding: 0.75rem;
+  padding: $app-padding-mobile;
   border: 2px solid $app-gray-light;
   border-radius: $app-radius-input;
-  font-size: $app-font-body;
+  font-size: $app-font-button;      // ズーム防止のため16px
   font-family: $app-font-body;
+  min-height: $app-touch-target-min; // タッチ領域確保
   transition: border-color 0.2s ease;
-
+  
+  // iOS用の最適化
+  -webkit-appearance: none;
+  
   &:focus {
     outline: none;
     border-color: $app-btn-primary;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1); // フォーカス表示
   }
 
   &:disabled {
@@ -244,14 +268,16 @@ $app-padding-desktop:     2rem;
 
 @mixin app-form-group-style {
   text-align: left;
+  margin-bottom: 1rem;
 
   label {
     display: block;
     margin-bottom: 0.5rem;
+    font-size: $app-font-subtitle; // ズーム防止
     @include app-text-style;
   }
 
-  input {
+  input, textarea {
     @include app-input-field-style;
   }
 
@@ -259,55 +285,48 @@ $app-padding-desktop:     2rem;
     display: block;
     color: $app-error-color;
     font-size: $app-font-body;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
+    line-height: 1.4;
   }
 }
 
+//////////////////////////////////////////////////////////////
+// ◆ ページレイアウト（スマホ用）
+//////////////////////////////////////////////////////////////
+
 @mixin app-page-header {
   background: $app-white;
-  padding: $app-padding-mobile $app-padding-desktop;
+  padding: $app-padding-mobile;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: $app-shadow-header;
-
-  @media (max-width: $app-breakpoint-mobile) {
-    flex-direction: column;
-    gap: 1rem;
-    padding: $app-padding-mobile;
-  }
+  min-height: 60px; // 最小高さを確保
+  
+  // セーフエリア対応
+  padding-top: max($app-padding-mobile, env(safe-area-inset-top));
 }
 
 @mixin app-main-content {
   flex: 1;
-  padding: $app-padding-desktop;
-  max-width: $app-max-width;
-  margin: 0 auto;
+  padding: $app-padding-mobile;
   width: 100%;
-
-  @media (max-width: $app-breakpoint-mobile) {
-    padding: $app-padding-mobile;
-  }
+  
+  // セーフエリア対応
+  padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
 }
 
-@mixin app-responsive-grid($min-width: 300px) {
+@mixin app-mobile-grid($gap: 1rem) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
-  gap: 1.5rem;
-
-  @media (max-width: $app-breakpoint-mobile) {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+  grid-template-columns: 1fr; // 常に1列
+  gap: $gap;
+  width: 100%;
 }
 
-@mixin app-flex-container($gap: 1rem, $direction: row) {
+@mixin app-mobile-flex($gap: 1rem, $direction: column) {
   display: flex;
   gap: $gap;
   flex-direction: $direction;
-  
-  @media (max-width: $app-breakpoint-mobile) {
-    flex-direction: column;
-    align-items: stretch;
-  }
+  width: 100%;
+  align-items: stretch;
 }

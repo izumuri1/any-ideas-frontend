@@ -25,7 +25,6 @@ export function Home({ user: userProp }: HomeProps) {
       {/* 上部メニュー */}
       <header className="home-header">
         <div className="header-left">
-          {/* ①Any ideas?を削除し、ワークスペース名と招待トークンの幅を広げる */}
           <div className="workspace-info">
             <span className="workspace-name">テストワークスペース</span>
             <span className="invite-token">招待トークン: ABC123</span>

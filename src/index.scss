@@ -1,5 +1,6 @@
 // src/index.scss
 // Any Ideas? アプリケーション全体のグローバルスタイル
+// スマホ特化版
 
 @use './styles/variables' as *;
 
@@ -34,6 +35,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: $app-bg-color;
   color: $app-text-color;
+  
+  // スマホ用の追加設定
+  -webkit-text-size-adjust: 100%; // iOS Safariでのズーム防止
+  -webkit-tap-highlight-color: transparent; // タップ時のハイライト除去
+  overscroll-behavior: none; // オーバースクロール無効化
 }
 
 /* リンクのデフォルトスタイルをリセット */
@@ -61,6 +67,10 @@ button {
   border: none;
   cursor: pointer;
   font-family: inherit;
+  
+  // スマホ用タッチ操作の改善
+  -webkit-appearance: none;
+  touch-action: manipulation; // ダブルタップズーム防止
 }
 
 /* フォーム要素のリセット */
@@ -69,24 +79,36 @@ textarea,
 select {
   font-family: inherit;
   font-size: inherit;
+  
+  // iOS用の最適化
+  -webkit-appearance: none;
+  border-radius: 0; // iOS デフォルトの角丸を削除
+}
+
+// タッチデバイス専用：入力時のズーム防止
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  font-size: 16px; // 16px以上でズーム防止
 }
 
 //////////////////////////////////////////////////////////////
 // Any Ideas! アプリケーション専用スタイル
 //////////////////////////////////////////////////////////////
 
-/* アプリ全体のコンテナ */
+/* アプリ全体のコンテナ - スマホ特化 */
 #root {
-  max-width: $app-max-width;
-  margin: 0 auto;
-  padding: $app-padding-desktop;
+  width: 100vw;
+  margin: 0;
+  padding: $app-padding-mobile;
   text-align: center;
   min-height: 100vh;
   background-color: $app-bg-color;
-
-  @media (max-width: $app-breakpoint-mobile) {
-    padding: $app-padding-mobile;
-  }
+  
+  // スマホでの表示最適化
+  position: relative;
+  overflow-x: hidden; // 横スクロール防止
 }
 
 //////////////////////////////////////////////////////////////
@@ -106,22 +128,30 @@ select {
 }
 
 //////////////////////////////////////////////////////////////
-// デバッグ用（開発環境でのみ表示）
+// スマホ専用ユーティリティクラス
 //////////////////////////////////////////////////////////////
 
-.debug-info {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  z-index: 9999;
+// セーフエリア対応（iPhone X以降のノッチ対応）
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+// スクロール改善
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+// タッチフィードバック改善
+.touch-feedback {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  transition: opacity 0.15s ease;
   
-  // プロダクション環境では非表示
-  .production & {
-    display: none;
+  &:active {
+    opacity: 0.7;
   }
 }
