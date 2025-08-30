@@ -1,4 +1,4 @@
-// src/components/Home.tsx
+// src/pages/Home.tsx
 import type { User } from '@supabase/auth-js'
 import { useAuth } from '../contexts/AuthContext'
 import './Home.scss'
@@ -25,9 +25,9 @@ export function Home({ user: userProp }: HomeProps) {
       {/* 上部メニュー */}
       <header className="home-header">
         <div className="header-left">
-          <h1 className="logo">Any ideas?</h1>
+          {/* ①Any ideas?を削除し、ワークスペース名と招待トークンの幅を広げる */}
           <div className="workspace-info">
-            <span className="workspace-name">テストワークスペース・{user?.email}</span>
+            <span className="workspace-name">テストワークスペース</span>
             <span className="invite-token">招待トークン: ABC123</span>
           </div>
         </div>
@@ -41,13 +41,6 @@ export function Home({ user: userProp }: HomeProps) {
 
       {/* メインコンテンツ */}
       <main className="home-main">
-        <div className="welcome-section">
-          <h2 className="welcome-title">ログイン確認テスト</h2>
-          <p className="welcome-message">
-            ログイン成功！ユーザー: {user?.email}
-          </p>
-        </div>
-
         {/* 簡易アイデア登録セクション */}
         <section className="idea-form-section">
           <h3 className="section-title">Any ideas?</h3>
@@ -71,8 +64,10 @@ export function Home({ user: userProp }: HomeProps) {
                 <div className="idea-card">
                   <p className="idea-text">今年の夏・家族で・海に行きたい</p>
                   <div className="card-actions">
+                    {/* ③いいねの♡ボタン - 角丸枠を削除 */}
                     <button className="btn-like">♡ 2</button>
                     <button className="btn-proceed">進める</button>
+                    {/* ②削除ボタン - 背景色グレー、テキスト白 */}
                     <button className="btn-delete">削除</button>
                   </div>
                 </div>
