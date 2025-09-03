@@ -1,0 +1,421 @@
+// src/components/CreateWorkspace.scss
+// ワークスペース作成画面専用スタイル
+// Login.scssの基本スタイルを含み、ワークスペース作成画面特有のスタイルを追加
+@use '../styles/variables' as *;
+
+//////////////////////////////////////////////////////////////
+// Login.scssから継承する基本スタイル
+//////////////////////////////////////////////////////////////
+
+.login-container {
+  @include app-fullscreen-container;
+  
+  // スマホ用の追加最適化
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  // セーフエリア対応の強化
+  padding-left: max($app-padding-mobile, env(safe-area-inset-left));
+  padding-right: max($app-padding-mobile, env(safe-area-inset-right));
+}
+
+.login-card {
+  @include app-large-card-style($app-bg-color);
+  
+  // スマホ用の最適化
+  max-width: none;
+  width: 100%;
+  min-height: auto;
+  margin: 0;
+  
+  // 縦画面での中央配置調整
+  justify-content: flex-start;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+
+  .logo {
+    @include app-logo-style;
+    
+    // スマホ用ロゴの調整
+    font-size: $app-font-logo;
+    margin-bottom: 0.5rem;
+    
+    // アニメーション効果追加
+    animation: logoFadeIn 0.6s ease-out;
+  }
+
+  .subtitle {
+    @include app-subtitle-style;
+    
+    // スマホ用サブタイトルの調整
+    font-size: $app-font-subtitle;
+    margin-bottom: 0.5rem;
+    color: $app-text-color;
+    
+    // ワークスペース作成画面らしい色合いに
+    font-weight: $app-weight-medium;
+    
+    // フェードインアニメーション
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+  }
+
+  .introduction {
+    @include app-text-style;
+    
+    // スマホ用説明文の調整
+    font-size: $app-font-body;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: $app-gray-dark;
+    
+    // フェードインアニメーション
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+  }
+}
+
+.error-message {
+  @include app-error-message;
+  
+  // スマホ用の調整
+  margin-bottom: 1.5rem;
+  padding: $app-padding-mobile;
+  border-radius: $app-radius-card;
+  
+  // エラー表示のアニメーション
+  animation: errorSlideIn 0.3s ease-out;
+  
+  // アクセシビリティ向上
+  role: alert;
+  aria-live: polite;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  
+  // フェードインアニメーション
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+
+  .form-group {
+    @include app-form-group-style;
+    
+    // スマホ用のフォームグループ調整
+    margin-bottom: 1.5rem;
+
+    label {
+      // ラベルの視認性向上
+      font-weight: $app-weight-medium;
+      color: $app-text-color;
+      margin-bottom: 0.75rem;
+      
+      // ズーム防止確実化
+      font-size: $app-font-subtitle;
+    }
+
+    input {
+      // スマホ用入力フィールドの最適化
+      min-height: $app-button-height;
+      padding: 1rem;
+      font-size: $app-font-button;
+      
+      // タッチフィードバック追加
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+      
+      // フォーカス時の視覚的強調
+      &:focus {
+        border-color: $app-btn-primary;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+      
+      // 入力中のスタイル
+      &:valid {
+        border-color: $app-gray-medium;
+      }
+      
+      // プレースホルダーの調整
+      &::placeholder {
+        color: $app-gray-medium;
+        font-size: $app-font-body;
+      }
+    }
+
+    .field-error {
+      // エラーメッセージの視認性向上
+      font-size: $app-font-body;
+      color: $app-error-color;
+      margin-top: 0.75rem;
+      padding: 0.5rem;
+      background-color: $app-error-bg;
+      border-radius: $app-radius-input;
+      border-left: 3px solid $app-error-color;
+      
+      // エラー表示アニメーション
+      animation: errorShake 0.5s ease-out;
+    }
+  }
+
+  .btn-primary {
+    @include app-button-primary;
+    
+    // スマホ用ボタンの最適化
+    min-height: $app-button-height;
+    font-size: $app-font-button;
+    font-weight: $app-weight-medium;
+    border-radius: $app-radius-button;
+    
+    // タッチフィードバック強化
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    &:disabled {
+      background-color: $app-gray-light;
+      color: $app-gray-medium;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// ワークスペース作成画面固有のスタイル
+//////////////////////////////////////////////////////////////
+
+// フォーム下部のボタンエリア
+.auth-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid $app-gray-light;
+  
+  // フェードインアニメーション
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+
+  .btn-secondary {
+    @include app-button-secondary;
+    
+    // スマホ用セカンダリボタンの最適化
+    width: 100%;
+    min-height: $app-button-height;
+    font-size: $app-font-button;
+    margin-top: 0.75rem;
+    
+    // タッチフィードバック
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    
+    &:active {
+      opacity: 0.7;
+    }
+
+    &:disabled {
+      background-color: $app-disabled-bg;
+      color: $app-gray-medium;
+      cursor: not-allowed;
+      border-color: $app-gray-light;
+    }
+  }
+}
+
+// ワークスペース作成画面のタイトル調整
+.login-card {
+  .subtitle {
+    // ワークスペース作成画面らしい色合いに
+    color: $app-text-color;
+    font-weight: $app-weight-medium;
+  }
+
+  .introduction {
+    // 説明文の調整
+    color: $app-gray-dark;
+    margin-bottom: 1.5rem;
+  }
+}
+
+// ローディング状態のボタンスタイル
+.auth-form {
+  .btn-primary {
+    &:disabled {
+      background-color: $app-gray-medium;
+      color: $app-white;
+      cursor: not-allowed;
+      opacity: 0.7;
+      
+      // ローディング時のアニメーション
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        width: 16px;
+        height: 16px;
+        margin-top: -8px;
+        border: 2px solid transparent;
+        border-top: 2px solid $app-white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+}
+
+// 説明欄の特別スタイル
+.form-group {
+  // 説明欄（任意）のラベルスタイル
+  &:has(input[id="description"]) {
+    label {
+      &::after {
+        content: '（任意）';
+        color: $app-gray-medium;
+        font-weight: $app-weight-normal;
+        margin-left: 0.5rem;
+        font-size: $app-font-body;
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アニメーション定義
+//////////////////////////////////////////////////////////////
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// レスポンシブ調整（ワークスペース作成画面専用）
+//////////////////////////////////////////////////////////////
+
+// 小さいスマホ画面用（iPhone SE、古いAndroid等）
+@media (max-width: 375px) {
+  .auth-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    
+    .btn-secondary {
+      margin-top: 0.5rem;
+      min-height: 44px; // 少し小さく
+    }
+  }
+  
+  .login-card {
+    .introduction {
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .auth-form {
+    .form-group {
+      margin-bottom: 1rem;
+      
+      input {
+        padding: 0.75rem;
+        min-height: 44px;
+      }
+    }
+  }
+}
+
+// 大きめのスマホ画面用（iPhone Pro Max、大型Android等）
+@media (min-width: 414px) {
+  .auth-footer {
+    .btn-secondary {
+      max-width: 200px;
+      margin: 0.75rem auto 0;
+    }
+  }
+  
+  .auth-form {
+    .btn-primary {
+      min-height: $app-button-height;
+    }
+  }
+}
+
+// 横画面モード対応
+@media (orientation: landscape) and (max-height: 500px) {
+  .login-card {
+    .introduction {
+      margin-bottom: 0.75rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  .auth-form {
+    gap: 1rem;
+    
+    .form-group {
+      margin-bottom: 0.75rem;
+      
+      input {
+        min-height: 40px;
+        padding: 0.75rem;
+      }
+    }
+  }
+
+  .auth-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    
+    .btn-secondary {
+      margin-top: 0.5rem;
+      min-height: 40px;
+    }
+  }
+}
+
+// アクセシビリティ改善（ワークスペース作成画面専用）
+//////////////////////////////////////////////////////////////
+
+// フォーカス可能要素の視覚的強調
+.auth-footer {
+  .btn-secondary {
+    &:focus-visible {
+      outline: 3px solid $app-btn-primary;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// 高コントラストモード対応
+@media (prefers-contrast: high) {
+  .auth-footer {
+    border-top-width: 3px;
+  }
+  
+  .auth-form {
+    .btn-primary:disabled {
+      border: 2px solid $app-gray-medium;
+    }
+  }
+  
+  .auth-footer {
+    .btn-secondary {
+      border: 2px solid $app-btn-secondary;
+    }
+  }
+}
+
+// 動きを減らす設定に対応
+@media (prefers-reduced-motion: reduce) {
+  .auth-form .btn-primary:disabled::after {
+    animation: none !important;
+  }
+}

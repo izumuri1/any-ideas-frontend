@@ -4,6 +4,7 @@ import { Home } from './pages/Home'
 import { Login } from './components/Login'
 import { SignUp } from './components/SignUp'
 import { LoadingSpinner } from './components/LoadingSpinner'
+import { CreateWorkspace } from './components/CreateWorkspace'
 import './App.scss'
 
 function App() {
@@ -25,8 +26,8 @@ function App() {
             <Route path="/home" element={<Home />} />
             {/* すでにログイン済みのユーザーをログインページから追い出したい場合 */}
             <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/create-workspace" element={<CreateWorkspace />} />
             {/* 将来追加予定のルート */}
-            {/* <Route path="/workspace/:id" element={<Workspace user={user} />} /> */}
             {/* <Route path="/idea/:id" element={<IdeaDetail user={user} />} /> */}
           </>
         ) : (
