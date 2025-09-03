@@ -7,11 +7,10 @@ import './CreateWorkspace.scss' // ワークスペース作成専用スタイル
 
 ////////////////////////////////////////////////////////////////
 // ◆ 実行時の流れ
-// ページ読み込み → コンポーネントが表示される
-// ユーザーが入力 → React Hook Formがリアルタイムでバリデーション
-// ワークスペース作成ボタンクリック → onSubmit関数が実行される
-// 作成成功 → ワークスペース一覧画面または直接作成したワークスペースに遷移
-// 作成失敗 → エラーメッセージを表示
+// ページ読み込み → ワークスペース選択状態で表示される
+// ワークスペース作成ボタンクリック → ワークスペース作成フォーム表示
+// ワークスペース作成成功 → ワークスペース選択状態に戻る
+// ワークスペース選択 → Home画面に遷移
 ////////////////////////////////////////////////////////////////
 
 // 1. 準備・設定
@@ -21,25 +20,39 @@ interface CreateWorkspaceFormData {
   description?: string
 }
 
+// 仮のワークスペース型定義（将来のAPI実装用）
+interface Workspace {
+  id: string
+  name: string
+  description?: string
+  owner_id: string
+  created_at: string
+}
+
 // 2. 状態管理・フック初期化
-// ワークスペース作成画面を表示するためのコンポーネントを作成
+// ワークスペース画面を表示するためのコンポーネントを作成
 export function CreateWorkspace() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [submitError, setSubmitError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showCreateForm, setShowCreateForm] = useState(false) // フォーム表示状態
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([
+    // 将来のAPI実装時には、ここをAPIから取得したデータで置き換える
+
+  ])
 
   // ワークスペース作成フォーム
   // React Hook Formからフォーム管理に必要な3つの道具を取り出す
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors }
     // React Hook Formを初期化。<CreateWorkspaceFormData>でフォームの型を指定
   } = useForm<CreateWorkspaceFormData>()
 
   // 3. ワークスペース作成処理ロジック
-  // 自作のonSubmit関数でワークスペース作成の結果を取得する非同期処理
   const onSubmit = async (data: CreateWorkspaceFormData) => {
     if (!user) {
       setSubmitError('ログインが必要です')
@@ -76,7 +89,19 @@ export function CreateWorkspace() {
       
       // 仮の成功処理（実装時は上記のコメントアウト部分を使用）
       setTimeout(() => {
-        navigate('/workspace-select') // ワークスペース一覧に遷移
+        // 新しいワークスペースを一覧に追加
+        const newWorkspace: Workspace = {
+          id: Date.now().toString(),
+          name: data.workspaceName,
+          description: data.description,
+          owner_id: user.id,
+          created_at: new Date().toISOString()
+        }
+        setWorkspaces(prev => [newWorkspace, ...prev])
+        
+        // フォームをリセットして選択状態に戻る
+        reset()
+        setShowCreateForm(false)
       }, 1000)
       
     } catch (error: any) {
@@ -99,9 +124,41 @@ export function CreateWorkspace() {
     }
   }
 
-  const handleBackClick = () => {
-    // ワークスペース一覧またはホーム画面に戻る
-    navigate('/workspace-select')
+  // ログアウト処理関数
+  const handleLogoutClick = async () => {
+    try {
+      setIsLoading(true)
+      await signOut()
+      // AuthContextがサインアウト状態を検知してログインページに自動リダイレクト
+    } catch (error) {
+      console.error('ログアウトに失敗しました:', error)
+      // エラーが発生してもログインページに遷移させる
+      navigate('/login')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // ワークスペース作成フォーム表示切り替え
+  const handleShowCreateForm = () => {
+    setShowCreateForm(true)
+    setSubmitError('') // エラーメッセージをクリア
+  }
+
+  // ワークスペース作成キャンセル
+  const handleCancelCreate = () => {
+    setShowCreateForm(false)
+    setSubmitError('')
+    reset()
+  }
+
+  // ワークスペース選択処理
+  const handleWorkspaceSelect = (workspace: Workspace) => {
+    // TODO: 選択したワークスペースをローカルストレージに保存
+    // localStorage.setItem('currentWorkspace', JSON.stringify(workspace))
+    
+    // Home画面に遷移
+    navigate(`/workspace/${workspace.id}`)
   }
 
   // 4. レンダリング（画面処理）
@@ -109,63 +166,103 @@ export function CreateWorkspace() {
     <div className="login-container">
       <div className="login-card">
         <h1 className="logo">Any ideas?</h1>
-        <p className="subtitle">ワークスペース作成</p>
-        <p className="introduction">アイデアを共有するワークスペースを作成しましょう</p>
+        
+        {/* ワークスペース作成フォーム表示状態 */}
+        {showCreateForm ? (
+          <>
+            <p className="subtitle">ワークスペース作成</p>
+            <p className="introduction">アイデアを共有するワークスペースを作成しましょう</p>
 
-        {/* エラーメッセージ */}
-        {submitError && <div className="error-message">{submitError}</div>}
+            {/* エラーメッセージ */}
+            {submitError && <div className="error-message">{submitError}</div>}
 
-        {/* ワークスペース作成フォーム */}
-        <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="workspaceName">ワークスペース名</label>
-            <input
-              type="text"
-              id="workspaceName"
-              placeholder="家族旅行の計画"
-              {...register('workspaceName', {
-                required: 'ワークスペース名は必須です',
-                maxLength: {
-                  value: 30,
-                  message: 'ワークスペース名は30文字以下で入力してください'
-                },
-                pattern: {
-                  value: /^[a-zA-Z0-9ひらがなカタカナ漢字\s\-_]+$/,
-                  message: 'ワークスペース名に使用できない文字が含まれています'
-                }
-              })}
-            />
-            {errors.workspaceName && (
-              <span className="field-error">{errors.workspaceName.message}</span>
-            )}
-          </div>
+            {/* ワークスペース作成フォーム */}
+            <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
+              <div className="form-group">
+                <label htmlFor="workspaceName">ワークスペース名</label>
+                <input
+                  type="text"
+                  id="workspaceName"
+                  placeholder="家族旅行の計画"
+                  {...register('workspaceName', {
+                    required: 'ワークスペース名は必須です',
+                    maxLength: {
+                      value: 30,
+                      message: 'ワークスペース名は30文字以下で入力してください'
+                    },
+                    pattern: {
+                      value: /^[a-zA-Z0-9\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\s\-_]+$/,
+                      message: 'ワークスペース名に使用できない文字が含まれています'
+                    }
+                  })}
+                />
+                {errors.workspaceName && (
+                  <span className="field-error">{errors.workspaceName.message}</span>
+                )}
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="description">説明（任意）</label>
-            <input
-              type="text"
-              id="description"
-              placeholder="このワークスペースの目的や内容を簡単に説明"
-              {...register('description', {
-                maxLength: {
-                  value: 100,
-                  message: '説明は100文字以下で入力してください'
-                }
-              })}
-            />
-            {errors.description && (
-              <span className="field-error">{errors.description.message}</span>
-            )}
-          </div>
+              <div className="form-buttons">
+                <button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="btn-primary"
+                >
+                  {isLoading ? 'ワークスペース作成中...' : 'ワークスペース作成'}
+                </button>
+                
+                <button 
+                  type="button"
+                  onClick={handleCancelCreate}
+                  disabled={isLoading}
+                  className="btn-secondary"
+                >
+                  キャンセル
+                </button>
+              </div>
+            </form>
+          </>
+        ) : (
+          /* ワークスペース選択状態 */
+          <>
+            <p className="subtitle">ワークスペース選択</p>
+            <p className="introduction">参加しているワークスペースを選択してください</p>
 
-          <button 
-            type="submit" 
-            disabled={isLoading}
-            className="btn-primary"
-          >
-            {isLoading ? 'ワークスペース作成中...' : 'ワークスペース作成'}
-          </button>
-        </form>
+            {/* ワークスペース作成ボタン */}
+            <button 
+              onClick={handleShowCreateForm}
+              disabled={isLoading}
+              className="btn-primary workspace-create-btn"
+            >
+              ワークスペース作成
+            </button>
+
+            {/* 既存ワークスペース一覧 */}
+            <div className="workspace-list">
+              {workspaces.length === 0 ? (
+                <div className="empty-workspace">
+                  <p>まだワークスペースがありません</p>
+                  <p>最初のワークスペースを作成しましょう！</p>
+                </div>
+              ) : (
+                workspaces.map((workspace) => (
+                  <button
+                    key={workspace.id}
+                    onClick={() => handleWorkspaceSelect(workspace)}
+                    disabled={isLoading}
+                    className="workspace-item"
+                  >
+                    <div className="workspace-info">
+                      <h3 className="workspace-name">{workspace.name}</h3>
+                      <span className="workspace-date">
+                        作成日: {new Date(workspace.created_at).toLocaleDateString('ja-JP')}
+                      </span>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </>
+        )}
 
         {/* ログアウトボタン */}
         <div className="auth-footer">

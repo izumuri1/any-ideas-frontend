@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useAuth } from './contexts/AuthContext'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Home } from './pages/Home'
@@ -22,11 +23,20 @@ function App() {
         {/* 認証されているユーザー（userが存在）なら、これらのページに移動できる */}
         {user ? (
           <>
-            <Route path="/" element={<Home />} />
+            {/* ログイン後は直接ワークスペース選択画面へ */}
+            <Route path="/" element={<CreateWorkspace />} />
+            <Route path="/workspace" element={<CreateWorkspace />} />
+            <Route path="/create-workspace" element={<CreateWorkspace />} />
+            <Route path="/workspace-select" element={<CreateWorkspace />} />
+            
+            {/* 個別のワークスペース（Home画面） */}
+            <Route path="/workspace/:workspaceId" element={<Home />} />
             <Route path="/home" element={<Home />} />
+            
             {/* すでにログイン済みのユーザーをログインページから追い出したい場合 */}
             <Route path="/login" element={<Navigate to="/" replace />} />
-            <Route path="/create-workspace" element={<CreateWorkspace />} />
+            <Route path="/signup" element={<Navigate to="/" replace />} />
+            
             {/* 将来追加予定のルート */}
             {/* <Route path="/idea/:id" element={<IdeaDetail user={user} />} /> */}
           </>
