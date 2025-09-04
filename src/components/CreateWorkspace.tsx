@@ -18,14 +18,12 @@ import './CreateWorkspace.scss'
 // ワークスペース作成フォームの型定義
 interface CreateWorkspaceFormData {
   workspaceName: string
-  description?: string
 }
 
 // ワークスペース型定義（Supabaseのテーブル構造に対応）
 interface Workspace {
   id: string
   name: string
-  description?: string
   owner_id: string
   created_at: string
 }
@@ -59,7 +57,6 @@ export function CreateWorkspace() {
           workspaces!inner (
             id,
             name,
-            description,
             owner_id,
             created_at
           )
@@ -75,7 +72,6 @@ export function CreateWorkspace() {
           return {
             id: workspace.id,
             name: workspace.name,
-            description: workspace.description,
             owner_id: workspace.owner_id,
             created_at: workspace.created_at
           }
@@ -110,7 +106,6 @@ export function CreateWorkspace() {
         .from('workspaces')
         .insert({
           name: data.workspaceName,
-          description: data.description || null,
           owner_id: user.id
         })
         .select()
@@ -258,24 +253,6 @@ export function CreateWorkspace() {
                 />
                 {errors.workspaceName && (
                   <span className="field-error">{errors.workspaceName.message}</span>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="description">説明（任意）</label>
-                <textarea
-                  id="description"
-                  placeholder="このワークスペースで何について話し合いますか？"
-                  rows={3}
-                  {...register('description', {
-                    maxLength: {
-                      value: 200,
-                      message: '説明は200文字以下で入力してください'
-                    }
-                  })}
-                />
-                {errors.description && (
-                  <span className="field-error">{errors.description.message}</span>
                 )}
               </div>
 
