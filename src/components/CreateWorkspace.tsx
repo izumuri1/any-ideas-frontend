@@ -1,9 +1,10 @@
 // src/components/CreateWorkspace.tsx
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import './CreateWorkspace.scss' // ワークスペース作成専用スタイル
+import { supabase } from '../lib/supabase'
+import './CreateWorkspace.scss'
 
 ////////////////////////////////////////////////////////////////
 // ◆ 実行時の流れ
@@ -20,7 +21,7 @@ interface CreateWorkspaceFormData {
   description?: string
 }
 
-// 仮のワークスペース型定義（将来のAPI実装用）
+// ワークスペース型定義（Supabaseのテーブル構造に対応）
 interface Workspace {
   id: string
   name: string
@@ -30,29 +31,61 @@ interface Workspace {
 }
 
 // 2. 状態管理・フック初期化
-// ワークスペース画面を表示するためのコンポーネントを作成
 export function CreateWorkspace() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [submitError, setSubmitError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [showCreateForm, setShowCreateForm] = useState(false) // フォーム表示状態
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([
-    // 将来のAPI実装時には、ここをAPIから取得したデータで置き換える
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([])
 
-  ])
-
-  // ワークスペース作成フォーム
-  // React Hook Formからフォーム管理に必要な3つの道具を取り出す
+  // React Hook Formの初期化
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors }
-    // React Hook Formを初期化。<CreateWorkspaceFormData>でフォームの型を指定
   } = useForm<CreateWorkspaceFormData>()
 
-  // 3. ワークスペース作成処理ロジック
+  // 3. ユーザーのワークスペース一覧を取得
+  const fetchWorkspaces = async () => {
+    if (!user) return
+
+    try {
+      // ユーザーが参加しているワークスペースを取得
+      const { data, error } = await supabase
+        .from('workspace_members')
+        .select(`
+          workspaces (
+            id,
+            name,
+            description,
+            owner_id,
+            created_at
+          )
+        `)
+        .eq('user_id', user.id)
+
+      if (error) throw error
+
+      // データを整形してワークスペース配列に変換
+      const userWorkspaces = data
+        ?.map(item => item.workspaces)
+        .filter(Boolean) as Workspace[]
+
+      setWorkspaces(userWorkspaces || [])
+    } catch (error) {
+      console.error('ワークスペース取得エラー:', error)
+      setSubmitError('ワークスペース一覧の取得に失敗しました')
+    }
+  }
+
+  // 4. コンポーネント初期化時にワークスペース一覧を取得
+  useEffect(() => {
+    fetchWorkspaces()
+  }, [user])
+
+  // 5. ワークスペース作成処理（Supabase連携）
   const onSubmit = async (data: CreateWorkspaceFormData) => {
     if (!user) {
       setSubmitError('ログインが必要です')
@@ -63,105 +96,123 @@ export function CreateWorkspace() {
     setIsLoading(true)
     
     try {
-      // TODO: 実際のワークスペース作成API呼び出し
-      // const { data: workspace, error } = await supabase
-      //   .from('workspaces')
-      //   .insert({
-      //     name: data.workspaceName,
-      //     description: data.description,
-      //     owner_id: user.id
-      //   })
-      //   .select()
-      //   .single()
-      
-      // if (error) throw error
-      
-      // // ワークスペースメンバーとして自分を追加
-      // const { error: memberError } = await supabase
-      //   .from('workspace_members')
-      //   .insert({
-      //     workspace_id: workspace.id,
-      //     user_id: user.id,
-      //     role: 'owner'
-      //   })
-      
-      // if (memberError) throw memberError
-      
-      // 仮の成功処理（実装時は上記のコメントアウト部分を使用）
-      setTimeout(() => {
-        // 新しいワークスペースを一覧に追加
-        const newWorkspace: Workspace = {
-          id: Date.now().toString(),
+      // ワークスペースを作成
+      const { data: workspace, error: workspaceError } = await supabase
+        .from('workspaces')
+        .insert({
           name: data.workspaceName,
-          description: data.description,
-          owner_id: user.id,
-          created_at: new Date().toISOString()
-        }
-        setWorkspaces(prev => [newWorkspace, ...prev])
-        
-        // フォームをリセットして選択状態に戻る
-        reset()
-        setShowCreateForm(false)
-      }, 1000)
+          description: data.description || null,
+          owner_id: user.id
+        })
+        .select()
+        .single()
+      
+      if (workspaceError) throw workspaceError
+      
+      // ワークスペースメンバーとして作成者を追加
+      const { error: memberError } = await supabase
+        .from('workspace_members')
+        .insert({
+          workspace_id: workspace.id,
+          user_id: user.id,
+          role: 'owner'
+        })
+      
+      if (memberError) throw memberError
+
+      // プロフィールの最終ワークスペースを更新
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          last_workspace_id: workspace.id,
+          last_workspace_accessed_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+      
+      if (profileError) {
+        console.warn('プロフィール更新に失敗:', profileError)
+        // プロフィール更新の失敗は致命的ではないので続行
+      }
+      
+      // ワークスペース一覧を再取得
+      await fetchWorkspaces()
+      
+      // フォームをリセットして選択状態に戻る
+      reset()
+      setShowCreateForm(false)
       
     } catch (error: any) {
+      console.error('ワークスペース作成エラー:', error)
+      
       // エラーハンドリング
-      switch (error?.code) {
-        case 'workspace_name_too_long':
-          setSubmitError('ワークスペース名が長すぎます。30文字以下で入力してください。')
-          break
-        case 'workspace_name_invalid':
-          setSubmitError('ワークスペース名に使用できない文字が含まれています。')
-          break
-        case 'user_workspace_limit_exceeded':
-          setSubmitError('作成できるワークスペースの上限に達しています。')
-          break
-        default:
-          setSubmitError('ワークスペースの作成に失敗しました。もう一度お試しください。')
+      if (error?.code) {
+        switch (error.code) {
+          case '23505': // unique_violation
+            setSubmitError('同じ名前のワークスペースが既に存在します')
+            break
+          case '23514': // check_violation
+            setSubmitError('ワークスペース名が無効です')
+            break
+          default:
+            setSubmitError(`エラー: ${error.message}`)
+        }
+      } else {
+        setSubmitError('ワークスペースの作成に失敗しました。もう一度お試しください。')
       }
     } finally {
       setIsLoading(false)
     }
   }
 
-  // ログアウト処理関数
+  // 6. ログアウト処理
   const handleLogoutClick = async () => {
     try {
       setIsLoading(true)
       await signOut()
-      // AuthContextがサインアウト状態を検知してログインページに自動リダイレクト
     } catch (error) {
       console.error('ログアウトに失敗しました:', error)
-      // エラーが発生してもログインページに遷移させる
       navigate('/login')
     } finally {
       setIsLoading(false)
     }
   }
 
-  // ワークスペース作成フォーム表示切り替え
+  // 7. その他の操作
   const handleShowCreateForm = () => {
     setShowCreateForm(true)
-    setSubmitError('') // エラーメッセージをクリア
+    setSubmitError('')
   }
 
-  // ワークスペース作成キャンセル
   const handleCancelCreate = () => {
     setShowCreateForm(false)
     setSubmitError('')
     reset()
   }
 
-  // ワークスペース選択処理
-  const handleWorkspaceSelect = (workspace: Workspace) => {
-    // TODO: 選択したワークスペースをローカルストレージに保存
-    // localStorage.setItem('currentWorkspace', JSON.stringify(workspace))
+  const handleWorkspaceSelect = async (workspace: Workspace) => {
+    try {
+      // プロフィールの最終ワークスペースを更新
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          last_workspace_id: workspace.id,
+          last_workspace_accessed_at: new Date().toISOString()
+        })
+        .eq('id', user!.id)
+      
+      if (error) {
+        console.warn('プロフィール更新に失敗:', error)
+        // エラーがあっても画面遷移は続行
+      }
+    } catch (error) {
+      console.warn('ワークスペース選択時のエラー:', error)
+    }
     
     // Home画面に遷移
     navigate(`/workspace/${workspace.id}`)
   }
 
-  // 4. レンダリング（画面処理）
+  // 8. レンダリング
   return (
     <div className="login-container">
       <div className="login-card">
@@ -198,6 +249,24 @@ export function CreateWorkspace() {
                 />
                 {errors.workspaceName && (
                   <span className="field-error">{errors.workspaceName.message}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">説明（任意）</label>
+                <textarea
+                  id="description"
+                  placeholder="このワークスペースで何について話し合いますか？"
+                  rows={3}
+                  {...register('description', {
+                    maxLength: {
+                      value: 200,
+                      message: '説明は200文字以下で入力してください'
+                    }
+                  })}
+                />
+                {errors.description && (
+                  <span className="field-error">{errors.description.message}</span>
                 )}
               </div>
 
@@ -239,41 +308,47 @@ export function CreateWorkspace() {
             {/* 既存ワークスペース一覧 */}
             <div className="workspace-list">
               {workspaces.length === 0 ? (
-                <div className="empty-workspace">
-                  <p>まだワークスペースがありません</p>
-                  <p>最初のワークスペースを作成しましょう！</p>
-                </div>
+                <p className="no-workspaces">
+                  まだワークスペースがありません。<br />
+                  最初のワークスペースを作成しましょう！
+                </p>
               ) : (
-                workspaces.map((workspace) => (
-                  <button
+                workspaces.map(workspace => (
+                  <div 
                     key={workspace.id}
-                    onClick={() => handleWorkspaceSelect(workspace)}
-                    disabled={isLoading}
                     className="workspace-item"
+                    onClick={() => handleWorkspaceSelect(workspace)}
                   >
                     <div className="workspace-info">
                       <h3 className="workspace-name">{workspace.name}</h3>
-                      <span className="workspace-date">
-                        作成日: {new Date(workspace.created_at).toLocaleDateString('ja-JP')}
-                      </span>
+                      {workspace.description && (
+                        <p className="workspace-description">{workspace.description}</p>
+                      )}
+                      <div className="workspace-meta">
+                        <span className="workspace-owner">
+                          {workspace.owner_id === user?.id ? 'オーナー' : 'メンバー'}
+                        </span>
+                        <span className="workspace-created">
+                          {new Date(workspace.created_at).toLocaleDateString('ja-JP')}
+                        </span>
+                      </div>
                     </div>
-                  </button>
+                    <div className="workspace-arrow">→</div>
+                  </div>
                 ))
               )}
             </div>
+
+            {/* ログアウトボタン */}
+            <button 
+              onClick={handleLogoutClick}
+              disabled={isLoading}
+              className="btn-secondary logout-btn"
+            >
+              ログアウト
+            </button>
           </>
         )}
-
-        {/* ログアウトボタン */}
-        <div className="auth-footer">
-          <button 
-            onClick={handleLogoutClick}
-            className="btn-secondary"
-            disabled={isLoading}
-          >
-            ログアウト
-          </button>
-        </div>
       </div>
     </div>
   )
