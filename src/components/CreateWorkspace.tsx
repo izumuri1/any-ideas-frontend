@@ -50,18 +50,16 @@ export function CreateWorkspace() {
     if (!user) return
 
     try {
-      // ユーザーが参加しているワークスペースを取得
+      // 修正版クエリ（JOINで権限チェック）
       const { data, error } = await supabase
-        .from('workspace_members')
+        .from('workspaces')
         .select(`
-          workspaces!inner (
-            id,
-            name,
-            owner_id,
-            created_at
-          )
+          id,
+          name,
+          owner_id,
+          created_at
         `)
-        .eq('user_id', user.id)
+        .or(`owner_id.eq.${user.id},workspace_members.user_id.eq.${user.id}`);
 
       if (error) throw error
 
