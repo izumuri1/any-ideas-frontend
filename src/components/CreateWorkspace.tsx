@@ -330,9 +330,6 @@ export function CreateWorkspace() {
                   >
                     <div className="workspace-info">
                       <h3 className="workspace-name">{workspace.name}</h3>
-                      {workspace.description && (
-                        <p className="workspace-description">{workspace.description}</p>
-                      )}
                       <div className="workspace-meta">
                         <span className="workspace-owner">
                           {workspace.owner_id === user?.id ? 'オーナー' : 'メンバー'}
