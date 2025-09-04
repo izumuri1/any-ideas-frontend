@@ -56,7 +56,7 @@ export function CreateWorkspace() {
       const { data, error } = await supabase
         .from('workspace_members')
         .select(`
-          workspaces (
+          workspaces!inner (
             id,
             name,
             description,
@@ -69,11 +69,20 @@ export function CreateWorkspace() {
       if (error) throw error
 
       // データを整形してワークスペース配列に変換
-      const userWorkspaces = data
-        ?.map(item => item.workspaces)
-        .filter(Boolean) as Workspace[]
+      const userWorkspaces: Workspace[] = data
+        ?.map((item: any) => {
+          const workspace = item.workspaces
+          return {
+            id: workspace.id,
+            name: workspace.name,
+            description: workspace.description,
+            owner_id: workspace.owner_id,
+            created_at: workspace.created_at
+          }
+        })
+        .filter(Boolean) || []
 
-      setWorkspaces(userWorkspaces || [])
+      setWorkspaces(userWorkspaces)
     } catch (error) {
       console.error('ワークスペース取得エラー:', error)
       setSubmitError('ワークスペース一覧の取得に失敗しました')
