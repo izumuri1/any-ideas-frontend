@@ -1,14 +1,16 @@
 // src/pages/Home.scss
-// スマホ向けアプリ特化版
+// スマホ向けアプリ特化版 - リファクタリング済み
 @use '../styles/variables' as *;
+
+//////////////////////////////////////////////////////////////
+// ホームコンテナ（スマホ特化）
+//////////////////////////////////////////////////////////////
 
 .home-container {
   min-height: 100vh;
   background-color: $app-bg-color;
   display: flex;
   flex-direction: column;
-  
-  // スマホ用の最適化
   width: 100%;
   overflow-x: hidden;
 }
@@ -24,54 +26,38 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  
-  // スマホ用の調整
   width: 100%;
-  max-width: none; // 画面幅いっぱいに表示
+  max-width: none;
   margin: 0;
   transform: none;
   
   // セーフエリア対応（ノッチ対応）
-  padding-top: max(1rem, env(safe-area-inset-top));
-  padding-left: max(1rem, env(safe-area-inset-left));
-  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-top: max($app-padding-mobile, env(safe-area-inset-top));
+  padding-left: max($app-padding-mobile, env(safe-area-inset-left));
+  padding-right: max($app-padding-mobile, env(safe-area-inset-right));
 
-  .header {
+  .workspace-info {
     display: flex;
-    align-items: center;
-    flex: 1;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+    min-width: 200px;
+    max-width: 60%;
     
-    .workspace-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      text-align: left;
-      
-      // スマホ用の幅調整
-      min-width: 200px;
-      max-width: 60%;
-      
-      .workspace-name {
-        @include app-subtitle-style;
-        font-size: $app-font-subtitle;
-        margin-bottom: 0;
-        
-        // 長いワークスペース名の省略対応
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+    .workspace-name {
+      @include app-subtitle-style;
+      margin-bottom: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      .invite-token {
-        font-size: 0.75rem;
-        color: $app-gray-dark;
-        font-family: $app-font-body;
-        
-        // 長いトークンの省略対応
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+    .invite-token {
+      @include app-small-text-style;
+      color: $app-gray-dark;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
@@ -85,8 +71,6 @@
   
   // 固定ヘッダー分のマージン調整
   margin-top: 80px;
-  
-  // スマホ用のパディング調整
   padding: $app-padding-mobile;
   
   // セーフエリア対応
@@ -94,390 +78,51 @@
 }
 
 //////////////////////////////////////////////////////////////
-// アイデア登録フォーム（スマホ特化）
+// アイデア登録フォームセクション
 //////////////////////////////////////////////////////////////
 
 .idea-form-section {
-  margin-bottom: 2rem;
-
-  .section-title {
-    @include app-section-title;
-    margin-bottom: 1.5rem;
-    
-    // スマホ用のタイトルサイズ調整
-    font-size: $app-font-title;
-  }
-
+  margin-bottom: $app-padding-mobile;
+  
   .idea-form {
-    background: $app-bg-color;
-    border-radius: $app-radius-card;
-    box-shadow: $app-shadow-card;
-    padding: $app-padding-large;
-    
-    // スマホ用の幅調整
-    width: 100%;
-    max-width: none;
-    margin: 0;
-
-    .form-row {
-      display: flex;
-      flex-direction: column; // スマホでは常に縦並び
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-
-      .input-field {
-        @include app-input-field-style;
-        
-        // スマホ用の高さとパディング調整
-        min-height: $app-touch-target-min;
-        padding: 1rem;
-        
-        // プレースホルダーのスタイル調整
-        &::placeholder {
-          color: $app-gray-dark;
-          font-size: $app-font-body;
-        }
-      }
-    }
-
-    .btn-primary {
-      @include app-button-primary;
-      
-      // スマホ用のボタンスタイル
-      width: 100%;
-      min-height: $app-button-height;
-      font-size: $app-font-button;
-      font-weight: $app-weight-medium;
-      
-      // タッチフィードバック強化
-      transition: opacity 0.15s ease;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-      
-      &:active {
-        opacity: 0.7;
-      }
-    }
+    @include app-idea-form;
   }
 }
 
 //////////////////////////////////////////////////////////////
-// アイデア一覧セクション（スマホ特化）
+// アイデア表示セクション
 //////////////////////////////////////////////////////////////
 
 .ideas-section {
-  .section-title {
-    @include app-section-title;
-    margin-bottom: 1.5rem;
-  }
-
   .ideas-grid {
-    // スマホでは縦一列のシンプルなレイアウト
-    @include app-mobile-grid(1.5rem);
-
+    @include app-responsive-grid(1, $app-padding-mobile);
+    
     .ideas-zone {
-      background: $app-bg-color;
-      border-radius: $app-radius-card;
-      box-shadow: $app-shadow-card;
-      padding: $app-padding-large;
-      
-      .zone-title {
-        margin-bottom: 1rem;
-        @include app-subtitle-style;
-        text-align: center;
-        
-        // スマホ用のタイトルサイズ
-        font-size: $app-font-subtitle;
-        color: $app-text-color;
-      }
-
-      .ideas-cards {
-        @include app-mobile-flex(1rem, column);
-
-        .idea-card {
-          background: white; // 黄色背景でコントラスト
-          padding: $app-padding-large;
-          border-radius: $app-radius-card;
-          border: 2px solid transparent;
-          text-align: left;
-          transition: all 0.3s ease;
-          
-          // スマホ用のタッチフィードバック
-          -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-
-          &:hover, &:active {
-            border-color: $app-text-color;
-            transform: translateY(-1px);
-            opacity: 0.7;
-          }
-
-          .idea-text {
-            margin-bottom: 1rem;
-            @include app-text-style;
-            line-height: 1.6;
-            
-            // スマホ用の読みやすい文字サイズ
-            font-size: $app-font-subtitle;
-            color: $app-text-color;
-          }
-
-          .card-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            justify-content: flex-start;
-            flex-wrap: wrap; // 小さい画面でボタンが折り返し可能
-
-            .btn-like {
-              background: none;
-              border: none;
-              color: $app-error-color;
-              font-size: $app-font-body;
-              min-height: $app-touch-target-min;
-              padding: 0.5rem;
-              cursor: pointer;
-              transition: all 0.2s ease;
-              
-              // タッチ領域を確保
-              display: flex;
-              align-items: center;
-              gap: 0.25rem;
-
-              &:hover, &:active {
-                background: $app-error-bg;
-                border-radius: $app-radius-button;
-              }
-            }
-
-            .btn-proceed, .btn-detail {
-              @include app-button-primary;
-              
-              // スマホ用のコンパクトボタン
-              width: auto;
-              min-width: 80px;
-              padding: 0.5rem 1rem;
-              font-size: $app-font-body;
-              min-height: $app-touch-target-min;
-            }
-
-            .btn-delete {
-              background-color: $app-gray-medium;
-              color: $app-white;
-              border: none;
-              border-radius: $app-radius-button;
-              cursor: pointer;
-              transition: all 0.2s ease;
-              
-              // スマホ用のタッチ対応
-              min-width: 60px;
-              padding: 0.5rem 1rem;
-              font-size: $app-font-body;
-              min-height: $app-touch-target-min;
-              -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-
-              &:hover, &:active {
-                background-color: $app-gray-dark;
-                opacity: 0.7;
-              }
-            }
-          }
-        }
-      }
+      @include app-ideas-zone;
     }
   }
 }
 
 //////////////////////////////////////////////////////////////
-// メンバーセクション（スマホ特化）
+// アイデアカード
 //////////////////////////////////////////////////////////////
 
-.members-section {
-  margin-top: 2rem;
-
-  .section-title {
-    @include app-section-title;
-    margin-bottom: 1.5rem;
-  }
-
-  .members-list {
-    @include app-mobile-flex(0.75rem, row);
-    justify-content: center;
-    flex-wrap: wrap;
-
-    .member-name {
-      background: $app-white;
-      padding: 0.75rem 1rem;
-      border-radius: $app-radius-button;
-      @include app-text-style;
-      box-shadow: $app-shadow-card;
-      
-      // スマホ用のタッチ対応
-      min-height: $app-touch-target-min;
-      display: flex;
-      align-items: center;
-      transition: opacity 0.15s ease;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-      
-      &:active {
-        opacity: 0.7;
-      }
-    }
-  }
+.idea-card {
+  @include app-idea-card;
 }
 
 //////////////////////////////////////////////////////////////
-// エラーメッセージ（スマホ対応）
+// スマホ用レスポンシブ調整
 //////////////////////////////////////////////////////////////
 
-.error-message {
-  margin-bottom: 1rem;
-  @include app-error-message;
-  
-  // スマホ用の調整
-  margin-left: $app-padding-mobile;
-  margin-right: $app-padding-mobile;
-}
-
-//////////////////////////////////////////////////////////////
-// 空の状態（スマホ特化）
-//////////////////////////////////////////////////////////////
-
-.empty-state {
-  text-align: center;
-  padding: 3rem $app-padding-mobile;
-
-  .empty-icon {
-    font-size: 3rem;
-    color: $app-gray-light;
-    margin-bottom: 1.5rem;
-  }
-
-  .empty-title {
-    color: $app-gray-medium;
-    margin-bottom: 1rem;
-    @include app-subtitle-style;
-  }
-
-  .empty-message {
-    color: $app-gray-medium;
-    @include app-text-style;
-    line-height: 1.6;
-  }
-}
-
-//////////////////////////////////////////////////////////////
-// スマホ専用メディアクエリ
-//////////////////////////////////////////////////////////////
-
-// 小さいスマホ画面用（iPhone SE、古いAndroid等）
-@media (max-width: 375px) {
-  .home-header {
-    .header{
-      .workspace-info {
-        min-width: 150px;
-        max-width: 50%;
-        
-        .workspace-name {
-          font-size: 0.875rem;
-        }
-        
-        .invite-token {
-          font-size: 0.7rem;
-        }
-      }
-    }
-  }
-
-  .idea-form-section {
-    .idea-form {
-      padding: $app-padding-mobile;
-      
-      .form-row {
-        gap: 0.75rem;
-        
-        .input-field {
-          padding: 0.75rem;
-          font-size: $app-font-body;
-        }
-      }
-    }
-  }
-
-  .ideas-section {
-    .ideas-grid {
-      gap: 1rem;
-      
-      .ideas-zone {
-        padding: $app-padding-mobile;
-        
-        .ideas-cards {
-          gap: 0.75rem;
-          
-          .idea-card {
-            padding: $app-padding-mobile;
-            
-            .card-actions {
-              flex-direction: column;
-              align-items: stretch;
-              gap: 0.5rem;
-              
-              .btn-proceed, .btn-detail, .btn-delete {
-                width: 100%;
-                justify-content: center;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// 大きめのスマホ画面用（iPhone Pro Max、大型Android等）
-@media (min-width: 414px) {
-  .home-header {
-    .header {
-      .workspace-info {
-        min-width: 250px;
-        max-width: 70%;
-      }
-    }
-  }
-
-  .idea-form-section {
-    .idea-form {
-      padding: $app-padding-large;
-      
-      .form-row {
-        .input-field {
-          padding: 1rem;
-        }
-      }
-      
-      .btn-primary {
-        min-height: $app-button-height;
-      }
-    }
-  }
-}
-
-//////////////////////////////////////////////////////////////
-// 横画面モード対応
-//////////////////////////////////////////////////////////////
-
-@media (orientation: landscape) and (max-height: 500px) {
-  .home-header {
-    // 横画面では固定ヘッダーを少しコンパクトに
-    min-height: 50px;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-
+@media (max-width: 480px) {
   .home-main {
     margin-top: 60px; // ヘッダー高さ調整
+    padding: $app-padding-small;
   }
 
   .idea-form-section {
-    margin-bottom: 1rem;
+    margin-bottom: $app-padding-small;
     
     .idea-form {
       padding: $app-padding-mobile;
@@ -486,7 +131,7 @@
 
   .ideas-section {
     .ideas-grid {
-      gap: 1rem;
+      gap: $app-padding-small;
       
       .ideas-zone {
         padding: $app-padding-mobile;
@@ -496,58 +141,11 @@
 }
 
 //////////////////////////////////////////////////////////////
-// タッチ操作向上のためのスタイル
+// スクロール可能エリアの改善
 //////////////////////////////////////////////////////////////
 
-// スワイプ可能エリアの視覚的ヒント
-.swipeable-hint {
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 20px;
-    background: $app-gray-light;
-    border-radius: 2px;
-  }
-}
-
-// スクロール可能エリアの改善
 .scrollable-area {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  
-  // スクロールバーのスタイリング（Webkit系ブラウザ）
-  &::-webkit-scrollbar {
-    width: 2px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: $app-gray-light;
-    border-radius: 1px;
-  }
-}
-
-// アニメーション改善（スマホでのパフォーマンス考慮）
-.performance-optimized {
-  // GPU加速を有効化
-  transform: translateZ(0);
-  will-change: transform;
-  
-  // アニメーションの最適化
-  transition: transform 0.2s ease;
-  
-  &:active {
-    transform: translateZ(0) scale(0.98);
-  }
+  @include app-scrollable-area;
 }
 
 //////////////////////////////////////////////////////////////
