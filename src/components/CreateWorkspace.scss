@@ -59,11 +59,20 @@
   .btn-primary {
     @include app-button-primary;
   }
+  
+  .btn-secondary {
+    @include app-button-secondary;
+  }
 }
 
 //////////////////////////////////////////////////////////////
 // ワークスペース関連のスタイル
 //////////////////////////////////////////////////////////////
+
+.workspace-create-btn {
+  @include app-button-primary;
+  margin-bottom: $app-padding-xlarge;
+}
 
 .workspace-list {
   display: flex;
@@ -74,6 +83,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0.5rem 0;
+  margin-bottom: $app-padding-xlarge;
   
   // スクロールバーのスタイリング
   &::-webkit-scrollbar {
@@ -88,10 +98,52 @@
     background: $app-gray-light;
     border-radius: 2px;
   }
+  
+  .no-workspaces {
+    @include app-text-style;
+    text-align: center;
+    color: $app-gray-dark;
+    padding: $app-padding-xlarge $app-padding-mobile;
+    line-height: 1.6;
+  }
+  
+  .empty-workspace {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: $app-gray-dark;
+    
+    p {
+      margin: 0.5rem 0;
+      font-size: $app-font-body;
+      line-height: 1.6;
+      
+      &:first-child {
+        font-weight: $app-weight-medium;
+        color: $app-text-color;
+      }
+    }
+  }
 }
 
 .workspace-item {
   @include app-workspace-item;
+  
+  .workspace-arrow {
+    font-size: $app-font-title;
+    color: $app-gray-medium;
+    font-weight: $app-weight-bold;
+  }
+  
+  .workspace-meta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    
+    .workspace-owner,
+    .workspace-created {
+      @include app-small-text-style;
+    }
+  }
 }
 
 //////////////////////////////////////////////////////////////
@@ -125,6 +177,26 @@
   margin: 0 auto;
   
   &:hover:not(:disabled) {
-    background-color: darken($app-btn-secondary, 10%);
+    background-color: $app-gray-darker;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// レスポンシブ調整
+//////////////////////////////////////////////////////////////
+
+@media (max-width: 480px) {
+  .login-card {
+    padding-top: $app-padding-large;
+    padding-bottom: $app-padding-large;
+  }
+  
+  .workspace-list {
+    max-height: 50vh;
+    gap: 0.75rem;
+  }
+  
+  .workspace-item {
+    padding: $app-padding-mobile;
   }
 }

@@ -18,6 +18,7 @@ $app-white:               #FFFFFF; // 白色
 $app-gray-light:          #e5e7eb; // ライトグレー
 $app-gray-medium:         #6b7280; // ミディアムグレー
 $app-gray-dark:           #828282; // ダークグレー（入力テキスト等）
+$app-gray-darker:         #4b5563; // より暗いグレー（ホバー用）
 
 // ステータスカラー
 $app-error-bg:            #fef2f2; // エラー背景
@@ -365,114 +366,6 @@ $app-ease-in-out:        ease-in-out;
 }
 
 //////////////////////////////////////////////////////////////
-/// Mixins - ワークスペース関連
-//////////////////////////////////////////////////////////////
-
-@mixin app-workspace-item {
-  @include app-card-style($app-white);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  cursor: pointer;
-  transition: all $app-animation-fast $app-ease-out;
-  border: 1px solid $app-gray-light;
-  
-  &:hover {
-    border-color: $app-btn-primary;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  &:active {
-    transform: scale(0.98);
-  }
-  
-  .workspace-info {
-    flex: 1;
-    text-align: left;
-    
-    .workspace-name {
-      @include app-title-style;
-      font-size: $app-font-subtitle;
-      margin: 0 0 0.25rem 0;
-    }
-    
-    .workspace-description {
-      @include app-text-style;
-      margin: 0 0 0.5rem 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .workspace-date {
-      @include app-small-text-style;
-    }
-  }
-}
-
-//////////////////////////////////////////////////////////////
-/// Mixins - ローディング関連
-//////////////////////////////////////////////////////////////
-
-@mixin app-loading-container {
-  @include app-fullscreen-container;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  overflow: hidden;
-  touch-action: none;
-}
-
-@mixin app-loading-spinner($size: 60px) {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: $size;
-  height: $size;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 4px solid $app-gray-light;
-    border-top: 4px solid $app-btn-primary;
-    border-radius: 50%;
-    animation: spinMain 1.2s linear infinite;
-    will-change: transform;
-    transform: translateZ(0);
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    width: 70%;
-    height: 70%;
-    background-color: $app-btn-primary;
-    border-radius: 50%;
-    animation: pulse 1.5s ease-in-out infinite;
-    opacity: 0.3;
-    will-change: transform, opacity;
-    transform: translateZ(0);
-  }
-}
-
-@mixin app-loading-text {
-  @include app-text-style;
-  font-size: $app-font-subtitle;
-  font-weight: $app-weight-medium;
-  color: $app-btn-primary;
-  text-align: center;
-  animation: fadeInUp 0.8s $app-ease-out 0.3s both;
-}
-
-//////////////////////////////////////////////////////////////
 /// Mixins - Home画面関連
 //////////////////////////////////////////////////////////////
 
@@ -610,10 +503,118 @@ $app-ease-in-out:        ease-in-out;
       min-height: auto;
       
       &:hover:not(:disabled) {
-        background-color: darken($app-gray-medium, 10%);
+        background-color: $app-gray-darker;
       }
     }
   }
+}
+
+//////////////////////////////////////////////////////////////
+/// Mixins - ワークスペース関連
+//////////////////////////////////////////////////////////////
+
+@mixin app-workspace-item {
+  @include app-card-style($app-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all $app-animation-fast $app-ease-out;
+  border: 1px solid $app-gray-light;
+  
+  &:hover {
+    border-color: $app-btn-primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+  
+  .workspace-info {
+    flex: 1;
+    text-align: left;
+    
+    .workspace-name {
+      @include app-title-style;
+      font-size: $app-font-subtitle;
+      margin: 0 0 0.25rem 0;
+    }
+    
+    .workspace-description {
+      @include app-text-style;
+      margin: 0 0 0.5rem 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .workspace-date {
+      @include app-small-text-style;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+/// Mixins - ローディング関連
+//////////////////////////////////////////////////////////////
+
+@mixin app-loading-container {
+  @include app-fullscreen-container;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  overflow: hidden;
+  touch-action: none;
+}
+
+@mixin app-loading-spinner($size: 60px) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $size;
+  height: $size;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 4px solid $app-gray-light;
+    border-top: 4px solid $app-btn-primary;
+    border-radius: 50%;
+    animation: spinMain 1.2s linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 70%;
+    height: 70%;
+    background-color: $app-btn-primary;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    opacity: 0.3;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+}
+
+@mixin app-loading-text {
+  @include app-text-style;
+  font-size: $app-font-subtitle;
+  font-weight: $app-weight-medium;
+  color: $app-btn-primary;
+  text-align: center;
+  animation: fadeInUp 0.8s $app-ease-out 0.3s both;
 }
 
 //////////////////////////////////////////////////////////////
