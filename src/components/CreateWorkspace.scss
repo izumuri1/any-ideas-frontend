@@ -390,6 +390,54 @@
 }
 
 //////////////////////////////////////////////////////////////
+// ログアウトボタン専用スタイル
+//////////////////////////////////////////////////////////////
+
+.logout-btn {
+  @include app-button-secondary;
+  
+  // ボタンの基本スタイル
+  display: inline-block;
+  border: 1px solid $app-btn-secondary;
+  background-color: $app-btn-secondary;
+  color: $app-text-color;
+  
+  // スマホ用ボタンの最適化
+  min-height: $app-button-height;
+  font-size: $app-font-button;
+  font-weight: $app-weight-medium;
+  border-radius: $app-radius-button;
+  
+  // 幅とマージンの調整
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  
+  // タッチフィードバック強化
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  cursor: pointer;
+  
+  &:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+  
+  &:disabled {
+    background-color: $app-gray-light;
+    color: $app-gray-medium;
+    border-color: $app-gray-light;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+//////////////////////////////////////////////////////////////
 // アニメーション定義
 //////////////////////////////////////////////////////////////
 
@@ -624,40 +672,6 @@
       }
     }
   }
-
-  // ログアウトボタンの明示的なスタイル定義を追加
-.btn-secondary logout-btn {
-  @include app-button-secondary;
-  
-  // スマホ用ボタンの最適化
-  min-height: $app-button-height;
-  font-size: $app-font-button;
-  font-weight: $app-weight-medium;
-  border-radius: $app-radius-button;
-  
-  // 幅の調整
-  width: 100%;
-  max-width: 200px;
-  margin: 0 auto;
-  padding: 0.75rem 1.5rem;
-  
-  // タッチフィードバック強化
-  transition: all 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  
-  &:active {
-    transform: scale(0.98);
-  }
-  
-  &:disabled {
-    background-color: $app-gray-light;
-    color: $app-gray-medium;
-    border-color: $app-gray-light;
-    cursor: not-allowed;
-    transform: none;
-  }
-}
   
   // アニメーション無効化
   .logo,

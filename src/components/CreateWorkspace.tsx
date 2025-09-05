@@ -324,7 +324,7 @@ export function CreateWorkspace() {
             <button 
               onClick={handleLogoutClick}
               disabled={isLoading}
-              className="btn-secondary logout-btn"
+              className="logout-btn"
             >
               ログアウト
             </button>
