@@ -1,5 +1,6 @@
 // src/components/CreateWorkspace.scss
-// ワークスペース作成・選択画面専用スタイル - リファクタリング済み
+// ワークスペース作成・選択画面専用スタイル
+// _variables.scssのmixinを最大限活用してシンプルに記述
 @use '../styles/variables' as *;
 
 //////////////////////////////////////////////////////////////
@@ -74,30 +75,17 @@
   margin-bottom: $app-padding-xlarge;
 }
 
+// ワークスペースリスト（スクロールバー隠し + グラデーション効果）
 .workspace-list {
+  // 通常のプロパティを最初に記述
   display: flex;
   flex-direction: column;
   gap: 1rem;
   width: 100%;
-  max-height: 60vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0.5rem 0;
   margin-bottom: $app-padding-xlarge;
   
-  // スクロールバーのスタイリング
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: $app-gray-light;
-    border-radius: 2px;
-  }
+  // mixinは最後に呼び出し（nested ruleを含むため）
+  @include app-scrollable-list($app-bg-color, 60vh);
   
   .no-workspaces {
     @include app-text-style;
@@ -192,7 +180,6 @@
   }
   
   .workspace-list {
-    max-height: 50vh;
     gap: 0.75rem;
   }
   
