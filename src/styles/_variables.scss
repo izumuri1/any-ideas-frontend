@@ -423,21 +423,21 @@ $app-ease-in-out:        ease-in-out;
 /// Mixins - フォーム関連
 //////////////////////////////////////////////////////////////
 
-// ベース入力フィールド（元の状態に完全復元）
+// ベース入力フィールド（完全に元の優しい見た目に復元）
 @mixin app-input-base {
   width: 100%;
-  padding: 0.75rem;
+  padding: 1rem 1.25rem; // 元のゆとりあるパディング
   border: 1px solid $app-gray-light;
-  border-radius: $app-radius-input;
+  border-radius: 12px; // 元の優しい角丸
   font-family: $app-font-body;
   font-size: $app-font-subtitle; // ズーム防止のため16px
   background-color: $app-white;
   color: $app-text-color;
+  box-sizing: border-box;
+  transition: border-color $app-animation-fast $app-ease-out;
   
   // スマホ最適化
   -webkit-appearance: none;
-  touch-action: manipulation;
-  min-height: $app-touch-target-min;
   
   &::placeholder {
     color: $app-gray-medium;
