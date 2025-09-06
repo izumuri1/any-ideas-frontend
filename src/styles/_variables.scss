@@ -616,7 +616,7 @@ $app-ease-in-out:        ease-in-out;
 }
 
 @mixin app-section-style {
-  background-color: $app-white;
+  background-color: $app-bg-color;
   border-radius: $app-radius-card;
   padding: $app-padding-large;
   margin-bottom: $app-padding-large;
