@@ -64,6 +64,11 @@
   .btn-secondary {
     @include app-button-secondary;
   }
+  
+  // フォーム用ボタングループを適用
+  .form-buttons {
+    @include app-form-button-group;
+  }
 }
 
 //////////////////////////////////////////////////////////////

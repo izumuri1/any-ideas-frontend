@@ -360,6 +360,119 @@ $app-ease-in-out:        ease-in-out;
 }
 
 //////////////////////////////////////////////////////////////
+/// Mixins - ボタンレイアウト（アプリ全体の統一仕様）
+//////////////////////////////////////////////////////////////
+
+// ボタングループの基本レイアウト - 縦配置
+@mixin app-button-group-vertical($gap: 1rem) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+  width: 100%;
+}
+
+// ボタングループの基本レイアウト - 横配置
+@mixin app-button-group-horizontal($gap: 1rem, $justify: flex-start) {
+  display: flex;
+  flex-direction: row;
+  gap: $gap;
+  justify-content: $justify;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+// カードアクション用ボタングループ（アイデアカード等）
+@mixin app-card-action-group {
+  @include app-button-group-horizontal(0.5rem, flex-start);
+  margin-top: 0.75rem;
+  
+  .btn-like {
+    @include app-button-base;
+    background-color: transparent;
+    color: $app-error-color;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    font-size: $app-font-body;
+    min-height: auto;
+    flex: none;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba($app-error-color, 0.1);
+    }
+  }
+  
+  .btn-proceed {
+    @include app-button-primary;
+    flex: 1;
+    min-width: 80px;
+    padding: 0.5rem 1rem;
+    font-size: $app-font-body;
+    min-height: auto;
+  }
+  
+  .btn-delete {
+    @include app-button-base;
+    background-color: $app-gray-medium;
+    color: $app-white;
+    padding: 0.5rem 1rem;
+    font-size: $app-font-body;
+    min-height: auto;
+    flex: none;
+    
+    &:hover:not(:disabled) {
+      background-color: $app-gray-darker;
+    }
+  }
+}
+
+// フォーム用ボタングループ（主要アクション + 補助アクション）
+@mixin app-form-button-group {
+  @include app-button-group-vertical(1rem);
+  
+  // スマホでは縦配置、デスクトップでは横配置に変更可能
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: flex-end;
+    
+    // メインボタンを右、サブボタンを左に配置
+    .btn-primary {
+      order: 2;
+      flex: none;
+      width: auto;
+      min-width: 120px;
+    }
+    
+    .btn-secondary {
+      order: 1;
+      flex: none;
+      width: auto;
+      min-width: 100px;
+    }
+  }
+}
+
+// ナビゲーション用ボタングループ（ヘッダー等）
+@mixin app-nav-button-group {
+  @include app-button-group-horizontal(0.75rem, center);
+}
+
+// 危険なアクション用の分離レイアウト
+@mixin app-dangerous-action-group {
+  @include app-button-group-vertical(1.5rem);
+  
+  .btn-danger {
+    @include app-button-base;
+    background-color: $app-error-color;
+    color: $app-white;
+    border: 1px solid $app-error-color;
+    
+    &:hover:not(:disabled) {
+      background-color: darken($app-error-color, 10%);
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
 /// Mixins - ボタンスタイル
 //////////////////////////////////////////////////////////////
 
@@ -640,45 +753,9 @@ $app-ease-in-out:        ease-in-out;
     line-height: 1.6;
   }
   
+  // カードアクション用の統一レイアウトを適用
   .card-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    
-    .btn-like {
-      @include app-button-base;
-      background-color: transparent;
-      color: $app-error-color;
-      border: none;
-      padding: 0.5rem 0.75rem;
-      font-size: $app-font-body;
-      min-height: auto;
-      
-      &:hover:not(:disabled) {
-        background-color: rgba($app-error-color, 0.1);
-      }
-    }
-    
-    .btn-proceed {
-      @include app-button-primary;
-      flex: 1;
-      min-width: 80px;
-      padding: 0.5rem 1rem;
-      font-size: $app-font-body;
-    }
-    
-    .btn-delete {
-      @include app-button-base;
-      background-color: $app-gray-medium;
-      color: $app-white;
-      padding: 0.5rem 1rem;
-      font-size: $app-font-body;
-      min-height: auto;
-      
-      &:hover:not(:disabled) {
-        background-color: $app-gray-darker;
-      }
-    }
+    @include app-card-action-group;
   }
 }
 
