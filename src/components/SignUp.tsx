@@ -104,7 +104,7 @@ export function SignUp() {
               {...register('email', {
                 required: 'メールアドレスは必須です',
                 pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   message: '正しいメールアドレスを入力してください'
                 }
               })}
