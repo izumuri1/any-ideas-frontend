@@ -423,25 +423,25 @@ $app-ease-in-out:        ease-in-out;
 /// Mixins - フォーム関連
 //////////////////////////////////////////////////////////////
 
-// ベース入力フィールド（元の優しい見た目に戻す）
+// ベース入力フィールド（元の状態に完全復元）
 @mixin app-input-base {
-  font-family: $app-font-body;
-  font-size: $app-font-button; // 16px以上でズーム防止
-  font-weight: $app-weight-normal;
-  color: $app-text-color;
-  background-color: $app-white;
-  border: 1px solid $app-gray-light;
-  border-radius: 12px; // 元の優しい角丸に戻す
-  padding: 1rem 1.25rem; // 元のゆとりのあるパディングに戻す
   width: 100%;
-  box-sizing: border-box;
-  transition: border-color $app-animation-fast $app-ease-out;
+  padding: 0.75rem;
+  border: 1px solid $app-gray-light;
+  border-radius: $app-radius-input;
+  font-family: $app-font-body;
+  font-size: $app-font-subtitle; // ズーム防止のため16px
+  background-color: $app-white;
+  color: $app-text-color;
   
-  // iOS用の最適化
+  // スマホ最適化
   -webkit-appearance: none;
+  touch-action: manipulation;
+  min-height: $app-touch-target-min;
   
   &::placeholder {
     color: $app-gray-medium;
+    opacity: 1;
   }
   
   &:focus {
@@ -454,14 +454,6 @@ $app-ease-in-out:        ease-in-out;
     background-color: $app-disabled-bg;
     color: $app-gray-medium;
     cursor: not-allowed;
-  }
-  
-  &.error {
-    border-color: $app-error-color;
-    
-    &:focus {
-      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
-    }
   }
 }
 
