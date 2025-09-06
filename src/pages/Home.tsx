@@ -24,16 +24,20 @@ export function Home() {
         {/* 簡易アイデア登録セクション */}
         <section className="idea-form-section">
           <div className="idea-form">
-            {/* ロゴとタイトルを横並びに */}
+            {/* ロゴとタイトルを横並びに、説明文を下の行に */}
             <div className="logo-title-section">
-              <img 
-                src="/icons/icon-48x48.png" 
-                alt="Any ideas? ロゴ" 
-                className="app-logo"
-                width="48"
-                height="48"
-              />
-              <h3 className="section-title">Any ideas?</h3>
+              {/* ロゴとタイトルの横並び部分 */}
+              <div className="logo-title-row">
+                <img 
+                  src="/icons/icon-48x48.png" 
+                  alt="Any ideas? ロゴ" 
+                  className="app-logo"
+                  width="48"
+                  height="48"
+                />
+                <h3 className="section-title">Any ideas?</h3>
+              </div>
+              {/* 説明文を独立した行に */}
               <p className="zone-description">メンバーと共有したいアイデアを登録しましょう</p>
             </div>
             <div className="form-row">

@@ -90,28 +90,40 @@
   .idea-form {
     @include app-idea-form;
     
-    // ロゴとタイトルの横並びセクション
+    // ロゴとタイトルの縦配置セクション
     .logo-title-section {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: $app-padding-mobile; // 適度な間隔（1rem）
       margin-bottom: $app-padding-large;
       
-      .app-logo {
-        border-radius: 8px;
-        box-shadow: $app-shadow-card;
-        transition: transform $app-animation-fast $app-ease-out;
-        flex-shrink: 0; // アイコンサイズを固定
+      // ロゴとタイトルの横並び部分
+      .logo-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $app-padding-mobile; // 適度な間隔（1rem）
+        margin-bottom: $app-padding-small; // 説明文との間隔
         
-        &:hover {
-          transform: scale(1.05);
+        .app-logo {
+          border-radius: 8px;
+          box-shadow: $app-shadow-card;
+          transition: transform $app-animation-fast $app-ease-out;
+          flex-shrink: 0; // アイコンサイズを固定
+          
+          &:hover {
+            transform: scale(1.05);
+          }
+        }
+        
+        .section-title {
+          margin: 0; // タイトルのマージンをリセット
+          line-height: 1; // ラインハイトを調整して垂直センタリングを改善
         }
       }
       
-      .section-title {
-        margin: 0; // タイトルのマージンをリセット
-        line-height: 1; // ラインハイトを調整して垂直センタリングを改善
+      // 説明文を下の行に独立配置
+      .zone-description {
+        text-align: center; // 中央寄せ
+        margin: 0; // マージンをリセット
+        color: $app-gray-dark; // 説明文の色
       }
     }
   }
@@ -133,7 +145,7 @@
 
 //////////////////////////////////////////////////////////////
 // アイデアカード
-//////////////////////////////////////////////////////////////
+///////////////////////
 
 .idea-card {
   @include app-idea-card;
@@ -154,6 +166,29 @@
     
     .idea-form {
       padding: $app-padding-mobile;
+      
+      // スマホサイズでのレイアウト調整
+      .logo-title-section {
+        .logo-title-row {
+          gap: $app-padding-small; // スマホでは間隔を狭く
+          margin-bottom: $app-padding-small;
+          
+          .app-logo {
+            // スマホでは少し小さく
+            width: 40px;
+            height: 40px;
+          }
+          
+          .section-title {
+            font-size: $app-font-subtitle; // スマホでは少し小さく
+          }
+        }
+        
+        .zone-description {
+          font-size: $app-font-small; // スマホでは小さく
+          line-height: 1.4;
+        }
+      }
     }
   }
 
@@ -163,6 +198,30 @@
       
       .ideas-zone {
         padding: $app-padding-mobile;
+      }
+    }
+  }
+}
+
+// 超小画面（320px以下）での追加調整
+@media (max-width: 320px) {
+  .idea-form-section {
+    .idea-form {
+      .logo-title-section {
+        .logo-title-row {
+          .app-logo {
+            width: 36px;
+            height: 36px;
+          }
+          
+          .section-title {
+            font-size: $app-font-body; // 超小画面ではさらに小さく
+          }
+        }
+        
+        .zone-description {
+          font-size: $app-font-small;
+        }
       }
     }
   }
