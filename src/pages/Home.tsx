@@ -34,6 +34,7 @@ export function Home() {
                 height="48"
               />
               <h3 className="section-title">Any ideas?</h3>
+              <p className="zone-description">メンバーと共有したいアイデアを登録しましょう</p>
             </div>
             <div className="form-row">
               <input type="text" placeholder="いつ頃？" className="input-field" />
