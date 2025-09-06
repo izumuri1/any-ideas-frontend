@@ -87,18 +87,30 @@ export function CreateWorkspace() {
         throw memberError
       }
 
-      // 3. メンバーワークスペースを整形
-      const memberWorkspaces = memberData
-        ?.map(item => item.workspaces)
-        .filter(workspace => workspace !== null) || []
+      // 3. メンバーワークスペースを整形（型安全版）
+      const memberWorkspaces: Workspace[] = []
+      
+      if (memberData) {
+        for (const item of memberData) {
+          const workspace = item.workspaces as any
+          if (workspace && workspace.id && workspace.name && workspace.owner_id && workspace.created_at) {
+            memberWorkspaces.push({
+              id: workspace.id,
+              name: workspace.name,
+              owner_id: workspace.owner_id,
+              created_at: workspace.created_at
+            })
+          }
+        }
+      }
 
       console.log('整形後メンバーワークスペース:', memberWorkspaces)
 
       // 4. 重複を除いて結合
-      const allWorkspaces = [...(ownerWorkspaces || [])]
+      const allWorkspaces: Workspace[] = [...(ownerWorkspaces || [])]
       
       // メンバーワークスペースから、既にオーナーワークスペースに含まれていないものを追加
-      memberWorkspaces.forEach(workspace => {
+      memberWorkspaces.forEach((workspace: Workspace) => {
         if (!allWorkspaces.find(w => w.id === workspace.id)) {
           allWorkspaces.push(workspace)
         }
