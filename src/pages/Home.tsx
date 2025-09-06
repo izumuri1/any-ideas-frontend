@@ -37,47 +37,27 @@ export function Home() {
             {/* Our ideas */}
             <div className="ideas-zone">
               <h4 className="zone-title">Our ideas</h4>
+              <p className="zone-description">登録されたアイデアの中から共感が得られたものを選ぼう</p>
               <div className="ideas-cards">
-                <div className="idea-card">
-                  <p className="idea-text">今年の夏・家族で・海に行きたい</p>
-                  <div className="card-actions">
-                    {/* ③いいねの♡ボタン - 角丸枠を削除 */}
-                    <button className="btn-like">♡ 2</button>
-                    <button className="btn-proceed">進める</button>
-                    {/* ②削除ボタン - 背景色グレー、テキスト白 */}
-                    <button className="btn-delete">削除</button>
-                  </div>
-                </div>
+                {/* ダミーデータを削除 */}
               </div>
             </div>
 
             {/* Ideas we're thinking about */}
             <div className="ideas-zone">
               <h4 className="zone-title">Ideas we're thinking about</h4>
+              <p className="zone-description">共感が得られたアイデアの検討を進めましょう</p>
               <div className="ideas-cards">
-                <div className="idea-card">
-                  <p className="idea-text">春休み・友人と・温泉旅行</p>
-                  <div className="card-actions">
-                    <button className="btn-like">♡ 1</button>
-                    <button className="btn-proceed">進める</button>
-                    <button className="btn-delete">削除</button>
-                  </div>
-                </div>
+                {/* ダミーデータを削除 */}
               </div>
             </div>
 
             {/* Ideas we're trying */}
             <div className="ideas-zone">
               <h4 className="zone-title">Ideas we're trying</h4>
+              <p className="zone-description">これまでに検討したアイデアを確認しましょう</p>
               <div className="ideas-cards">
-                <div className="idea-card">
-                  <p className="idea-text">年末・恋人と・温泉旅行</p>
-                  <div className="card-actions">
-                    <button className="btn-like">♡ 3</button>
-                    <button className="btn-proceed">進める</button>
-                    <button className="btn-delete">削除</button>
-                  </div>
-                </div>
+                {/* ダミーデータを削除 */}
               </div>
             </div>
           </div>
