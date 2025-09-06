@@ -118,7 +118,7 @@
   align-items: center;
   justify-content: space-between;
   padding: $app-padding-large $app-padding-mobile;
-  padding-left: 60px; // ハンバーガーボタンと重ならないよう左パディングを増加
+  padding-left: 80px; // ハンバーガーボタンと重ならないよう左パディングを大幅増加（60px→80px）
   border-bottom: 1px solid $app-gray-light;
   background-color: $app-bg-color;
   
@@ -261,10 +261,32 @@
   
   .menu-header {
     padding: $app-padding-mobile;
+    padding-left: 75px; // スマホでも十分なスペースを確保（60px→75px）
   }
   
   .menu-item .menu-link {
     padding: $app-padding-mobile;
+  }
+}
+
+// 超小画面（320px以下）での追加調整
+@media (max-width: 320px) {
+  .hamburger-menu {
+    width: 240px; // さらに幅を狭く
+  }
+  
+  .menu-header {
+    padding-left: 70px; // 最小画面でも重ならないよう調整（60px→70px）
+    
+    .menu-title {
+      font-size: $app-font-body; // フォントサイズを小さく
+    }
+  }
+  
+  .menu-item .menu-link {
+    .menu-label {
+      font-size: $app-font-small; // メニューラベルも小さく
+    }
   }
 }
 
