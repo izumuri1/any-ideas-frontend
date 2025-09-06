@@ -24,7 +24,17 @@ export function Home() {
         {/* 簡易アイデア登録セクション */}
         <section className="idea-form-section">
           <div className="idea-form">
-          <h3 className="section-title">Any ideas?</h3>
+            {/* ロゴとタイトルを横並びに */}
+            <div className="logo-title-section">
+              <img 
+                src="/icons/icon-48x48.png" 
+                alt="Any ideas? ロゴ" 
+                className="app-logo"
+                width="48"
+                height="48"
+              />
+              <h3 className="section-title">Any ideas?</h3>
+            </div>
             <div className="form-row">
               <input type="text" placeholder="いつ頃？" className="input-field" />
               <input type="text" placeholder="誰と？" className="input-field" />

@@ -89,6 +89,31 @@
   
   .idea-form {
     @include app-idea-form;
+    
+    // ロゴとタイトルの横並びセクション
+    .logo-title-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $app-padding-mobile; // 適度な間隔（1rem）
+      margin-bottom: $app-padding-large;
+      
+      .app-logo {
+        border-radius: 8px;
+        box-shadow: $app-shadow-card;
+        transition: transform $app-animation-fast $app-ease-out;
+        flex-shrink: 0; // アイコンサイズを固定
+        
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+      
+      .section-title {
+        margin: 0; // タイトルのマージンをリセット
+        line-height: 1; // ラインハイトを調整して垂直センタリングを改善
+      }
+    }
   }
 }
 

@@ -118,6 +118,7 @@
   align-items: center;
   justify-content: space-between;
   padding: $app-padding-large $app-padding-mobile;
+  padding-left: 60px; // ハンバーガーボタンと重ならないよう左パディングを増加
   border-bottom: 1px solid $app-gray-light;
   background-color: $app-bg-color;
   
