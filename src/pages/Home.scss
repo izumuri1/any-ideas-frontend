@@ -221,6 +221,7 @@
         
         .zone-description {
           font-size: $app-font-small;
+          color: $app-gray-dark; // 薄いグレーを維持
         }
       }
     }

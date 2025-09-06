@@ -661,6 +661,14 @@ $app-ease-in-out:        ease-in-out;
     padding-bottom: 0.5rem;
   }
   
+  .zone-description {
+    @include app-text-style;
+    font-size: $app-font-small;
+    color: $app-gray-dark; // Any ideas?と同じ薄いグレーに統一
+    margin: 0 0 $app-padding-large 0;
+    line-height: 1.5;
+  }
+  
   .ideas-cards {
     display: flex;
     flex-direction: column;
