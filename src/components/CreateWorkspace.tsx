@@ -45,38 +45,68 @@ export function CreateWorkspace() {
     formState: { errors }
   } = useForm<CreateWorkspaceFormData>()
 
-  // 3. ユーザーのワークスペース一覧を取得
+  // 3. ユーザーのワークスペース一覧を取得（修正版）
   const fetchWorkspaces = async () => {
-    if (!user) return
+    if (!user) {
+      console.log('ユーザーが存在しません:', user)
+      return
+    }
+
+    console.log('現在のユーザーID:', user.id)
 
     try {
-      // 修正版クエリ（JOINで権限チェック）
-      const { data, error } = await supabase
+      // 1. オーナーとしてのワークスペースを取得
+      const { data: ownerWorkspaces, error: ownerError } = await supabase
         .from('workspaces')
+        .select('*')
+        .eq('owner_id', user.id)
+
+      console.log('オーナーワークスペース:', ownerWorkspaces)
+      if (ownerError) {
+        console.error('オーナークエリエラー:', ownerError)
+        throw ownerError
+      }
+
+      // 2. メンバーとしてのワークスペースを取得
+      const { data: memberData, error: memberError } = await supabase
+        .from('workspace_members')
         .select(`
-          id,
-          name,
-          owner_id,
-          created_at
+          workspace_id,
+          workspaces (
+            id,
+            name,
+            owner_id,
+            created_at
+          )
         `)
-        .or(`owner_id.eq.${user.id},workspace_members.user_id.eq.${user.id}`);
+        .eq('user_id', user.id)
 
-      if (error) throw error
+      console.log('メンバーデータ:', memberData)
+      if (memberError) {
+        console.error('メンバークエリエラー:', memberError)
+        throw memberError
+      }
 
-      // データを整形してワークスペース配列に変換
-      const userWorkspaces: Workspace[] = data
-        ?.map((item: any) => {
-          const workspace = item.workspaces
-          return {
-            id: workspace.id,
-            name: workspace.name,
-            owner_id: workspace.owner_id,
-            created_at: workspace.created_at
-          }
-        })
-        .filter(Boolean) || []
+      // 3. メンバーワークスペースを整形
+      const memberWorkspaces = memberData
+        ?.map(item => item.workspaces)
+        .filter(workspace => workspace !== null) || []
 
-      setWorkspaces(userWorkspaces)
+      console.log('整形後メンバーワークスペース:', memberWorkspaces)
+
+      // 4. 重複を除いて結合
+      const allWorkspaces = [...(ownerWorkspaces || [])]
+      
+      // メンバーワークスペースから、既にオーナーワークスペースに含まれていないものを追加
+      memberWorkspaces.forEach(workspace => {
+        if (!allWorkspaces.find(w => w.id === workspace.id)) {
+          allWorkspaces.push(workspace)
+        }
+      })
+
+      console.log('全ワークスペース:', allWorkspaces)
+      setWorkspaces(allWorkspaces)
+
     } catch (error) {
       console.error('ワークスペース取得エラー:', error)
       setSubmitError('ワークスペース一覧の取得に失敗しました')
@@ -279,6 +309,9 @@ export function CreateWorkspace() {
           <>
             <p className="subtitle">ワークスペース選択</p>
             <p className="introduction">参加しているワークスペースを選択してください</p>
+
+            {/* エラーメッセージ */}
+            {submitError && <div className="error-message">{submitError}</div>}
 
             {/* ワークスペース作成ボタン */}
             <button 
