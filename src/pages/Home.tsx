@@ -1,5 +1,6 @@
 // src/pages/Home.tsx
 import './Home.scss'
+import { HamburgerMenu } from '../components/HamburgerMenu'
 
 export function Home() {
   // 現在は認証機能を使用していないので、userプロパティも削除
@@ -9,9 +10,11 @@ export function Home() {
       {/* 上部メニュー */}
       <header className="home-header">
         <div className="header">
+          {/* ハンバーガーメニュー */}
+          <HamburgerMenu currentPage="home" />
+          
           <div className="workspace-info">
-            <span className="workspace-name">テストワークスペース</span>
-            <span className="invite-token">招待URL: ABC123</span>
+            {/* ダミーデータを削除 */}
           </div>
         </div>
       </header>

@@ -1,0 +1,305 @@
+// src/components/HamburgerMenu.scss
+// ハンバーガーメニューコンポーネント専用スタイル
+@use '../styles/variables' as *;
+
+//////////////////////////////////////////////////////////////
+// ハンバーガーメニューボタン
+//////////////////////////////////////////////////////////////
+
+.hamburger-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1100;
+  position: relative;
+  
+  // タッチ操作改善
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  
+  .hamburger-line {
+    width: 24px;
+    height: 3px;
+    background-color: $app-text-color;
+    margin: 2px 0;
+    transition: all $app-animation-fast $app-ease-out;
+    border-radius: 2px;
+  }
+  
+  // アクティブ状態（✕ボタンに変化）
+  &.active {
+    .hamburger-line {
+      &:nth-child(1) {
+        transform: rotate(45deg) translate(7px, 7px);
+      }
+      
+      &:nth-child(2) {
+        opacity: 0;
+      }
+      
+      &:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+      }
+    }
+  }
+  
+  // ホバー効果
+  &:hover:not(.active) {
+    .hamburger-line {
+      background-color: $app-btn-primary;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// オーバーレイ
+//////////////////////////////////////////////////////////////
+
+.hamburger-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: fadeIn $app-animation-fast $app-ease-out;
+  
+  // タッチ操作改善
+  touch-action: none;
+}
+
+//////////////////////////////////////////////////////////////
+// メニューパネル
+//////////////////////////////////////////////////////////////
+
+.hamburger-menu {
+  position: fixed;
+  top: 0;
+  left: -300px; // 初期状態では画面外に配置
+  width: 280px;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.8); // 透明度を80%に上げて、より透明感を強化
+  backdrop-filter: blur(10px); // ぼかし効果を追加
+  -webkit-backdrop-filter: blur(10px); // Safari対応
+  z-index: 1001;
+  transition: left $app-animation-normal $app-ease-out;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  
+  // セーフエリア対応
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  
+  &.open {
+    left: 0; // 開いた状態では画面内に表示
+  }
+  
+  // スクロール改善
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+//////////////////////////////////////////////////////////////
+// メニューヘッダー
+//////////////////////////////////////////////////////////////
+
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $app-padding-large $app-padding-mobile;
+  border-bottom: 1px solid $app-gray-light;
+  background-color: $app-bg-color;
+  
+  .menu-title {
+    @include app-title-style;
+    font-size: $app-font-subtitle;
+    margin: 0;
+    color: $app-text-color;
+  }
+  
+  .menu-close-button {
+    @include app-button-base;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background-color: transparent;
+    color: $app-gray-dark;
+    font-size: 18px;
+    min-height: auto;
+    
+    &:hover {
+      background-color: $app-gray-light;
+      color: $app-text-color;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// メニューコンテンツ
+//////////////////////////////////////////////////////////////
+
+.menu-content {
+  flex: 1;
+  padding: $app-padding-mobile 0;
+  background-color: transparent;
+}
+
+.menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-item {
+  margin: 0;
+  
+  .menu-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: $app-padding-mobile $app-padding-large;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: all $app-animation-fast $app-ease-out;
+    min-height: $app-touch-target-min;
+    
+    // タッチ操作改善
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    
+    .menu-icon {
+      font-size: 20px;
+      width: 32px;
+      text-align: center;
+      margin-right: $app-padding-mobile;
+      flex-shrink: 0;
+    }
+    
+    .menu-label {
+      @include app-text-style;
+      margin: 0;
+      flex: 1;
+      font-weight: $app-weight-medium;
+    }
+    
+    .active-indicator {
+      color: $app-btn-primary;
+      font-size: 12px;
+      margin-left: auto;
+    }
+    
+    // ホバー・アクティブ状態
+    &:hover {
+      background-color: $app-gray-light;
+    }
+    
+    &:active {
+      background-color: $app-gray-medium;
+      transform: scale(0.98);
+    }
+    
+    // アクティブ状態（現在のページ）
+    &.active {
+      background-color: rgba($app-btn-primary, 0.1);
+      border-right: 3px solid $app-btn-primary;
+      
+      .menu-label {
+        color: $app-btn-primary;
+        font-weight: $app-weight-bold;
+      }
+    }
+    
+    // 危険なアクション（ログアウト）
+    &.danger {
+      .menu-icon,
+      .menu-label {
+        color: $app-error-color;
+      }
+      
+      &:hover {
+        background-color: $app-error-bg;
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アニメーション
+//////////////////////////////////////////////////////////////
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// スマホ用レスポンシブ調整
+//////////////////////////////////////////////////////////////
+
+@media (max-width: 480px) {
+  .hamburger-menu {
+    width: 260px;
+  }
+  
+  .menu-header {
+    padding: $app-padding-mobile;
+  }
+  
+  .menu-item .menu-link {
+    padding: $app-padding-mobile;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アクセシビリティ改善
+//////////////////////////////////////////////////////////////
+
+// キーボードナビゲーション対応
+.hamburger-button:focus-visible,
+.menu-close-button:focus-visible,
+.menu-link:focus-visible {
+  outline: 2px solid $app-btn-primary;
+  outline-offset: 2px;
+}
+
+// 高コントラストモード対応
+@media (prefers-contrast: high) {
+  .hamburger-menu {
+    border: 2px solid $app-text-color;
+  }
+  
+  .menu-item .menu-link.active {
+    border-right-width: 5px;
+  }
+}
+
+// 動きを減らす設定に対応
+@media (prefers-reduced-motion: reduce) {
+  .hamburger-button .hamburger-line,
+  .hamburger-menu,
+  .hamburger-overlay,
+  .menu-link {
+    transition: none;
+  }
+  
+  .hamburger-menu.open {
+    animation: none;
+  }
+}

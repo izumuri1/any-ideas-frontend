@@ -31,6 +31,9 @@
   margin: 0;
   transform: none;
   
+  // ヘッダー全体の背景色を $app-gray-light に変更
+  background-color: $app-gray-light;
+  
   // セーフエリア対応（ノッチ対応）
   padding-top: max($app-padding-mobile, env(safe-area-inset-top));
   padding-left: max($app-padding-mobile, env(safe-area-inset-left));
