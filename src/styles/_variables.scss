@@ -423,7 +423,7 @@ $app-ease-in-out:        ease-in-out;
 /// Mixins - フォーム関連
 //////////////////////////////////////////////////////////////
 
-// ベース入力フィールド
+// ベース入力フィールド（元の優しい見た目に戻す）
 @mixin app-input-base {
   font-family: $app-font-body;
   font-size: $app-font-button; // 16px以上でズーム防止
@@ -431,10 +431,9 @@ $app-ease-in-out:        ease-in-out;
   color: $app-text-color;
   background-color: $app-white;
   border: 1px solid $app-gray-light;
-  border-radius: $app-radius-input;
-  padding: $app-padding-mobile;
+  border-radius: 12px; // 元の優しい角丸に戻す
+  padding: 1rem 1.25rem; // 元のゆとりのあるパディングに戻す
   width: 100%;
-  min-height: $app-button-height;
   box-sizing: border-box;
   transition: border-color $app-animation-fast $app-ease-out;
   
