@@ -409,7 +409,7 @@ export function Home() {
               
               {/* 説明文 */}
               <p className="app-description">
-                いつ？誰と？何をしたいか？アイデアを登録しよう
+                いつ頃？誰と？何をしたい？アイデアを登録しよう
               </p>
             </div>
 
