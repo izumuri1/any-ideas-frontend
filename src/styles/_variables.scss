@@ -11,6 +11,7 @@
 $app-bg-color:            #F4C14E; // メインイエロー（背景色）
 $app-text-color:          #000000; // 黒色テキスト
 $app-btn-primary:         #000000; // プライマリボタン（黒）
+$app-btn-primary-hover:   #1a1a1a; // プライマリボタンホバー（少し明るい黒）
 $app-btn-secondary:       #828282; // セカンダリボタン（グレー）
 
 // サブカラー
@@ -23,6 +24,7 @@ $app-gray-darker:         #4b5563; // より暗いグレー（ホバー用）
 // ステータスカラー
 $app-error-bg:            #fef2f2; // エラー背景
 $app-error-color:         #dc2626; // エラーテキスト
+$app-error-color-hover:   #b91c1c; // エラーボタンホバー
 $app-error-border:        #fecaca; // エラー枠線
 $app-disabled-bg:         #f9fafb; // 無効状態背景
 $app-success-color:       #059669; // 成功テキスト
@@ -404,7 +406,7 @@ $app-ease-in-out:        ease-in-out;
     border: 1px solid $app-error-color;
     
     &:hover:not(:disabled) {
-      background-color: darken($app-error-color, 10%);
+      background-color: $app-error-color-hover; // 事前定義した変数を使用
     }
   }
 }
@@ -601,9 +603,9 @@ $app-ease-in-out:        ease-in-out;
   .header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start; // 左寄せに変更
     max-width: 100%;
-    margin: 0 auto;
+    margin: 0; // 中央寄せを削除
   }
 }
 
