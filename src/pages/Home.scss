@@ -152,149 +152,243 @@
           border-radius: 8px;
           box-shadow: $app-shadow-card;
           transition: transform $app-animation-fast $app-ease-out;
-          flex-shrink: 0; // アイコンサイズを固定
           
           &:hover {
             transform: scale(1.05);
           }
         }
         
-        .section-title {
-          margin: 0; // タイトルのマージンをリセット
-          line-height: 1; // ラインハイトを調整して垂直センタリングを改善
+        .app-title {
           @include app-title-style;
+          font-size: $app-font-title;
+          margin: 0;
+          color: $app-text-color;
+          font-weight: $app-weight-bold;
+          line-height: 1.2;
         }
       }
       
-      // 説明文を下の行に独立配置
-      .zone-description {
-        text-align: center; // 中央寄せ
-        margin: 0; // マージンをリセット
-        color: $app-gray-medium;
-        @include app-small-text-style;
-      }
-    }
-
-    .form-row {
-      display: flex;
-      flex-direction: column;
-      gap: $app-padding-small;
-      margin-bottom: $app-padding-large;
-
-      .input-field {
-        @include app-input-base;
-        padding: $app-padding-mobile;
-        border-radius: $app-radius-input;
-        border: 1px solid $app-gray-light;
-        background-color: white;
-        font-size: 1rem;
-        
-        &:focus {
-          outline: none;
-          border-color: $app-btn-primary;
-          box-shadow: 0 0 0 2px rgba($app-btn-primary, 0.2);
-        }
-
-        &::placeholder {
-          color: $app-gray-medium;
-        }
-      }
-    }
-
-    .btn-primary {
-      @include app-button-primary;
-      width: 100%;
-      padding: $app-padding-mobile;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: $app-radius-button;
-      
-      &:hover {
-        background-color: $app-btn-primary-hover; // 事前定義した変数を使用
-        transform: translateY(-1px);
+      // 説明文のスタイル
+      .app-description {
+        @include app-text-style;
+        text-align: center;
+        margin: 0;
+        color: $app-gray-dark;
+        line-height: 1.5;
+        font-size: $app-font-body;
       }
     }
   }
 }
 
 //////////////////////////////////////////////////////////////
-// アイデア表示セクション
+// アイデア登録フォーム詳細スタイル
 //////////////////////////////////////////////////////////////
 
-.ideas-section {
-  margin-bottom: $app-padding-large;
+.idea-registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
 
-  .ideas-grid {
+  .error-message {
+    @include app-error-message;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-row {
     display: flex;
     flex-direction: column;
-    gap: $app-padding-large;
+    gap: 0.5rem;
+
+    .input-field {
+      @include app-input-base;
+      
+      &.textarea-field {
+        resize: vertical;
+        min-height: 80px;
+        line-height: 1.5;
+        font-family: inherit;
+      }
+    }
+    
+    // セレクトボックス専用の文字色修正
+    select.input-field {
+      color: $app-text-color;
+      
+      // 初期状態（値が空）の場合も黒色にする
+      &:invalid {
+        color: $app-text-color;
+      }
+      
+      option {
+        color: $app-text-color;
+      }
+      
+      // プレースホルダー的な初期オプションも黒色にする
+      option[value=""] {
+        color: $app-text-color;
+      }
+    }
   }
 
-  .ideas-zone {
-    background-color: $app-bg-color; // 元の黄色背景に戻す
-    border-radius: $app-radius-card;
-    padding: $app-padding-large;
-    box-shadow: $app-shadow-card;
-    border: 1px solid $app-gray-light;
-
-    .zone-title {
-      @include app-title-style;
-      margin: 0 0 $app-padding-small 0;
-      color: $app-text-color; // 元の黒色に戻す
-      font-size: 1.2rem;
-      font-weight: 600;
-      border-bottom: 2px solid $app-text-color; // 元の黒い下線を復活
-      padding-bottom: 0.5rem;
-    }
-
-    .zone-description {
-      @include app-small-text-style;
-      margin: 0 0 $app-padding-large 0;
-      color: $app-gray-medium;
-      line-height: 1.5;
-    }
-
-    .ideas-cards {
-      min-height: 100px;
-      display: flex;
-      flex-direction: column;
-      gap: $app-padding-mobile;
-      
-      // 今後のカード用の準備
-      .idea-card {
-        background-color: $app-gray-light;
-        border-radius: $app-radius-card;
-        padding: $app-padding-mobile;
-        border: 1px solid $app-gray-medium;
-        
-        &:hover {
-          box-shadow: $app-shadow-card;
-          transform: translateY(-1px);
-          transition: all $app-animation-fast $app-ease-out;
-        }
-      }
+  .btn-primary {
+    @include app-button-primary;
+    margin-top: 0.5rem;
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   }
 }
 
 //////////////////////////////////////////////////////////////
-// メンバー表示セクション（今後実装予定）
+// アイデアゾーン基本スタイル（今後の拡張用）
 //////////////////////////////////////////////////////////////
 
-.members-section {
-  background-color: $app-bg-color; // 他のセクションと同じ黄色背景
+.ideas-zone {
+  @include app-ideas-zone;
+  
+  // すべてのゾーンの下線色を統一（黒）
+  .zone-title {
+    border-bottom-color: $app-btn-primary;
+  }
+  
+  .ideas-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    
+    // プレースホルダーテキスト用
+    p {
+      @include app-text-style;
+      color: $app-gray-dark;
+      font-style: italic;
+      margin: 0;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アイデアカードスタイル
+//////////////////////////////////////////////////////////////
+
+.idea-card {
+  background-color: $app-white;
+  border: 1px solid $app-gray-light;
   border-radius: $app-radius-card;
   padding: $app-padding-large;
   box-shadow: $app-shadow-card;
-  border: 1px solid $app-gray-light;
+  transition: all $app-animation-fast $app-ease-out;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .idea-header {
+    margin-bottom: $app-padding-mobile;
+    text-align: left; // 左寄せに設定
+    
+    .idea-name {
+      @include app-title-style;
+      font-size: $app-font-subtitle;
+      margin: 0;
+      color: $app-text-color;
+      line-height: 1.3;
+      display: inline;
+    }
+    
+    .idea-owner {
+      @include app-small-text-style;
+      color: $app-gray-medium;
+      font-size: 0.85rem;
+      margin-left: 1rem; // 3文字分程度のスペース
+      display: inline;
+    }
+  }
+  
+  .idea-details {
+    margin-bottom: $app-padding-mobile;
+    
+    .idea-detail {
+      margin-bottom: 0.5rem;
+      text-align: left;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .detail-value {
+        @include app-text-style;
+        color: $app-text-color;
+        line-height: 1.4;
+        display: block;
+      }
+    }
+  }
+  
+  .idea-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: $app-padding-mobile;
+    border-top: 1px solid $app-gray-light;
+    
+    .like-button {
+      @include app-text-style;
+      color: $app-error-color;
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: $app-radius-button;
+      transition: background-color $app-animation-fast;
+      
+      &:hover {
+        background-color: rgba($app-error-color, 0.1);
+      }
+    }
+    
+    .btn-proceed {
+      @include app-button-primary;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      min-height: auto;
+      flex: 1;
+    }
+    
+    .btn-delete {
+      @include app-button-base;
+      background-color: $app-gray-medium;
+      color: $app-white;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      min-height: auto;
+      
+      &:hover:not(:disabled) {
+        background-color: $app-gray-darker;
+      }
+    }
+  }
+}
 
-  .zone-title {
+//////////////////////////////////////////////////////////////
+// メンバーセクション基本スタイル（今後の拡張用）
+//////////////////////////////////////////////////////////////
+
+.members-section {
+  @include app-section-style;
+  
+  .members-title {
     @include app-title-style;
-    margin: 0 0 $app-padding-mobile 0;
-    color: $app-text-color; // 他のセクションと同じ黒色
-    font-size: 1.2rem;
+    font-size: $app-font-subtitle;
+    margin-bottom: $app-padding-mobile;
+    color: $app-text-color;
     font-weight: 600;
-    border-bottom: 2px solid $app-text-color; // 他のセクションと同じ黒い下線
+    border-bottom: 2px solid $app-text-color;
     padding-bottom: 0.5rem;
   }
 
@@ -303,6 +397,14 @@
     display: flex;
     flex-wrap: wrap;
     gap: $app-padding-small;
+    
+    // プレースホルダーテキスト用
+    p {
+      @include app-text-style;
+      color: $app-gray-dark;
+      font-style: italic;
+      margin: 0;
+    }
     
     // 今後のメンバーカード用の準備
     .member-card {
@@ -385,5 +487,15 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: $app-padding-large * 2;
+  }
+
+  .ideas-zone {
+    .ideas-cards {
+      p {
+        text-align: center;
+        padding: 2rem;
+        font-size: 1.1rem;
+      }
+    }
   }
 }
