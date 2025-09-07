@@ -59,6 +59,18 @@ interface IdeaCardProps {
   showProceedButton?: boolean
 }
 
+// 追加：Members sharing ideas用の型定義
+interface WorkspaceMember {
+  id: string
+  workspace_id: string
+  user_id: string
+  role: string
+  joined_at: string
+  profiles: {
+    username: string
+  }
+}
+
 // 強化されたアイデアカードコンポーネント
 function EnhancedIdeaCard({ 
   idea, 
@@ -175,6 +187,115 @@ function EnhancedIdeaCard({
         )}
       </div>
     </div>
+  )
+}
+
+// 追加：Members sharing ideas コンポーネント
+function MembersSharingIdeas({ workspaceId }: { workspaceId: string }) {
+  const [members, setMembers] = useState<WorkspaceMember[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchWorkspaceMembers = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const { data, error: fetchError } = await supabase
+        .from('workspace_members')
+        .select(`
+          id,
+          workspace_id,
+          user_id,
+          role,
+          joined_at,
+          profiles:user_id (
+            username
+          )
+        `)
+        .eq('workspace_id', workspaceId)
+        .order('joined_at', { ascending: true }) // メンバーになった順（古い順）
+
+      if (fetchError) {
+        throw fetchError
+      }
+
+      // データの型を正しく変換してセット
+      const formattedMembers: WorkspaceMember[] = (data || []).map((item: any) => ({
+        id: item.id,
+        workspace_id: item.workspace_id,
+        user_id: item.user_id,
+        role: item.role,
+        joined_at: item.joined_at,
+        profiles: {
+          username: Array.isArray(item.profiles) ? item.profiles[0]?.username || 'Unknown' : item.profiles?.username || 'Unknown'
+        }
+      }))
+      
+      setMembers(formattedMembers)
+    } catch (err: any) {
+      console.error('メンバー取得エラー:', err)
+      setError(err.message || 'メンバー情報の取得に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (workspaceId) {
+      fetchWorkspaceMembers()
+    }
+  }, [workspaceId])
+
+  if (loading) {
+    return (
+      <section className="members-section">
+        <h2 className="members-title">Members sharing ideas</h2>
+        <div className="members-list">
+          <p>メンバー情報を読み込み中...</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (error) {
+    return (
+      <section className="members-section">
+        <h2 className="members-title">Members sharing ideas</h2>
+        <div className="members-list">
+          <p>エラー: {error}</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (members.length === 0) {
+    return (
+      <section className="members-section">
+        <h2 className="members-title">Members sharing ideas</h2>
+        <div className="members-list">
+          <p>まだメンバーがいません</p>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <section className="members-section">
+      <h2 className="members-title">Members sharing ideas</h2>
+      <div className="members-list">
+        {members.map((member, index) => (
+          <div key={member.id} className="member-item">
+            <span className="member-order">#{index + 1}</span>
+            <span className="member-username">{member.profiles.username}</span>
+            <span className="member-role">{member.role === 'owner' ? 'オーナー' : 'メンバー'}</span>
+            <span className="member-joined">
+              {new Date(member.joined_at).toLocaleDateString('ja-JP')}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -730,13 +851,8 @@ export function Home() {
           </div>
         </section>
 
-        {/* Members sharing ideas セクション */}
-        <section className="members-section">
-          <h2 className="members-title">Members sharing ideas</h2>
-          <div className="members-list">
-            <p>（メンバー一覧は次のステップで実装予定）</p>
-          </div>
-        </section>
+        {/* Members sharing ideas セクション - 追加 */}
+        {workspaceId && <MembersSharingIdeas workspaceId={workspaceId} />}
       </main>
     </div>
   )
