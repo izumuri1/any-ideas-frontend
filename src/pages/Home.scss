@@ -1,6 +1,7 @@
 // src/pages/Home.scss
-// スマホ向けアプリ特化版 - リファクタリング版
+// スマホ向けアプリ特化版 - いいね機能付きリファクタリング版
 @use '../styles/variables' as *;
+@use 'sass:color'; // color モジュールをインポート
 
 //////////////////////////////////////////////////////////////
 // メイン コンテナ & レイアウト
@@ -132,7 +133,9 @@
     gap: $app-padding-mobile;
     margin-bottom: $app-padding-small;
     
-    .app-logo {
+    .form-logo {
+      width: 48px;
+      height: 48px;
       border-radius: 8px;
       box-shadow: $app-shadow-card;
       transition: transform $app-animation-fast $app-ease-out;
@@ -142,7 +145,7 @@
       }
     }
     
-    .app-title {
+    .form-title {
       @include app-title-style;
       font-size: $app-font-title;
       margin: 0;
@@ -152,7 +155,7 @@
     }
   }
   
-  .app-description {
+  .form-description {
     @include app-text-style;
     text-align: center;
     margin: 0;
@@ -162,7 +165,7 @@
   }
 }
 
-.idea-registration-form {
+.idea-form-fields {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -173,12 +176,21 @@
     margin-bottom: 0.5rem;
   }
 
-  .form-row {
+  .form-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 
-    .input-field {
+    label {
+      @include app-subtitle-style;
+      font-size: $app-font-body;
+      font-weight: $app-weight-medium;
+      margin-bottom: 0.25rem;
+      text-align: left;
+    }
+
+    input,
+    textarea {
       @include app-input-base;
       
       &.textarea-field {
@@ -189,7 +201,15 @@
       }
     }
     
-    select.input-field {
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.5;
+      font-family: inherit;
+    }
+    
+    select {
+      @include app-input-base;
       color: $app-text-color;
       
       &:invalid,
@@ -301,26 +321,39 @@
   }
 }
 
-// アイデアカード - アクション部分
+// アイデアカード - アクション部分（いいね機能強化版）
 .idea-actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding-top: $app-padding-mobile;
   border-top: 1px solid $app-gray-light;
+  flex-wrap: wrap;
   
-  .like-button {
-    @include app-text-style;
-    color: $app-error-color;
-    font-size: 0.9rem;
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    border-radius: $app-radius-button;
-    transition: background-color $app-animation-fast;
+  // いいねセクションのレイアウト
+  .like-section {
+    flex-shrink: 0;
+    order: 1;
+    position: relative;
+    display: inline-block;
+  }
+  
+  // 他のボタンを右寄せ
+  .btn-proceed,
+  .btn-delete {
+    margin-left: auto;
     
-    &:hover {
-      background-color: rgba($app-error-color, 0.1);
+    &:first-of-type {
+      margin-left: auto;
     }
+  }
+  
+  .btn-proceed {
+    order: 2;
+  }
+  
+  .btn-delete {
+    order: 3;
   }
   
   // アクションボタン共通スタイル
@@ -343,6 +376,120 @@
     
     &:hover:not(:disabled) {
       background-color: $app-gray-darker;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// いいね機能のスタイル（新規追加）
+//////////////////////////////////////////////////////////////
+
+// いいねボタンの強化スタイル
+.like-button {
+  @include app-text-style;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.4rem 0.7rem;
+  border: none;
+  background: transparent;
+  border-radius: $app-radius-button;
+  transition: all $app-animation-fast;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 50px;
+  position: relative;
+  
+  // 基本状態（いいねしていない）
+  color: $app-gray-medium;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba($app-error-color, 0.1);
+    color: $app-error-color;
+    transform: scale(1.05);
+  }
+  
+  // いいね済み状態
+  &.liked {
+    color: $app-error-color;
+    font-weight: $app-weight-medium;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba($app-error-color, 0.15);
+      color: color.adjust($app-error-color, $lightness: -10%); // darken() を color.adjust() に置き換え
+    }
+  }
+  
+  // ローディング状態
+  &.liking {
+    cursor: not-allowed;
+    opacity: 0.7;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 14px;
+      border: 2px solid transparent;
+      border-top: 2px solid $app-error-color;
+      border-radius: 50%;
+      animation: spinMain 0.8s linear infinite;
+    }
+  }
+  
+  // 無効状態
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  
+  // ハートアイコンのアニメーション
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+  
+  // いいね数の数字
+  .like-count {
+    font-size: 0.85rem;
+    margin-left: 0.2rem;
+  }
+}
+
+// ツールチップスタイル
+.like-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  z-index: 1000;
+  pointer-events: none;
+  animation: fadeInUp 0.2s ease-out;
+  
+  .tooltip-content {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: $app-white;
+    padding: 0.5rem 0.75rem;
+    border-radius: $app-radius-button;
+    font-size: $app-font-small;
+    white-space: nowrap;
+    max-width: 200px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    
+    // ツールチップの矢印
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: rgba(0, 0, 0, 0.8);
     }
   }
 }
@@ -392,6 +539,41 @@
 // レスポンシブ対応
 //////////////////////////////////////////////////////////////
 
+@media (max-width: 767px) {
+  .like-tooltip {
+    .tooltip-content {
+      max-width: 150px;
+      font-size: 0.75rem;
+      padding: 0.4rem 0.6rem;
+    }
+  }
+  
+  .like-button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.85rem;
+    min-width: 45px;
+  }
+  
+  .idea-actions {
+    gap: 0.5rem;
+    
+    // スマホでは縦積み
+    flex-direction: column;
+    align-items: stretch;
+    
+    .like-section {
+      order: 1;
+      align-self: flex-start;
+    }
+    
+    .btn-proceed,
+    .btn-delete {
+      order: 2;
+      margin-left: 0;
+    }
+  }
+}
+
 @media (min-width: 768px) {
   .home-main {
     max-width: 600px;
@@ -415,10 +597,17 @@
     }
   }
 
-  .idea-registration-form .form-row {
+  .idea-form-fields .form-group {
     flex-direction: row;
+    align-items: center;
     
-    .input-field {
+    label {
+      min-width: 120px;
+      flex-shrink: 0;
+    }
+    
+    input,
+    textarea {
       flex: 1;
     }
   }
@@ -436,5 +625,64 @@
   .ideas-zone .ideas-cards > p {
     padding: 2rem;
     font-size: 1.1rem;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// ダークモード対応（必要に応じて）
+//////////////////////////////////////////////////////////////
+
+@media (prefers-color-scheme: dark) {
+  .like-tooltip {
+    .tooltip-content {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: $app-text-color;
+      
+      &::after {
+        border-top-color: rgba(255, 255, 255, 0.9);
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アクセシビリティ対応
+//////////////////////////////////////////////////////////////
+
+@media (prefers-reduced-motion: reduce) {
+  .like-button {
+    transition: none;
+    
+    &:hover:not(:disabled) {
+      transform: none;
+    }
+    
+    &:active:not(:disabled) {
+      transform: none;
+    }
+    
+    &.liking::after {
+      animation: none;
+    }
+  }
+  
+  .like-tooltip {
+    animation: none;
+  }
+  
+  .idea-card {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+  }
+  
+  .form-logo {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
   }
 }

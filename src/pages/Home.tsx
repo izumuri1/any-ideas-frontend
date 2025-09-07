@@ -21,6 +21,16 @@ interface IdeaFormData {
   what_text: string
 }
 
+interface IdeaLike {
+  id: string
+  idea_id: string
+  user_id: string
+  created_at: string
+  profiles: {
+    username: string
+  }
+}
+
 interface Idea {
   id: string
   idea_name: string
@@ -33,6 +43,9 @@ interface Idea {
   profiles: {
     username: string
   }
+  idea_likes?: IdeaLike[]
+  like_count?: number
+  user_has_liked?: boolean
 }
 
 interface IdeaCardProps {
@@ -40,22 +53,56 @@ interface IdeaCardProps {
   currentUser: any
   onProceed?: (ideaId: string) => void
   onDelete: (ideaId: string) => void
+  onLikeToggle?: (ideaId: string) => void
   proceedingIdeaId: string | null
   deletingIdeaId: string | null
   showProceedButton?: boolean
 }
 
-// アイデアカードコンポーネント
-function IdeaCard({ 
+// 強化されたアイデアカードコンポーネント
+function EnhancedIdeaCard({ 
   idea, 
   currentUser, 
   onProceed, 
   onDelete, 
+  onLikeToggle,
   proceedingIdeaId, 
   deletingIdeaId,
   showProceedButton = false 
 }: IdeaCardProps) {
+  const [liking, setLiking] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
   const isOwner = currentUser && currentUser.id === idea.creator_id
+
+  // いいねのトグル処理
+  const handleLikeToggle = async () => {
+    if (!currentUser || liking || !onLikeToggle) return
+
+    setLiking(true)
+    try {
+      await onLikeToggle(idea.id)
+    } finally {
+      setLiking(false)
+    }
+  }
+
+  // いいねしたユーザー一覧のツールチップ
+  const renderLikeTooltip = () => {
+    if (!showTooltip || !idea.like_count || idea.like_count === 0) return null
+
+    return (
+      <div className="like-tooltip">
+        <div className="tooltip-content">
+          {idea.idea_likes?.map((like, index) => (
+            <span key={like.id}>
+              {like.profiles.username}
+              {index < (idea.idea_likes?.length || 0) - 1 ? ', ' : ''}
+            </span>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="idea-card">
@@ -83,7 +130,22 @@ function IdeaCard({
       </div>
       
       <div className="idea-actions">
-        <span className="like-button">♡ 0</span>
+        {/* 強化されたいいねボタン */}
+        <div 
+          className="like-section"
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          <button
+            className={`like-button ${idea.user_has_liked ? 'liked' : ''} ${liking ? 'liking' : ''}`}
+            onClick={handleLikeToggle}
+            disabled={liking || !currentUser}
+            title={idea.user_has_liked ? 'いいねを取り消す' : 'いいねする'}
+          >
+            {idea.user_has_liked ? '♥' : '♡'} {idea.like_count || 0}
+          </button>
+          {renderLikeTooltip()}
+        </div>
         
         {/* 進めるボタン */}
         {isOwner && showProceedButton && onProceed && (
@@ -128,6 +190,20 @@ export function Home() {
     return `${year}年${month}月`
   }
 
+  // 年月オプション生成関数（2025年1月〜2099年12月）
+  const generateWhenOptions = () => {
+    const options = []
+    
+    // 2025年1月から2099年12月まで生成
+    for (let year = 2025; year <= 2099; year++) {
+      for (let month = 1; month <= 12; month++) {
+        options.push(`${year}年${month}月`)
+      }
+    }
+    
+    return options
+  }
+
   // 状態管理
   const [workspaceInfo, setWorkspaceInfo] = useState<WorkspaceInfo | null>(null)
   const [loading, setLoading] = useState(true)
@@ -152,22 +228,7 @@ export function Home() {
   const [deletingIdeaId, setDeletingIdeaId] = useState<string | null>(null)
   const [proceedingIdeaId, setProceedingIdeaId] = useState<string | null>(null)
 
-  // データ変換用共通関数
-  const transformIdeaData = (item: any): Idea => ({
-    id: item.id,
-    idea_name: item.idea_name,
-    when_text: item.when_text,
-    who_text: item.who_text,
-    what_text: item.what_text,
-    creator_id: item.creator_id,
-    status: item.status,
-    created_at: item.created_at,
-    profiles: {
-      username: item.profiles?.username || 'Unknown'
-    }
-  })
-
-  // ステータス別アイデア取得用共通関数
+  // ステータス別アイデア取得用共通関数（いいね情報を含む）
   const fetchIdeasByStatus = async (status: string): Promise<Idea[]> => {
     if (!workspaceId) throw new Error('ワークスペースIDが不正です')
 
@@ -182,21 +243,50 @@ export function Home() {
         creator_id,
         status,
         created_at,
-        profiles!ideas_creator_id_fkey (
-          username
+        profiles:creator_id (username),
+        idea_likes (
+          id,
+          idea_id,
+          user_id,
+          created_at,
+          profiles:user_id (username)
         )
       `)
       .eq('workspace_id', workspaceId)
       .eq('status', status)
       .is('deleted_at', null)
-      .order('when_text', { ascending: true })
+      .order('created_at', { ascending: false })
 
     if (error) {
       console.error(`${status}アイデア取得エラー:`, error)
       throw error
     }
 
-    return (data || []).map(transformIdeaData)
+    // いいね情報を追加して変換
+    return (data || []).map(item => ({
+      id: item.id,
+      idea_name: item.idea_name,
+      when_text: item.when_text,
+      who_text: item.who_text,
+      what_text: item.what_text,
+      creator_id: item.creator_id,
+      status: item.status,
+      created_at: item.created_at,
+      profiles: {
+        username: (item.profiles as any)?.username || 'Unknown'
+      },
+      idea_likes: (item.idea_likes || []).map((like: any) => ({
+        id: like.id,
+        idea_id: like.idea_id,
+        user_id: like.user_id,
+        created_at: like.created_at,
+        profiles: {
+          username: Array.isArray(like.profiles) ? like.profiles[0]?.username || 'Unknown' : like.profiles?.username || 'Unknown'
+        }
+      })),
+      like_count: item.idea_likes?.length || 0,
+      user_has_liked: user ? item.idea_likes?.some((like: any) => like.user_id === user.id) || false : false
+    }))
   }
 
   // エラーハンドリング用共通関数
@@ -205,7 +295,7 @@ export function Home() {
     alert(message)
   }
 
-  // アイデア一覧取得関数（統合版）
+  // アイデア一覧取得関数（既存ロジック保持）
   const fetchAllIdeas = async () => {
     if (!workspaceId) return
 
@@ -227,55 +317,97 @@ export function Home() {
     }
   }
 
+  // いいね機能（新規追加）
+  const handleLikeToggle = async (ideaId: string) => {
+    if (!user) return
+
+    try {
+      // 現在のいいね状態を確認
+      const { data: existingLike, error: checkError } = await supabase
+        .from('idea_likes')
+        .select('id')
+        .eq('idea_id', ideaId)
+        .eq('user_id', user.id)
+        .single()
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError
+      }
+
+      if (existingLike) {
+        // いいねを削除
+        const { error } = await supabase
+          .from('idea_likes')
+          .delete()
+          .eq('idea_id', ideaId)
+          .eq('user_id', user.id)
+
+        if (error) throw error
+      } else {
+        // いいねを追加
+        const { error } = await supabase
+          .from('idea_likes')
+          .insert({
+            idea_id: ideaId,
+            user_id: user.id
+          })
+
+        if (error) throw error
+      }
+
+      // アイデア一覧を再読み込み
+      await fetchAllIdeas()
+    } catch (error) {
+      console.error('いいねの操作でエラーが発生しました:', error)
+    }
+  }
+
   // ワークスペース情報取得
   useEffect(() => {
     const fetchWorkspaceInfo = async () => {
-      if (!workspaceId || !user) return
+      if (!workspaceId) {
+        setError('ワークスペースIDが不正です')
+        setLoading(false)
+        return
+      }
 
       try {
         setLoading(true)
         setError(null)
 
-        const { data, error: wsError } = await supabase
+        const { data, error } = await supabase
           .from('workspaces')
           .select(`
             id,
             name,
             owner_id,
-            profiles!workspaces_owner_id_fkey (
-              username
-            )
+            profiles:owner_id (username)
           `)
           .eq('id', workspaceId)
           .single()
 
-        if (wsError) {
-          console.error('ワークスペース情報取得エラー:', wsError)
-          throw wsError
-        }
+        if (error) throw error
 
         if (!data) {
           throw new Error('ワークスペースが見つかりません')
         }
 
-        const profiles = data.profiles as any
         setWorkspaceInfo({
           id: data.id,
           name: data.name,
           owner_id: data.owner_id,
-          owner_username: profiles?.username || 'Unknown'
+          owner_username: (data.profiles as any)?.username || 'Unknown'
         })
-
-      } catch (error) {
-        console.error('ワークスペース情報取得エラー:', error)
-        setError('ワークスペース情報の取得に失敗しました')
+      } catch (error: any) {
+        console.error('ワークスペース情報の取得でエラーが発生しました:', error)
+        setError(error.message || 'ワークスペース情報の取得に失敗しました')
       } finally {
         setLoading(false)
       }
     }
 
     fetchWorkspaceInfo()
-  }, [workspaceId, user])
+  }, [workspaceId])
 
   // アイデア一覧初期取得
   useEffect(() => {
@@ -293,119 +425,42 @@ export function Home() {
     }
   }
 
-  // アイデア進める処理
-  const handleIdeaProceed = async (ideaId: string) => {
-    if (!user) {
-      alert('ユーザー情報が不正です')
-      return
-    }
-
-    if (!window.confirm('このアイデアを検討段階に進めてもよろしいですか？')) {
-      return
-    }
-
-    try {
-      setProceedingIdeaId(ideaId)
-
-      const { error } = await supabase
-        .from('ideas')
-        .update({ 
-          status: 'thinking_about',
-          moved_to_thinking_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', ideaId)
-        .eq('creator_id', user.id)
-
-      if (error) throw error
-
-      console.log('アイデア進める成功:', ideaId)
-      alert('アイデアを検討段階に進めました')
-      await fetchAllIdeas()
-
-    } catch (error) {
-      handleError(error, 'アイデアを進めることに失敗しました。もう一度お試しください。')
-    } finally {
-      setProceedingIdeaId(null)
-    }
-  }
-
-  // アイデア削除処理
-  const handleIdeaDelete = async (ideaId: string) => {
-    if (!user) {
-      alert('ユーザー情報が不正です')
-      return
-    }
-
-    if (!window.confirm('このアイデアを削除してもよろしいですか？')) {
-      return
-    }
-
-    try {
-      setDeletingIdeaId(ideaId)
-
-      const { error } = await supabase
-        .from('ideas')
-        .update({ 
-          deleted_at: new Date().toISOString()
-        })
-        .eq('id', ideaId)
-        .eq('creator_id', user.id)
-
-      if (error) throw error
-
-      console.log('アイデア削除成功:', ideaId)
-      alert('アイデアを削除しました')
-      await fetchAllIdeas()
-
-    } catch (error) {
-      handleError(error, 'アイデアの削除に失敗しました。もう一度お試しください。')
-    } finally {
-      setDeletingIdeaId(null)
-    }
-  }
-
   // アイデア登録処理
   const handleIdeaSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!user || !workspaceId) {
-      setIdeaSubmitError('ユーザー情報またはワークスペース情報が不正です')
+    if (!workspaceId || !user) return
+    
+    // バリデーション
+    if (!ideaForm.idea_name.trim()) {
+      setIdeaSubmitError('アイデア名は必須です')
+      return
+    }
+    
+    if (!ideaForm.what_text.trim()) {
+      setIdeaSubmitError('何をしたい？は必須です')
       return
     }
 
-    if (!ideaForm.idea_name.trim()) {
-      setIdeaSubmitError('アイデア名を入力してください')
-      return
-    }
-    if (!ideaForm.what_text.trim()) {
-      setIdeaSubmitError('何をしたいかを入力してください')
-      return
-    }
+    setIsSubmittingIdea(true)
+    setIdeaSubmitError(null)
 
     try {
-      setIsSubmittingIdea(true)
-      setIdeaSubmitError(null)
-
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('ideas')
-        .insert([
-          {
-            workspace_id: workspaceId,
-            creator_id: user.id,
-            idea_name: ideaForm.idea_name.trim(),
-            when_text: ideaForm.when_text.trim() || null,
-            who_text: ideaForm.who_text.trim() || null,
-            what_text: ideaForm.what_text.trim(),
-            status: 'our_ideas'
-          }
-        ])
-        .select()
+        .insert({
+          workspace_id: workspaceId,
+          creator_id: user.id,
+          idea_name: ideaForm.idea_name.trim(),
+          when_text: ideaForm.when_text.trim() || null,
+          who_text: ideaForm.who_text.trim() || null,
+          what_text: ideaForm.what_text.trim(),
+          status: 'our_ideas'
+        })
 
       if (error) throw error
 
-      console.log('アイデア登録成功:', data)
-
+      // フォームをリセット
       setIdeaForm({
         idea_name: '',
         when_text: getCurrentYearMonth(),
@@ -413,29 +468,62 @@ export function Home() {
         what_text: ''
       })
 
-      alert('アイデアを登録しました！')
+      // アイデア一覧を再読み込み（重要）
       await fetchAllIdeas()
 
-    } catch (error) {
-      handleError(error, 'アイデアの登録に失敗しました。もう一度お試しください。')
-      setIdeaSubmitError('アイデアの登録に失敗しました。もう一度お試しください。')
+    } catch (error: any) {
+      console.error('アイデア登録でエラーが発生しました:', error)
+      setIdeaSubmitError('アイデアの登録に失敗しました')
     } finally {
       setIsSubmittingIdea(false)
     }
   }
 
-  // 年月入力用のオプション生成
-  const generateWhenOptions = () => {
-    const options = []
-    const startYear = 2025
-    const endYear = 2099
-    
-    for (let year = startYear; year <= endYear; year++) {
-      for (let month = 1; month <= 12; month++) {
-        options.push(`${year}年${month}月`)
-      }
+  // アイデア削除処理
+  const handleIdeaDelete = async (ideaId: string) => {
+    if (!user) return
+
+    setDeletingIdeaId(ideaId)
+    try {
+      const { error } = await supabase
+        .from('ideas')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', ideaId)
+        .eq('creator_id', user.id)
+
+      if (error) throw error
+
+      await fetchAllIdeas()
+    } catch (error) {
+      console.error('アイデア削除でエラーが発生しました:', error)
+    } finally {
+      setDeletingIdeaId(null)
     }
-    return options
+  }
+
+  // アイデア進める処理
+  const handleIdeaProceed = async (ideaId: string) => {
+    if (!user) return
+
+    setProceedingIdeaId(ideaId)
+    try {
+      const { error } = await supabase
+        .from('ideas')
+        .update({ 
+          status: 'thinking_about',
+          moved_to_thinking_at: new Date().toISOString()
+        })
+        .eq('id', ideaId)
+        .eq('creator_id', user.id)
+
+      if (error) throw error
+
+      await fetchAllIdeas()
+    } catch (error) {
+      console.error('アイデア進める処理でエラーが発生しました:', error)
+    } finally {
+      setProceedingIdeaId(null)
+    }
   }
 
   // ローディング中
@@ -593,12 +681,13 @@ export function Home() {
               <p>まだアイデアがありません。最初のアイデアを投稿してみましょう！</p>
             ) : (
               ideas.map((idea) => (
-                <IdeaCard
+                <EnhancedIdeaCard
                   key={idea.id}
                   idea={idea}
                   currentUser={user}
                   onProceed={handleIdeaProceed}
                   onDelete={handleIdeaDelete}
+                  onLikeToggle={handleLikeToggle}
                   proceedingIdeaId={proceedingIdeaId}
                   deletingIdeaId={deletingIdeaId}
                   showProceedButton={true}
@@ -617,11 +706,12 @@ export function Home() {
               <p>検討中のアイデアはありません。Our ideasから進めてみましょう！</p>
             ) : (
               thinkingIdeas.map((idea) => (
-                <IdeaCard
+                <EnhancedIdeaCard
                   key={idea.id}
                   idea={idea}
                   currentUser={user}
                   onDelete={handleIdeaDelete}
+                  onLikeToggle={handleLikeToggle}
                   proceedingIdeaId={proceedingIdeaId}
                   deletingIdeaId={deletingIdeaId}
                   showProceedButton={false}
