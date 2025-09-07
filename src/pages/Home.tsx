@@ -35,6 +35,87 @@ interface Idea {
   }
 }
 
+interface IdeaCardProps {
+  idea: Idea
+  currentUser: any
+  onProceed?: (ideaId: string) => void
+  onDelete: (ideaId: string) => void
+  proceedingIdeaId: string | null
+  deletingIdeaId: string | null
+  showProceedButton?: boolean
+}
+
+// アイデアカードコンポーネント
+function IdeaCard({ 
+  idea, 
+  currentUser, 
+  onProceed, 
+  onDelete, 
+  proceedingIdeaId, 
+  deletingIdeaId,
+  showProceedButton = false 
+}: IdeaCardProps) {
+  const isOwner = currentUser && currentUser.id === idea.creator_id
+
+  return (
+    <div className="idea-card">
+      <div className="idea-header">
+        <h3 className="idea-name">{idea.idea_name}</h3>
+        <span className="idea-owner">by {idea.profiles.username}</span>
+      </div>
+      
+      <div className="idea-details">
+        {idea.when_text && (
+          <div className="idea-detail">
+            <span className="detail-value">{idea.when_text}</span>
+          </div>
+        )}
+        
+        {idea.who_text && (
+          <div className="idea-detail">
+            <span className="detail-value">{idea.who_text}</span>
+          </div>
+        )}
+        
+        <div className="idea-detail">
+          <span className="detail-value">{idea.what_text}</span>
+        </div>
+      </div>
+      
+      <div className="idea-actions">
+        <span className="like-button">♡ 0</span>
+        
+        {/* 進めるボタン */}
+        {isOwner && showProceedButton && onProceed && (
+          <button 
+            className="btn-proceed"
+            onClick={() => onProceed(idea.id)}
+            disabled={proceedingIdeaId === idea.id}
+          >
+            {proceedingIdeaId === idea.id ? '進める中...' : '進める'}
+          </button>
+        )}
+        
+        {/* 検討ボタン（Ideas we're thinking about用） */}
+        {!showProceedButton && (
+          <button className="btn-proceed">検討</button>
+        )}
+        
+        {/* 削除ボタン */}
+        {isOwner && (
+          <button 
+            className="btn-delete"
+            onClick={() => onDelete(idea.id)}
+            disabled={deletingIdeaId === idea.id}
+          >
+            {deletingIdeaId === idea.id ? '削除中...' : '削除'}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function Home() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
   const { user } = useAuth()
@@ -55,7 +136,7 @@ export function Home() {
   // アイデア登録フォーム用の状態
   const [ideaForm, setIdeaForm] = useState<IdeaFormData>({
     idea_name: '',
-    when_text: getCurrentYearMonth(), // 初期値を現在の年月に設定
+    when_text: getCurrentYearMonth(),
     who_text: '',
     what_text: ''
   })
@@ -64,7 +145,87 @@ export function Home() {
 
   // アイデア一覧用の状態
   const [ideas, setIdeas] = useState<Idea[]>([])
+  const [thinkingIdeas, setThinkingIdeas] = useState<Idea[]>([])
   const [loadingIdeas, setLoadingIdeas] = useState(false)
+
+  // アクション機能用の状態
+  const [deletingIdeaId, setDeletingIdeaId] = useState<string | null>(null)
+  const [proceedingIdeaId, setProceedingIdeaId] = useState<string | null>(null)
+
+  // データ変換用共通関数
+  const transformIdeaData = (item: any): Idea => ({
+    id: item.id,
+    idea_name: item.idea_name,
+    when_text: item.when_text,
+    who_text: item.who_text,
+    what_text: item.what_text,
+    creator_id: item.creator_id,
+    status: item.status,
+    created_at: item.created_at,
+    profiles: {
+      username: item.profiles?.username || 'Unknown'
+    }
+  })
+
+  // ステータス別アイデア取得用共通関数
+  const fetchIdeasByStatus = async (status: string): Promise<Idea[]> => {
+    if (!workspaceId) throw new Error('ワークスペースIDが不正です')
+
+    const { data, error } = await supabase
+      .from('ideas')
+      .select(`
+        id,
+        idea_name,
+        when_text,
+        who_text,
+        what_text,
+        creator_id,
+        status,
+        created_at,
+        profiles!ideas_creator_id_fkey (
+          username
+        )
+      `)
+      .eq('workspace_id', workspaceId)
+      .eq('status', status)
+      .is('deleted_at', null)
+      .order('when_text', { ascending: true })
+
+    if (error) {
+      console.error(`${status}アイデア取得エラー:`, error)
+      throw error
+    }
+
+    return (data || []).map(transformIdeaData)
+  }
+
+  // エラーハンドリング用共通関数
+  const handleError = (error: any, message: string) => {
+    console.error(message, error)
+    alert(message)
+  }
+
+  // アイデア一覧取得関数（統合版）
+  const fetchAllIdeas = async () => {
+    if (!workspaceId) return
+
+    try {
+      setLoadingIdeas(true)
+      
+      const [ourIdeasData, thinkingIdeasData] = await Promise.all([
+        fetchIdeasByStatus('our_ideas'),
+        fetchIdeasByStatus('thinking_about')
+      ])
+
+      setIdeas(ourIdeasData)
+      setThinkingIdeas(thinkingIdeasData)
+
+    } catch (error) {
+      handleError(error, 'アイデア一覧の取得に失敗しました')
+    } finally {
+      setLoadingIdeas(false)
+    }
+  }
 
   // ワークスペース情報取得
   useEffect(() => {
@@ -75,7 +236,6 @@ export function Home() {
         setLoading(true)
         setError(null)
 
-        // ワークスペース情報とオーナー情報を取得
         const { data, error: wsError } = await supabase
           .from('workspaces')
           .select(`
@@ -98,7 +258,6 @@ export function Home() {
           throw new Error('ワークスペースが見つかりません')
         }
 
-        // 型安全な情報設定
         const profiles = data.profiles as any
         setWorkspaceInfo({
           id: data.id,
@@ -118,65 +277,9 @@ export function Home() {
     fetchWorkspaceInfo()
   }, [workspaceId, user])
 
-  // アイデア一覧取得
+  // アイデア一覧初期取得
   useEffect(() => {
-    const fetchIdeas = async () => {
-      if (!workspaceId) return
-
-      try {
-        setLoadingIdeas(true)
-
-        // ワークスペース内のOur ideasステータスのアイデアを取得（when_text昇順）
-        const { data, error } = await supabase
-          .from('ideas')
-          .select(`
-            id,
-            idea_name,
-            when_text,
-            who_text,
-            what_text,
-            creator_id,
-            status,
-            created_at,
-            profiles!ideas_creator_id_fkey (
-              username
-            )
-          `)
-          .eq('workspace_id', workspaceId)
-          .eq('status', 'our_ideas')
-          .is('deleted_at', null)
-          .order('when_text', { ascending: true })
-
-        if (error) {
-          console.error('アイデア取得エラー:', error)
-          throw error
-        }
-
-        // 型安全な変換処理
-        const transformedIdeas: Idea[] = (data || []).map((item: any) => ({
-          id: item.id,
-          idea_name: item.idea_name,
-          when_text: item.when_text,
-          who_text: item.who_text,
-          what_text: item.what_text,
-          creator_id: item.creator_id,
-          status: item.status,
-          created_at: item.created_at,
-          profiles: {
-            username: item.profiles?.username || 'Unknown'
-          }
-        }))
-
-        setIdeas(transformedIdeas)
-
-      } catch (error) {
-        console.error('アイデア一覧取得エラー:', error)
-      } finally {
-        setLoadingIdeas(false)
-      }
-    }
-
-    fetchIdeas()
+    fetchAllIdeas()
   }, [workspaceId])
 
   // アイデア登録フォームの入力ハンドラ
@@ -185,65 +288,80 @@ export function Home() {
       ...prev,
       [field]: value
     }))
-    // エラーメッセージをクリア
     if (ideaSubmitError) {
       setIdeaSubmitError(null)
     }
   }
 
-  // アイデア一覧取得関数（登録後の再取得用）
-  const fetchIdeas = async () => {
-    if (!workspaceId) return
+  // アイデア進める処理
+  const handleIdeaProceed = async (ideaId: string) => {
+    if (!user) {
+      alert('ユーザー情報が不正です')
+      return
+    }
+
+    if (!window.confirm('このアイデアを検討段階に進めてもよろしいですか？')) {
+      return
+    }
 
     try {
-      setLoadingIdeas(true)
+      setProceedingIdeaId(ideaId)
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('ideas')
-        .select(`
-          id,
-          idea_name,
-          when_text,
-          who_text,
-          what_text,
-          creator_id,
-          status,
-          created_at,
-          profiles!ideas_creator_id_fkey (
-            username
-          )
-        `)
-        .eq('workspace_id', workspaceId)
-        .eq('status', 'our_ideas')
-        .is('deleted_at', null)
-        .order('when_text', { ascending: true })
+        .update({ 
+          status: 'thinking_about',
+          moved_to_thinking_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', ideaId)
+        .eq('creator_id', user.id)
 
-      if (error) {
-        console.error('アイデア取得エラー:', error)
-        throw error
-      }
+      if (error) throw error
 
-      // 型安全な変換処理
-      const transformedIdeas: Idea[] = (data || []).map((item: any) => ({
-        id: item.id,
-        idea_name: item.idea_name,
-        when_text: item.when_text,
-        who_text: item.who_text,
-        what_text: item.what_text,
-        creator_id: item.creator_id,
-        status: item.status,
-        created_at: item.created_at,
-        profiles: {
-          username: item.profiles?.username || 'Unknown'
-        }
-      }))
-
-      setIdeas(transformedIdeas)
+      console.log('アイデア進める成功:', ideaId)
+      alert('アイデアを検討段階に進めました')
+      await fetchAllIdeas()
 
     } catch (error) {
-      console.error('アイデア一覧取得エラー:', error)
+      handleError(error, 'アイデアを進めることに失敗しました。もう一度お試しください。')
     } finally {
-      setLoadingIdeas(false)
+      setProceedingIdeaId(null)
+    }
+  }
+
+  // アイデア削除処理
+  const handleIdeaDelete = async (ideaId: string) => {
+    if (!user) {
+      alert('ユーザー情報が不正です')
+      return
+    }
+
+    if (!window.confirm('このアイデアを削除してもよろしいですか？')) {
+      return
+    }
+
+    try {
+      setDeletingIdeaId(ideaId)
+
+      const { error } = await supabase
+        .from('ideas')
+        .update({ 
+          deleted_at: new Date().toISOString()
+        })
+        .eq('id', ideaId)
+        .eq('creator_id', user.id)
+
+      if (error) throw error
+
+      console.log('アイデア削除成功:', ideaId)
+      alert('アイデアを削除しました')
+      await fetchAllIdeas()
+
+    } catch (error) {
+      handleError(error, 'アイデアの削除に失敗しました。もう一度お試しください。')
+    } finally {
+      setDeletingIdeaId(null)
     }
   }
 
@@ -256,7 +374,6 @@ export function Home() {
       return
     }
 
-    // バリデーション
     if (!ideaForm.idea_name.trim()) {
       setIdeaSubmitError('アイデア名を入力してください')
       return
@@ -270,7 +387,6 @@ export function Home() {
       setIsSubmittingIdea(true)
       setIdeaSubmitError(null)
 
-      // アイデアをDBに登録
       const { data, error } = await supabase
         .from('ideas')
         .insert([
@@ -286,40 +402,31 @@ export function Home() {
         ])
         .select()
 
-      if (error) {
-        console.error('アイデア登録エラー:', error)
-        throw error
-      }
+      if (error) throw error
 
       console.log('アイデア登録成功:', data)
 
-      // フォームをリセット
       setIdeaForm({
         idea_name: '',
-        when_text: getCurrentYearMonth(), // リセット時も現在の年月に戻す
+        when_text: getCurrentYearMonth(),
         who_text: '',
         what_text: ''
       })
 
-      // 成功メッセージ（一時的に表示）
       alert('アイデアを登録しました！')
-
-      // アイデア一覧を再取得
-      await fetchIdeas()
+      await fetchAllIdeas()
 
     } catch (error) {
-      console.error('アイデア登録エラー:', error)
+      handleError(error, 'アイデアの登録に失敗しました。もう一度お試しください。')
       setIdeaSubmitError('アイデアの登録に失敗しました。もう一度お試しください。')
     } finally {
       setIsSubmittingIdea(false)
     }
   }
 
-  // 年月入力用のオプション生成（2025年1月から2099年12月まで、現在月がデフォルト選択）
+  // 年月入力用のオプション生成
   const generateWhenOptions = () => {
     const options = []
-    
-    // 2025年1月から2099年12月まで全ての年月を生成
     const startYear = 2025
     const endYear = 2099
     
@@ -368,7 +475,6 @@ export function Home() {
       {/* 上部メニュー */}
       <header className="home-header">
         <div className="header">
-          {/* ハンバーガーメニュー */}
           <HamburgerMenu currentPage="home" />
           
           <div className="workspace-info">
@@ -393,9 +499,7 @@ export function Home() {
         {/* アイデア登録セクション */}
         <section className="idea-form-section">
           <div className="idea-form">
-            {/* ロゴとタイトルを横並びに、説明文を下の行に */}
             <div className="logo-title-section">
-              {/* ロゴとタイトルの横並び部分 */}
               <div className="logo-title-row">
                 <img 
                   src="/icons/icon-48x48.png" 
@@ -407,22 +511,18 @@ export function Home() {
                 <h1 className="app-title">Any ideas?</h1>
               </div>
               
-              {/* 説明文 */}
               <p className="app-description">
                 いつ頃？誰と？何をしたい？アイデアを登録しよう
               </p>
             </div>
 
-            {/* アイデア登録フォーム */}
             <form onSubmit={handleIdeaSubmit} className="idea-registration-form">
-              {/* エラーメッセージ */}
               {ideaSubmitError && (
                 <div className="error-message" role="alert">
                   {ideaSubmitError}
                 </div>
               )}
 
-              {/* アイデア名 */}
               <div className="form-row">
                 <input
                   type="text"
@@ -435,7 +535,6 @@ export function Home() {
                 />
               </div>
 
-              {/* いつ頃？ */}
               <div className="form-row">
                 <select
                   value={ideaForm.when_text}
@@ -449,7 +548,6 @@ export function Home() {
                 </select>
               </div>
 
-              {/* 誰と？ */}
               <div className="form-row">
                 <input
                   type="text"
@@ -461,7 +559,6 @@ export function Home() {
                 />
               </div>
 
-              {/* 何をしたい？ */}
               <div className="form-row">
                 <textarea
                   placeholder="何をしたい？"
@@ -474,7 +571,6 @@ export function Home() {
                 />
               </div>
 
-              {/* 登録ボタン */}
               <button
                 type="submit"
                 disabled={isSubmittingIdea}
@@ -497,37 +593,16 @@ export function Home() {
               <p>まだアイデアがありません。最初のアイデアを投稿してみましょう！</p>
             ) : (
               ideas.map((idea) => (
-                <div key={idea.id} className="idea-card">
-                  <div className="idea-header">
-                    <h3 className="idea-name">{idea.idea_name}</h3>
-                    <span className="idea-owner">by {idea.profiles.username}</span>
-                  </div>
-                  
-                  <div className="idea-details">
-                    {idea.when_text && (
-                      <div className="idea-detail">
-                        <span className="detail-value">{idea.when_text}</span>
-                      </div>
-                    )}
-                    
-                    {idea.who_text && (
-                      <div className="idea-detail">
-                        <span className="detail-value">{idea.who_text}</span>
-                      </div>
-                    )}
-                    
-                    <div className="idea-detail">
-                      <span className="detail-value">{idea.what_text}</span>
-                    </div>
-                  </div>
-                  
-                  {/* TODO: 後で権限管理とアクションボタンを追加 */}
-                  <div className="idea-actions">
-                    <span className="like-button">♡ 0</span>
-                    <button className="btn-proceed">進める</button>
-                    <button className="btn-delete">削除</button>
-                  </div>
-                </div>
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  currentUser={user}
+                  onProceed={handleIdeaProceed}
+                  onDelete={handleIdeaDelete}
+                  proceedingIdeaId={proceedingIdeaId}
+                  deletingIdeaId={deletingIdeaId}
+                  showProceedButton={true}
+                />
               ))
             )}
           </div>
@@ -538,7 +613,21 @@ export function Home() {
           <h2 className="zone-title">Ideas we're thinking about</h2>
           <p className="zone-description">アイデアを具体的に検討しよう</p>
           <div className="ideas-cards">
-            <p>（検討中アイデア一覧は次のステップで実装予定）</p>
+            {thinkingIdeas.length === 0 ? (
+              <p>検討中のアイデアはありません。Our ideasから進めてみましょう！</p>
+            ) : (
+              thinkingIdeas.map((idea) => (
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  currentUser={user}
+                  onDelete={handleIdeaDelete}
+                  proceedingIdeaId={proceedingIdeaId}
+                  deletingIdeaId={deletingIdeaId}
+                  showProceedButton={false}
+                />
+              ))
+            )}
           </div>
         </section>
 

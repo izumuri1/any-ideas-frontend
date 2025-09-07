@@ -1,9 +1,9 @@
 // src/pages/Home.scss
-// スマホ向けアプリ特化版 - ワークスペース情報表示対応
+// スマホ向けアプリ特化版 - リファクタリング版
 @use '../styles/variables' as *;
 
 //////////////////////////////////////////////////////////////
-// ホームコンテナ（スマホ特化）
+// メイン コンテナ & レイアウト
 //////////////////////////////////////////////////////////////
 
 .home-container {
@@ -15,10 +15,6 @@
   overflow-x: hidden;
 }
 
-//////////////////////////////////////////////////////////////
-// ヘッダー（スマホ用固定ヘッダー）
-//////////////////////////////////////////////////////////////
-
 .home-header {
   @include app-page-header;
   position: fixed;
@@ -27,14 +23,9 @@
   right: 0;
   z-index: 1000;
   width: 100%;
-  max-width: none;
-  margin: 0;
-  transform: none;
-  
-  // ヘッダー全体の背景色を $app-gray-light に変更
   background-color: $app-gray-light;
   
-  // セーフエリア対応（ノッチ対応）
+  // セーフエリア対応
   padding-top: max($app-padding-mobile, env(safe-area-inset-top));
   padding-left: max($app-padding-mobile, env(safe-area-inset-left));
   padding-right: max($app-padding-mobile, env(safe-area-inset-right));
@@ -42,92 +33,85 @@
   .header {
     gap: $app-padding-mobile;
   }
-
-  .workspace-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: left;
-    min-width: 0;
-    margin-left: $app-padding-mobile; // ハンバーガーメニューからの距離
-    align-items: flex-start;
-    justify-content: flex-start;
-    
-    .workspace-name,
-    .workspace-owner {
-      display: flex;
-      align-items: baseline;
-      gap: 0.25rem;
-      white-space: nowrap;
-      overflow: hidden;
-      
-      .label {
-        @include app-small-text-style;
-        color: $app-gray-medium;
-        font-size: 0.8rem;
-        font-weight: 500;
-        flex-shrink: 0; // ラベルは縮まない
-      }
-      
-      .value {
-        @include app-subtitle-style;
-        margin: 0;
-        padding: 0;
-        color: $app-gray-dark;
-        font-size: 1rem;
-        font-weight: 600;
-        line-height: 1.3;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        min-width: 0; // テキストの切り詰めを有効にする
-      }
-    }
-    
-    .workspace-owner {
-      .label {
-        font-size: 0.75rem;
-      }
-      
-      .value {
-        font-size: 0.9rem;
-        font-weight: 500;
-        opacity: 0.9;
-      }
-    }
-
-    // ローディング・エラー状態のスタイル
-    .loading-text,
-    .error-text {
-      @include app-small-text-style;
-      margin: 0;
-      padding: 0;
-      color: $app-gray-dark;
-      font-style: italic;
-    }
-
-    .error-text {
-      color: #d32f2f; // エラー色
-    }
-  }
 }
-
-//////////////////////////////////////////////////////////////
-// メインコンテンツ（スマホ用レイアウト）
-//////////////////////////////////////////////////////////////
 
 .home-main {
   @include app-main-content;
-  
-  // 固定ヘッダー分のマージン調整
   margin-top: 80px;
   padding: $app-padding-mobile;
-  
-  // セーフエリア対応
   padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
 }
 
 //////////////////////////////////////////////////////////////
-// アイデア登録フォームセクション
+// ワークスペース情報表示
+//////////////////////////////////////////////////////////////
+
+.workspace-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+  min-width: 0;
+  margin-left: $app-padding-mobile;
+  
+  .workspace-name,
+  .workspace-owner {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  .label {
+    @include app-small-text-style;
+    color: $app-gray-medium;
+    font-size: 0.8rem;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  
+  .value {
+    @include app-subtitle-style;
+    margin: 0;
+    padding: 0;
+    color: $app-gray-dark;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  
+  .workspace-owner {
+    .label {
+      font-size: 0.75rem;
+    }
+    
+    .value {
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+  }
+
+  .loading-text,
+  .error-text {
+    @include app-small-text-style;
+    margin: 0;
+    padding: 0;
+    color: $app-gray-dark;
+    font-style: italic;
+  }
+
+  .error-text {
+    color: #d32f2f;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アイデア登録フォーム
 //////////////////////////////////////////////////////////////
 
 .idea-form-section {
@@ -135,55 +119,48 @@
   
   .idea-form {
     @include app-idea-form;
-    
-    // ロゴとタイトルの縦配置セクション
-    .logo-title-section {
-      margin-bottom: $app-padding-large;
-      
-      // ロゴとタイトルの横並び部分
-      .logo-title-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: $app-padding-mobile; // 適度な間隔（1rem）
-        margin-bottom: $app-padding-small; // 説明文との間隔
-        
-        .app-logo {
-          border-radius: 8px;
-          box-shadow: $app-shadow-card;
-          transition: transform $app-animation-fast $app-ease-out;
-          
-          &:hover {
-            transform: scale(1.05);
-          }
-        }
-        
-        .app-title {
-          @include app-title-style;
-          font-size: $app-font-title;
-          margin: 0;
-          color: $app-text-color;
-          font-weight: $app-weight-bold;
-          line-height: 1.2;
-        }
-      }
-      
-      // 説明文のスタイル
-      .app-description {
-        @include app-text-style;
-        text-align: center;
-        margin: 0;
-        color: $app-gray-dark;
-        line-height: 1.5;
-        font-size: $app-font-body;
-      }
-    }
   }
 }
 
-//////////////////////////////////////////////////////////////
-// アイデア登録フォーム詳細スタイル
-//////////////////////////////////////////////////////////////
+.logo-title-section {
+  margin-bottom: $app-padding-large;
+  
+  .logo-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $app-padding-mobile;
+    margin-bottom: $app-padding-small;
+    
+    .app-logo {
+      border-radius: 8px;
+      box-shadow: $app-shadow-card;
+      transition: transform $app-animation-fast $app-ease-out;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+    
+    .app-title {
+      @include app-title-style;
+      font-size: $app-font-title;
+      margin: 0;
+      color: $app-text-color;
+      font-weight: $app-weight-bold;
+      line-height: 1.2;
+    }
+  }
+  
+  .app-description {
+    @include app-text-style;
+    text-align: center;
+    margin: 0;
+    color: $app-gray-dark;
+    line-height: 1.5;
+    font-size: $app-font-body;
+  }
+}
 
 .idea-registration-form {
   display: flex;
@@ -212,20 +189,11 @@
       }
     }
     
-    // セレクトボックス専用の文字色修正
     select.input-field {
       color: $app-text-color;
       
-      // 初期状態（値が空）の場合も黒色にする
-      &:invalid {
-        color: $app-text-color;
-      }
-      
-      option {
-        color: $app-text-color;
-      }
-      
-      // プレースホルダー的な初期オプションも黒色にする
+      &:invalid,
+      option,
       option[value=""] {
         color: $app-text-color;
       }
@@ -244,13 +212,12 @@
 }
 
 //////////////////////////////////////////////////////////////
-// アイデアゾーン基本スタイル（今後の拡張用）
+// アイデアゾーン共通スタイル
 //////////////////////////////////////////////////////////////
 
 .ideas-zone {
   @include app-ideas-zone;
   
-  // すべてのゾーンの下線色を統一（黒）
   .zone-title {
     border-bottom-color: $app-btn-primary;
   }
@@ -260,8 +227,8 @@
     flex-direction: column;
     gap: 1rem;
     
-    // プレースホルダーテキスト用
-    p {
+    // プレースホルダーテキスト
+    > p {
       @include app-text-style;
       color: $app-gray-dark;
       font-style: italic;
@@ -273,7 +240,7 @@
 }
 
 //////////////////////////////////////////////////////////////
-// アイデアカードスタイル
+// アイデアカード
 //////////////////////////////////////////////////////////////
 
 .idea-card {
@@ -288,95 +255,100 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
+}
+
+// アイデアカード - ヘッダー部分
+.idea-header {
+  margin-bottom: $app-padding-mobile;
+  text-align: left;
   
-  .idea-header {
-    margin-bottom: $app-padding-mobile;
-    text-align: left; // 左寄せに設定
-    
-    .idea-name {
-      @include app-title-style;
-      font-size: $app-font-subtitle;
-      margin: 0;
-      color: $app-text-color;
-      line-height: 1.3;
-      display: inline;
-    }
-    
-    .idea-owner {
-      @include app-small-text-style;
-      color: $app-gray-medium;
-      font-size: 0.85rem;
-      margin-left: 1rem; // 3文字分程度のスペース
-      display: inline;
-    }
+  .idea-name {
+    @include app-title-style;
+    font-size: $app-font-subtitle;
+    margin: 0;
+    color: $app-text-color;
+    line-height: 1.3;
+    display: inline;
   }
   
-  .idea-details {
-    margin-bottom: $app-padding-mobile;
-    
-    .idea-detail {
-      margin-bottom: 0.5rem;
-      text-align: left;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-      
-      .detail-value {
-        @include app-text-style;
-        color: $app-text-color;
-        line-height: 1.4;
-        display: block;
-      }
-    }
+  .idea-owner {
+    @include app-small-text-style;
+    color: $app-gray-medium;
+    font-size: 0.85rem;
+    margin-left: 1rem;
+    display: inline;
   }
+}
+
+// アイデアカード - 詳細部分
+.idea-details {
+  margin-bottom: $app-padding-mobile;
   
-  .idea-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding-top: $app-padding-mobile;
-    border-top: 1px solid $app-gray-light;
+  .idea-detail {
+    margin-bottom: 0.5rem;
+    text-align: left;
     
-    .like-button {
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .detail-value {
       @include app-text-style;
-      color: $app-error-color;
-      font-size: 0.9rem;
-      cursor: pointer;
-      padding: 0.25rem 0.5rem;
-      border-radius: $app-radius-button;
-      transition: background-color $app-animation-fast;
-      
-      &:hover {
-        background-color: rgba($app-error-color, 0.1);
-      }
+      color: $app-text-color;
+      line-height: 1.4;
+      display: block;
     }
+  }
+}
+
+// アイデアカード - アクション部分
+.idea-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: $app-padding-mobile;
+  border-top: 1px solid $app-gray-light;
+  
+  .like-button {
+    @include app-text-style;
+    color: $app-error-color;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: $app-radius-button;
+    transition: background-color $app-animation-fast;
     
-    .btn-proceed {
-      @include app-button-primary;
-      font-size: 0.85rem;
-      padding: 0.5rem 1rem;
-      min-height: auto;
-      flex: 1;
+    &:hover {
+      background-color: rgba($app-error-color, 0.1);
     }
+  }
+  
+  // アクションボタン共通スタイル
+  .btn-proceed,
+  .btn-delete {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    min-height: auto;
+  }
+  
+  .btn-proceed {
+    @include app-button-primary;
+    flex: 1;
+  }
+  
+  .btn-delete {
+    @include app-button-base;
+    background-color: $app-gray-medium;
+    color: $app-white;
     
-    .btn-delete {
-      @include app-button-base;
-      background-color: $app-gray-medium;
-      color: $app-white;
-      font-size: 0.85rem;
-      padding: 0.5rem 1rem;
-      min-height: auto;
-      
-      &:hover:not(:disabled) {
-        background-color: $app-gray-darker;
-      }
+    &:hover:not(:disabled) {
+      background-color: $app-gray-darker;
     }
   }
 }
 
 //////////////////////////////////////////////////////////////
-// メンバーセクション基本スタイル（今後の拡張用）
+// メンバーセクション
 //////////////////////////////////////////////////////////////
 
 .members-section {
@@ -398,7 +370,6 @@
     flex-wrap: wrap;
     gap: $app-padding-small;
     
-    // プレースホルダーテキスト用
     p {
       @include app-text-style;
       color: $app-gray-dark;
@@ -406,7 +377,6 @@
       margin: 0;
     }
     
-    // 今後のメンバーカード用の準備
     .member-card {
       background-color: $app-gray-light;
       border-radius: $app-radius-card;
@@ -419,55 +389,37 @@
 }
 
 //////////////////////////////////////////////////////////////
-// レスポンシブ対応（より大きな画面用）
+// レスポンシブ対応
 //////////////////////////////////////////////////////////////
 
 @media (min-width: 768px) {
   .home-main {
     max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 80px;
+    margin: 80px auto 0;
   }
 
-  .home-header {
-    .workspace-info {
-      margin-left: $app-padding-large; // PC版では距離を広げる
-      
-      .workspace-name,
-      .workspace-owner {
-        .label {
-          font-size: 0.85rem; // PC版では少し大きく
-        }
-        
-        .value {
-          font-size: 1.1rem; // PC版では少し大きく
-        }
-      }
-      
-      .workspace-owner {
-        .label {
-          font-size: 0.8rem;
-        }
-        
-        .value {
-          font-size: 1rem;
-        }
-      }
+  .workspace-info {
+    margin-left: $app-padding-large;
+    
+    .workspace-name .label,
+    .workspace-owner .label {
+      font-size: 0.85rem;
+    }
+    
+    .workspace-name .value {
+      font-size: 1.1rem;
+    }
+    
+    .workspace-owner .value {
+      font-size: 1rem;
     }
   }
 
-  .ideas-grid {
-    gap: $app-padding-large * 1.5;
-  }
-
-  .idea-form {
-    .form-row {
-      flex-direction: row;
-      
-      .input-field {
-        flex: 1;
-      }
+  .idea-registration-form .form-row {
+    flex-direction: row;
+    
+    .input-field {
+      flex: 1;
     }
   }
 }
@@ -477,25 +429,12 @@
     max-width: 800px;
   }
 
-  .home-header {
-    .workspace-info {
-      margin-left: $app-padding-xlarge; // デスクトップ版では更に距離を広げる
-    }
+  .workspace-info {
+    margin-left: $app-padding-xlarge;
   }
 
-  .ideas-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: $app-padding-large * 2;
-  }
-
-  .ideas-zone {
-    .ideas-cards {
-      p {
-        text-align: center;
-        padding: 2rem;
-        font-size: 1.1rem;
-      }
-    }
+  .ideas-zone .ideas-cards > p {
+    padding: 2rem;
+    font-size: 1.1rem;
   }
 }
