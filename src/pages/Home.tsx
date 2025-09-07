@@ -409,7 +409,7 @@ export function Home() {
               
               {/* 説明文 */}
               <p className="app-description">
-                みんなでアイデアを共有して、一緒に楽しいことを企画しよう
+                いつ？誰と？何をしたいか？アイデアを登録しよう
               </p>
             </div>
 
@@ -489,7 +489,7 @@ export function Home() {
         {/* Our ideas セクション */}
         <section className="ideas-zone our-ideas">
           <h2 className="zone-title">Our ideas</h2>
-          <p className="zone-description">みんなが投稿したアイデアを共有しよう</p>
+          <p className="zone-description">みんなの共感が得られたら検討を進めよう</p>
           <div className="ideas-cards">
             {loadingIdeas ? (
               <p>アイデア読み込み中...</p>
@@ -536,7 +536,7 @@ export function Home() {
         {/* Ideas we're thinking about セクション */}
         <section className="ideas-zone thinking-about">
           <h2 className="zone-title">Ideas we're thinking about</h2>
-          <p className="zone-description">みんなで具体的に検討しているアイデア</p>
+          <p className="zone-description">アイデアを具体的に検討しよう</p>
           <div className="ideas-cards">
             <p>（検討中アイデア一覧は次のステップで実装予定）</p>
           </div>
@@ -545,7 +545,7 @@ export function Home() {
         {/* Ideas we're trying セクション */}
         <section className="ideas-zone trying">
           <h2 className="zone-title">Ideas we're trying</h2>
-          <p className="zone-description">実行に向けて準備中のアイデア</p>
+          <p className="zone-description">これまでに検討したアイデアを確認しよう</p>
           <div className="ideas-cards">
             <p>（実行中アイデア一覧は次のステップで実装予定）</p>
           </div>
