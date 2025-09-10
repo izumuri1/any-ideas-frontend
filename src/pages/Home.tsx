@@ -603,6 +603,13 @@ export function Home() {
   // アイデア削除処理
   const handleIdeaDelete = async (ideaId: string) => {
     if (!user) return
+    
+    // アプリケーション側で作成者チェック
+    const ideaToDelete = [...ideas, ...thinkingIdeas].find(idea => idea.id === ideaId)
+    if (!ideaToDelete || ideaToDelete.creator_id !== user.id) {
+      alert('自分が作成したアイデアのみ削除できます')
+      return
+    }
 
     setDeletingIdeaId(ideaId)
     try {
@@ -610,10 +617,8 @@ export function Home() {
         .from('ideas')
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', ideaId)
-        .eq('creator_id', user.id)
 
       if (error) throw error
-
       await fetchAllIdeas()
     } catch (error) {
       console.error('アイデア削除でエラーが発生しました:', error)
@@ -621,6 +626,7 @@ export function Home() {
       setDeletingIdeaId(null)
     }
   }
+
 
   // アイデア進める処理
   const handleIdeaProceed = async (ideaId: string) => {
