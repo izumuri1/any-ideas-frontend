@@ -31,7 +31,9 @@ function App() {
             
             {/* 個別のワークスペース（Home画面） */}
             <Route path="/workspace/:workspaceId" element={<Home />} />
-            <Route path="/home" element={<Home />} />
+            
+            {/* /home は削除 - 常にワークスペースIDが必要 */}
+            {/* <Route path="/home" element={<Home />} /> */}
             
             {/* すでにログイン済みのユーザーをログインページから追い出したい場合 */}
             <Route path="/login" element={<Navigate to="/" replace />} />

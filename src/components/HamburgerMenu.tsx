@@ -1,6 +1,6 @@
 // src/components/HamburgerMenu.tsx
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import './HamburgerMenu.scss'
 
@@ -12,6 +12,9 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const navigate = useNavigate()
   const { signOut } = useAuth()
+  
+  // 現在のワークスペースIDを取得
+  const { workspaceId } = useParams<{ workspaceId: string }>()
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
@@ -26,7 +29,13 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
     
     switch (action) {
       case 'home':
-        navigate('/home')
+        // workspaceIdが存在する場合は、そのワークスペースのHomeに戻る
+        if (workspaceId) {
+          navigate(`/workspace/${workspaceId}`)
+        } else {
+          // workspaceIdがない場合は、ワークスペース選択画面に戻る
+          navigate('/workspace-select')
+        }
         break
       case 'workspace-create':
         navigate('/create-workspace')
@@ -119,6 +128,7 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
                   onClick={() => handleMenuClick(item.id)}
                 >
                   <span className="menu-label">{item.label}</span>
+                  {item.isActive && <span className="active-indicator">●</span>}
                 </button>
               </li>
             ))}
