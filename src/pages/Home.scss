@@ -105,10 +105,6 @@
     color: $app-gray-dark;
     font-style: italic;
   }
-
-  .error-text {
-    color: #d32f2f;
-  }
 }
 
 //////////////////////////////////////////////////////////////
@@ -116,117 +112,76 @@
 //////////////////////////////////////////////////////////////
 
 .idea-form-section {
-  margin-bottom: $app-padding-mobile;
-  
-  .idea-form {
-    @include app-idea-form;
-  }
-}
-
-.logo-title-section {
+  @include app-section-style;
   margin-bottom: $app-padding-large;
   
-  .logo-title-row {
+  .idea-form {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: $app-padding-mobile;
-    margin-bottom: $app-padding-small;
+    flex-direction: column;
+    gap: 1.5rem;
     
-    .form-logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-      box-shadow: $app-shadow-card;
-      transition: transform $app-animation-fast $app-ease-out;
+    .logo-title-section {
+      text-align: center;
       
-      &:hover {
-        transform: scale(1.05);
+      .logo-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        
+        .app-logo {
+          transition: transform $app-animation-fast $app-ease-out;
+          
+          &:hover {
+            transform: scale(1.05);
+          }
+        }
+        
+        .app-title {
+          @include app-logo-style;
+          margin: 0;
+        }
       }
-    }
-    
-    .form-title {
-      @include app-title-style;
-      font-size: $app-font-title;
-      margin: 0;
-      color: $app-text-color;
-      font-weight: $app-weight-bold;
-      line-height: 1.2;
+      
+      .app-description {
+        @include app-text-style;
+        color: $app-gray-dark;
+        margin: 0;
+        line-height: 1.5;
+      }
     }
   }
   
-  .form-description {
-    @include app-text-style;
-    text-align: center;
-    margin: 0;
-    color: $app-gray-dark;
-    line-height: 1.5;
-    font-size: $app-font-body;
-  }
-}
-
-.idea-form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
-
-  .error-message {
-    @include app-error-message;
-    margin-bottom: 0.5rem;
-  }
-
-  .form-group {
+  .idea-registration-form {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-
-    label {
-      @include app-subtitle-style;
-      font-size: $app-font-body;
-      font-weight: $app-weight-medium;
-      margin-bottom: 0.25rem;
-      text-align: left;
-    }
-
-    input,
-    textarea {
-      @include app-input-base;
+    gap: 1rem;
+    
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
       
-      &.textarea-field {
+      .input-field,
+      .textarea-field {
+        @include app-input-base;
+      }
+      
+      .textarea-field {
         resize: vertical;
         min-height: 80px;
-        line-height: 1.5;
-        font-family: inherit;
       }
     }
     
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-      line-height: 1.5;
-      font-family: inherit;
-    }
-    
-    select {
-      @include app-input-base;
-      color: $app-text-color;
+    .btn-primary {
+      @include app-button-primary;
+      margin-top: 0.5rem;
       
-      &:invalid,
-      option,
-      option[value=""] {
-        color: $app-text-color;
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
-    }
-  }
-
-  .btn-primary {
-    @include app-button-primary;
-    margin-top: 0.5rem;
-    
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
   }
 }
@@ -335,37 +290,24 @@
     flex-shrink: 0;
     order: 1;
     position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
   }
   
-  // 他のボタンを右寄せ
+  // ボタンスタイル（進める・削除ボタン）
   .btn-proceed,
   .btn-delete {
-    margin-left: auto;
-    
-    &:first-of-type {
-      margin-left: auto;
-    }
-  }
-  
-  .btn-proceed {
     order: 2;
-  }
-  
-  .btn-delete {
-    order: 3;
-  }
-  
-  // アクションボタン共通スタイル
-  .btn-proceed,
-  .btn-delete {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem;
-    min-height: auto;
+    margin-left: auto;
+    min-width: 80px;
   }
   
   .btn-proceed {
     @include app-button-primary;
+    padding: 0.5rem 1rem;
+    font-size: $app-font-body;
+    min-height: auto;
     flex: 1;
   }
   
@@ -373,6 +315,10 @@
     @include app-button-base;
     background-color: $app-gray-medium;
     color: $app-white;
+    padding: 0.5rem 1rem;
+    font-size: $app-font-body;
+    min-height: auto;
+    flex: none;
     
     &:hover:not(:disabled) {
       background-color: $app-gray-darker;
@@ -380,75 +326,58 @@
   }
 }
 
-//////////////////////////////////////////////////////////////
-// いいね機能のスタイル（新規追加）
-//////////////////////////////////////////////////////////////
-
-// いいねボタンの強化スタイル
+// いいねボタンスタイル
 .like-button {
-  @include app-text-style;
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0.4rem 0.7rem;
+  @include app-button-base;
+  background-color: transparent;
+  color: $app-error-color;
   border: none;
-  background: transparent;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  min-height: auto;
   border-radius: $app-radius-button;
-  transition: all $app-animation-fast;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  min-width: 50px;
+  transition: all 0.2s ease;
   position: relative;
-  
-  // 基本状態（いいねしていない）
-  color: $app-gray-medium;
+  overflow: hidden;
   
   &:hover:not(:disabled) {
     background-color: rgba($app-error-color, 0.1);
-    color: $app-error-color;
-    transform: scale(1.05);
+    transform: translateY(-1px);
   }
   
-  // いいね済み状態
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
   &.liked {
-    color: $app-error-color;
-    font-weight: $app-weight-medium;
-    
-    &:hover:not(:disabled) {
-      background-color: rgba($app-error-color, 0.15);
-      color: color.adjust($app-error-color, $lightness: -10%); // darken() を color.adjust() に置き換え
-    }
+    color: #e53e3e;
+    font-weight: 600;
   }
   
-  // ローディング状態
   &.liking {
-    cursor: not-allowed;
-    opacity: 0.7;
+    pointer-events: none;
     
     &::after {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 14px;
-      height: 14px;
-      border: 2px solid transparent;
-      border-top: 2px solid $app-error-color;
-      border-radius: 50%;
-      animation: spinMain 0.8s linear infinite;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      animation: shimmer 1s infinite;
     }
   }
   
-  // 無効状態
   &:disabled {
-    cursor: not-allowed;
     opacity: 0.5;
-  }
-  
-  // ハートアイコンのアニメーション
-  &:active:not(:disabled) {
-    transform: scale(0.95);
+    cursor: not-allowed;
+    transform: none;
   }
   
   // いいね数の数字
@@ -456,6 +385,11 @@
     font-size: 0.85rem;
     margin-left: 0.2rem;
   }
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
 // ツールチップスタイル
@@ -495,18 +429,20 @@
 }
 
 //////////////////////////////////////////////////////////////
-// メンバーセクション
+// メンバーセクション - $app-font-theme 修正済み
 //////////////////////////////////////////////////////////////
 
 .members-section {
   @include app-section-style;
   
   .members-title {
-    @include app-title-style;
+    // $app-font-theme を確実に適用するための修正
+    font-family: $app-font-theme; // 明示的に指定
     font-size: $app-font-subtitle;
-    margin-bottom: $app-padding-mobile;
+    font-weight: $app-weight-bold; // app-title-styleと同じウェイト
     color: $app-text-color;
-    font-weight: 600;
+    margin: 0 0 $app-padding-mobile 0;
+    line-height: 1.3;
     border-bottom: 2px solid $app-text-color;
     padding-bottom: 0.5rem;
   }
