@@ -48,6 +48,70 @@ interface Idea {
   user_has_liked?: boolean
 }
 
+// ===== いいねボタン関連のコードをここに集約 =====
+
+interface LikeButtonProps {
+  idea: Idea
+  currentUser: any
+  onLikeToggle?: (ideaId: string) => void
+}
+
+// いいねボタンコンポーネント
+function LikeButton({ idea, currentUser, onLikeToggle }: LikeButtonProps) {
+  const [liking, setLiking] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
+
+  // いいねのトグル処理
+  const handleLikeToggle = async () => {
+    if (!currentUser || liking || !onLikeToggle) return
+
+    setLiking(true)
+    try {
+      await onLikeToggle(idea.id)
+    } finally {
+      setLiking(false)
+    }
+  }
+
+  // いいねしたユーザー一覧のツールチップ
+  const renderLikeTooltip = () => {
+    if (!showTooltip || !idea.like_count || idea.like_count === 0) return null
+
+    return (
+      <div className="like-tooltip">
+        <div className="tooltip-content">
+          {idea.idea_likes?.map((like, index) => (
+            <span key={like.id}>
+              {like.profiles.username}
+              {index < (idea.idea_likes?.length || 0) - 1 ? ', ' : ''}
+            </span>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div 
+      className="like-section"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      <button
+        className={`like-button ${idea.user_has_liked ? 'liked' : ''} ${liking ? 'liking' : ''}`}
+        onClick={handleLikeToggle}
+        disabled={liking || !currentUser}
+        title={idea.user_has_liked ? 'いいねを取り消す' : 'いいねする'}
+      >
+        {idea.user_has_liked ? '♥' : '♡'} {idea.like_count || 0}
+      </button>
+      {renderLikeTooltip()}
+    </div>
+  )
+}
+
+// ===== いいねボタン関連のコードここまで =====
+
 interface IdeaCardProps {
   idea: Idea
   currentUser: any
@@ -82,39 +146,7 @@ function EnhancedIdeaCard({
   deletingIdeaId,
   showProceedButton = false 
 }: IdeaCardProps) {
-  const [liking, setLiking] = useState(false)
-  const [showTooltip, setShowTooltip] = useState(false)
   const isOwner = currentUser && currentUser.id === idea.creator_id
-
-  // いいねのトグル処理
-  const handleLikeToggle = async () => {
-    if (!currentUser || liking || !onLikeToggle) return
-
-    setLiking(true)
-    try {
-      await onLikeToggle(idea.id)
-    } finally {
-      setLiking(false)
-    }
-  }
-
-  // いいねしたユーザー一覧のツールチップ
-  const renderLikeTooltip = () => {
-    if (!showTooltip || !idea.like_count || idea.like_count === 0) return null
-
-    return (
-      <div className="like-tooltip">
-        <div className="tooltip-content">
-          {idea.idea_likes?.map((like, index) => (
-            <span key={like.id}>
-              {like.profiles.username}
-              {index < (idea.idea_likes?.length || 0) - 1 ? ', ' : ''}
-            </span>
-          ))}
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="idea-card">
@@ -142,22 +174,12 @@ function EnhancedIdeaCard({
       </div>
       
       <div className="idea-actions">
-        {/* 強化されたいいねボタン */}
-        <div 
-          className="like-section"
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
-        >
-          <button
-            className={`like-button ${idea.user_has_liked ? 'liked' : ''} ${liking ? 'liking' : ''}`}
-            onClick={handleLikeToggle}
-            disabled={liking || !currentUser}
-            title={idea.user_has_liked ? 'いいねを取り消す' : 'いいねする'}
-          >
-            {idea.user_has_liked ? '♥' : '♡'} {idea.like_count || 0}
-          </button>
-          {renderLikeTooltip()}
-        </div>
+        {/* いいねボタンをコンポーネント化で一箇所に集約 */}
+        <LikeButton 
+          idea={idea}
+          currentUser={currentUser}
+          onLikeToggle={onLikeToggle}
+        />
         
         {/* 進めるボタン */}
         {isOwner && showProceedButton && onProceed && (
@@ -214,13 +236,12 @@ function MembersSharingIdeas({ workspaceId }: { workspaceId: string }) {
           )
         `)
         .eq('workspace_id', workspaceId)
-        .order('joined_at', { ascending: true }) // メンバーになった順（古い順）
+        .order('joined_at', { ascending: true })
 
       if (fetchError) {
         throw fetchError
       }
 
-      // データの型を正しく変換してセット
       const formattedMembers: WorkspaceMember[] = (data || []).map((item: any) => ({
         id: item.id,
         workspace_id: item.workspace_id,
@@ -303,7 +324,6 @@ export function Home() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
   const { user } = useAuth()
 
-  // 現在の年月を取得する関数
   const getCurrentYearMonth = () => {
     const now = new Date()
     const year = now.getFullYear()
@@ -311,26 +331,20 @@ export function Home() {
     return `${year}年${month}月`
   }
 
-  // 年月オプション生成関数（2025年1月〜2099年12月）
   const generateWhenOptions = () => {
     const options = []
-    
-    // 2025年1月から2099年12月まで生成
     for (let year = 2025; year <= 2099; year++) {
       for (let month = 1; month <= 12; month++) {
         options.push(`${year}年${month}月`)
       }
     }
-    
     return options
   }
 
-  // 状態管理
   const [workspaceInfo, setWorkspaceInfo] = useState<WorkspaceInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  // アイデア登録フォーム用の状態
   const [ideaForm, setIdeaForm] = useState<IdeaFormData>({
     idea_name: '',
     when_text: getCurrentYearMonth(),
@@ -340,16 +354,13 @@ export function Home() {
   const [isSubmittingIdea, setIsSubmittingIdea] = useState(false)
   const [ideaSubmitError, setIdeaSubmitError] = useState<string | null>(null)
 
-  // アイデア一覧用の状態
   const [ideas, setIdeas] = useState<Idea[]>([])
   const [thinkingIdeas, setThinkingIdeas] = useState<Idea[]>([])
   const [loadingIdeas, setLoadingIdeas] = useState(false)
 
-  // アクション機能用の状態
   const [deletingIdeaId, setDeletingIdeaId] = useState<string | null>(null)
   const [proceedingIdeaId, setProceedingIdeaId] = useState<string | null>(null)
 
-  // ステータス別アイデア取得用共通関数（いいね情報を含む）
   const fetchIdeasByStatus = async (status: string): Promise<Idea[]> => {
     if (!workspaceId) throw new Error('ワークスペースIDが不正です')
 
@@ -383,7 +394,6 @@ export function Home() {
       throw error
     }
 
-    // いいね情報を追加して変換
     return (data || []).map(item => ({
       id: item.id,
       idea_name: item.idea_name,
@@ -410,13 +420,11 @@ export function Home() {
     }))
   }
 
-  // エラーハンドリング用共通関数
   const handleError = (error: any, message: string) => {
     console.error(message, error)
     alert(message)
   }
 
-  // アイデア一覧取得関数（既存ロジック保持）
   const fetchAllIdeas = async () => {
     if (!workspaceId) return
 
@@ -438,12 +446,10 @@ export function Home() {
     }
   }
 
-  // いいね機能（新規追加）
   const handleLikeToggle = async (ideaId: string) => {
     if (!user) return
 
     try {
-      // 現在のいいね状態を確認
       const { data: existingLike, error: checkError } = await supabase
         .from('idea_likes')
         .select('id')
@@ -456,7 +462,6 @@ export function Home() {
       }
 
       if (existingLike) {
-        // いいねを削除
         const { error } = await supabase
           .from('idea_likes')
           .delete()
@@ -465,7 +470,6 @@ export function Home() {
 
         if (error) throw error
       } else {
-        // いいねを追加
         const { error } = await supabase
           .from('idea_likes')
           .insert({
@@ -476,14 +480,12 @@ export function Home() {
         if (error) throw error
       }
 
-      // アイデア一覧を再読み込み
       await fetchAllIdeas()
     } catch (error) {
       console.error('いいねの操作でエラーが発生しました:', error)
     }
   }
 
-  // ワークスペース情報取得
   useEffect(() => {
     const fetchWorkspaceInfo = async () => {
       if (!workspaceId) {
@@ -530,12 +532,10 @@ export function Home() {
     fetchWorkspaceInfo()
   }, [workspaceId])
 
-  // アイデア一覧初期取得
   useEffect(() => {
     fetchAllIdeas()
   }, [workspaceId])
 
-  // アイデア登録フォームの入力ハンドラ
   const handleIdeaFormChange = (field: keyof IdeaFormData, value: string) => {
     setIdeaForm(prev => ({
       ...prev,
@@ -546,13 +546,11 @@ export function Home() {
     }
   }
 
-  // アイデア登録処理
   const handleIdeaSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!workspaceId || !user) return
     
-    // バリデーション
     if (!ideaForm.idea_name.trim()) {
       setIdeaSubmitError('アイデア名は必須です')
       return
@@ -581,7 +579,6 @@ export function Home() {
 
       if (error) throw error
 
-      // フォームをリセット
       setIdeaForm({
         idea_name: '',
         when_text: getCurrentYearMonth(),
@@ -589,7 +586,6 @@ export function Home() {
         what_text: ''
       })
 
-      // アイデア一覧を再読み込み（重要）
       await fetchAllIdeas()
 
     } catch (error: any) {
@@ -600,11 +596,9 @@ export function Home() {
     }
   }
 
-  // アイデア削除処理
   const handleIdeaDelete = async (ideaId: string) => {
     if (!user) return
     
-    // アプリケーション側で作成者チェック
     const ideaToDelete = [...ideas, ...thinkingIdeas].find(idea => idea.id === ideaId)
     if (!ideaToDelete || ideaToDelete.creator_id !== user.id) {
       alert('自分が作成したアイデアのみ削除できます')
@@ -627,8 +621,6 @@ export function Home() {
     }
   }
 
-
-  // アイデア進める処理
   const handleIdeaProceed = async (ideaId: string) => {
     if (!user) return
 
@@ -653,7 +645,6 @@ export function Home() {
     }
   }
 
-  // ローディング中
   if (loading) {
     return (
       <div className="home-container">
@@ -669,7 +660,6 @@ export function Home() {
     )
   }
 
-  // エラー時
   if (error || !workspaceInfo) {
     return (
       <div className="home-container">
@@ -687,7 +677,6 @@ export function Home() {
 
   return (
     <div className="home-container">
-      {/* 上部メニュー */}
       <header className="home-header">
         <div className="header">
           <HamburgerMenu currentPage="home" />
@@ -709,9 +698,7 @@ export function Home() {
         </div>
       </header>
 
-      {/* メインコンテンツ */}
       <main className="home-main">
-        {/* アイデア登録セクション */}
         <section className="idea-form-section">
           <div className="idea-form">
             <div className="logo-title-section">
@@ -797,7 +784,6 @@ export function Home() {
           </div>
         </section>
 
-        {/* Our ideas セクション */}
         <section className="ideas-zone our-ideas">
           <h2 className="zone-title">Our ideas</h2>
           <p className="zone-description">みんなの共感が得られたら検討を進めよう</p>
@@ -824,7 +810,6 @@ export function Home() {
           </div>
         </section>
 
-        {/* Ideas we're thinking about セクション */}
         <section className="ideas-zone thinking-about">
           <h2 className="zone-title">Ideas we're thinking about</h2>
           <p className="zone-description">アイデアを具体的に検討しよう</p>
@@ -848,7 +833,6 @@ export function Home() {
           </div>
         </section>
 
-        {/* Ideas we're trying セクション */}
         <section className="ideas-zone trying">
           <h2 className="zone-title">Ideas we're trying</h2>
           <p className="zone-description">これまでに検討したアイデアを確認しよう</p>
@@ -857,7 +841,6 @@ export function Home() {
           </div>
         </section>
 
-        {/* Members sharing ideas セクション - 追加 */}
         {workspaceId && <MembersSharingIdeas workspaceId={workspaceId} />}
       </main>
     </div>

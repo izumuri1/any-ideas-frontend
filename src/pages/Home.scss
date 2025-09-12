@@ -285,16 +285,6 @@
   border-top: 1px solid $app-gray-light;
   flex-wrap: wrap;
   
-  // いいねセクションのレイアウト
-  .like-section {
-    flex-shrink: 0;
-    order: 1;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-  
   // ボタンスタイル（進める・削除ボタン）
   .btn-proceed,
   .btn-delete {
@@ -324,6 +314,20 @@
       background-color: $app-gray-darker;
     }
   }
+}
+
+//////////////////////////////////////////////////////////////
+// ===== いいねボタン関連スタイル（一箇所に集約） =====
+//////////////////////////////////////////////////////////////
+
+// いいねセクションのレイアウト
+.like-section {
+  flex-shrink: 0;
+  order: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 // いいねボタンスタイル
@@ -387,6 +391,7 @@
   }
 }
 
+// シマーアニメーション
 @keyframes shimmer {
   0% { left: -100%; }
   100% { left: 100%; }
@@ -427,6 +432,22 @@
     }
   }
 }
+
+// フェードインアップアニメーション
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// ===== いいねボタン関連スタイルここまで =====
+//////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////
 // メンバーセクション - $app-font-theme 修正済み
