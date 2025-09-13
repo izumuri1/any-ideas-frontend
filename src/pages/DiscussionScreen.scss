@@ -158,8 +158,9 @@
   display: flex;
   overflow-x: auto;
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid $app-gray-light;
+  border-bottom: 1px solid $app-gray-light;
   -webkit-overflow-scrolling: touch;
+  position: relative;
   
   // スクロールバーを隠す
   &::-webkit-scrollbar {
@@ -168,27 +169,63 @@
   scrollbar-width: none;
   
   .tab-button {
-    @include app-button-base;
     background: none;
     border: none;
-    border-bottom: 3px solid transparent;
-    border-radius: 0;
+    border-radius: 6px 6px 0 0;
     padding: 1rem 0.75rem;
     font-size: $app-font-body;
     font-weight: $app-weight-medium;
     white-space: nowrap;
     min-width: auto;
     flex-shrink: 0;
-    transition: all $app-animation-fast $app-ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: $app-gray-medium;
+    position: relative;
+    outline: none;
+    box-shadow: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    &:focus {
+    outline: none;
+    box-shadow: none;
+}
+    
+    // アニメーション付き下線（ブラウン系グラデーション）
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #92400E, #D97706);
+      border-radius: 2px 2px 0 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateX(-50%);
+    }
     
     &:hover {
-      background-color: rgba($app-btn-primary, 0.05);
+      background: rgba(146, 64, 14, 0.03);
+      color: #92400E;
+      
+      &::before {
+        width: 30%;
+        opacity: 0.5;
+      }
     }
     
     &.active {
-      color: $app-btn-primary;
-      border-bottom-color: $app-btn-primary;
+      background: rgba(146, 64, 14, 0.06);
+      color: #92400E;
       font-weight: $app-weight-bold;
+      
+      &::before {
+        width: 80%;
+        opacity: 1;
+        box-shadow: 0 0 8px rgba(146, 64, 14, 0.4);
+      }
     }
     
     &:active {
