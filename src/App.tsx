@@ -1,19 +1,23 @@
 // src/App.tsx
 import { useAuth } from './contexts/AuthContext'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { Home } from './pages/Home'
 import { Login } from './components/Login'
 import { SignUp } from './components/SignUp'
-import { LoadingSpinner } from './components/LoadingSpinner'
 import { CreateWorkspace } from './components/CreateWorkspace'
+import Home from './pages/Home'
+import DiscussionScreen from './pages/DiscussionScreen'
 import './App.scss'
 
 function App() {
-  const {user, loading} = useAuth()
+  const { user, loading } = useAuth()
 
   // ローディング中の表示
   if (loading) {
-    return <LoadingSpinner />
+    return (
+      <div className="loading-container">
+        <p>読み込み中...</p>
+      </div>
+    )
   }
 
   return (
@@ -32,15 +36,12 @@ function App() {
             {/* 個別のワークスペース（Home画面） */}
             <Route path="/workspace/:workspaceId" element={<Home />} />
             
-            {/* /home は削除 - 常にワークスペースIDが必要 */}
-            {/* <Route path="/home" element={<Home />} /> */}
+            {/* 検討画面 */}
+            <Route path="/workspace/:workspaceId/discussion/:ideaId" element={<DiscussionScreen />} />
             
             {/* すでにログイン済みのユーザーをログインページから追い出したい場合 */}
             <Route path="/login" element={<Navigate to="/" replace />} />
             <Route path="/signup" element={<Navigate to="/" replace />} />
-            
-            {/* 将来追加予定のルート */}
-            {/* <Route path="/idea/:id" element={<IdeaDetail user={user} />} /> */}
           </>
         ) : (
           // 認証されていないユーザー（userがnull）なら、ログイン画面と新規登録画面のみアクセス可能

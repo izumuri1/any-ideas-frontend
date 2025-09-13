@@ -1,0 +1,325 @@
+// src/pages/DiscussionScreen.scss
+// 検討画面専用スタイル - Any Ideas? プロジェクト仕様準拠
+// プロジェクトの_variables.scssを活用してスマホ最適化
+// Home画面のフォーム構造と統一したデザインシステム対応版
+
+@use '../styles/variables' as *;
+
+//////////////////////////////////////////////////////////////
+// 画面全体レイアウト
+//////////////////////////////////////////////////////////////
+
+.discussion-screen {
+  min-height: 100vh;
+  background-color: $app-bg-color;
+  display: flex;
+  flex-direction: column;
+}
+
+//////////////////////////////////////////////////////////////
+// ヘッダー
+//////////////////////////////////////////////////////////////
+
+.screen-header {
+  @include app-page-header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: flex-end;
+    min-width: 0; // テキストオーバーフロー対応
+  }
+  
+  .idea-info {
+    text-align: right;
+    min-width: 0;
+    
+    .idea-name {
+      @include app-subtitle-style;
+      margin: 0;
+      font-weight: $app-weight-bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+    
+    .idea-owner {
+      @include app-small-text-style;
+      margin: 0;
+      color: $app-gray-medium;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// メインコンテンツ
+//////////////////////////////////////////////////////////////
+
+.main-content {
+  @include app-main-content;
+  padding: $app-padding-mobile;
+}
+
+//////////////////////////////////////////////////////////////
+// How about？セクション
+//////////////////////////////////////////////////////////////
+
+.how-about-section {
+  @include app-section-style;
+  margin-bottom: $app-padding-large;
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: $app-padding-large;
+    
+    .section-title {
+      @include app-title-style;
+      margin-bottom: 0.5rem;
+    }
+    
+    .section-description {
+      @include app-text-style;
+      color: $app-gray-dark;
+      margin: 0;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// エラーメッセージ
+//////////////////////////////////////////////////////////////
+
+.error-message {
+  @include app-error-message;
+  margin-bottom: 1rem;
+}
+
+//////////////////////////////////////////////////////////////
+// タブナビゲーション
+//////////////////////////////////////////////////////////////
+
+.tab-navigation {
+  display: flex;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid $app-gray-light;
+  -webkit-overflow-scrolling: touch;
+  
+  // スクロールバーを隠す
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  
+  .tab-button {
+    @include app-button-base;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    padding: 1rem 0.75rem;
+    font-size: $app-font-body;
+    font-weight: $app-weight-medium;
+    white-space: nowrap;
+    min-width: auto;
+    flex-shrink: 0;
+    transition: all $app-animation-fast $app-ease-out;
+    
+    &:hover {
+      background-color: rgba($app-btn-primary, 0.05);
+    }
+    
+    &.active {
+      color: $app-btn-primary;
+      border-bottom-color: $app-btn-primary;
+      font-weight: $app-weight-bold;
+    }
+    
+    &:active {
+      transform: none; // タブボタンはスケール効果なし
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// タブコンテンツ
+//////////////////////////////////////////////////////////////
+
+.tab-contents {
+  position: relative;
+  min-height: 300px;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeInUp 0.3s $app-ease-out;
+  
+  &.active {
+    display: block;
+  }
+  
+  .tab-title {
+    @include app-subtitle-style;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: $app-btn-primary;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 提案登録フォーム（Home画面のidea-registration-formと同じ構造）
+//////////////////////////////////////////////////////////////
+
+.proposal-registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .input-field,
+    .textarea-field {
+      @include app-input-base;
+    }
+    
+    .textarea-field {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .character-count {
+      @include app-small-text-style;
+      text-align: right;
+      margin-top: 0.25rem;
+      color: $app-gray-medium;
+    }
+  }
+  
+  .btn-primary {
+    @include app-button-primary;
+    margin-top: 0.5rem;
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 提案一覧セクション（将来実装用）
+//////////////////////////////////////////////////////////////
+
+.proposals-section {
+  @include app-section-style;
+  text-align: center;
+  
+  .proposals-title {
+    @include app-title-style;
+    margin-bottom: 1rem;
+  }
+  
+  .proposals-description {
+    @include app-text-style;
+    color: $app-gray-medium;
+    font-style: italic;
+    margin: 0;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// レスポンシブ調整
+//////////////////////////////////////////////////////////////
+
+@media (min-width: 768px) {
+  .screen-header {
+    padding: 1.5rem 2rem;
+    
+    .idea-info {
+      .idea-name {
+        max-width: 300px;
+        font-size: $app-font-title;
+      }
+    }
+  }
+  
+  .main-content {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .tab-navigation {
+    justify-content: center;
+    overflow-x: visible;
+    
+    .tab-button {
+      padding: 1rem 1.5rem;
+      font-size: $app-font-subtitle;
+    }
+  }
+  
+  .proposal-registration-form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アニメーション
+//////////////////////////////////////////////////////////////
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アクセシビリティ対応
+//////////////////////////////////////////////////////////////
+
+// フォーカス時のアウトライン強化
+.tab-button:focus,
+.input-field:focus,
+.btn-primary:focus {
+  outline: 2px solid $app-btn-primary;
+  outline-offset: 2px;
+}
+
+// 高コントラストモード対応
+@media (prefers-contrast: high) {
+  .tab-button.active {
+    background-color: $app-btn-primary;
+    color: $app-white;
+  }
+}
+
+// リデュースモーション対応
+@media (prefers-reduced-motion: reduce) {
+  .tab-content {
+    animation: none;
+    transition: none;
+  }
+}

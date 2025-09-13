@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'  // useNavigateを追加
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { HamburgerMenu } from '../components/HamburgerMenu'
@@ -42,6 +42,7 @@ interface IdeaCardProps {
   onProceed?: (ideaId: string) => void
   onDelete: (ideaId: string) => void
   onLikeToggle?: (ideaId: string) => void
+  onDiscussion?: (ideaId: string) => void  // 検討機能追加
   proceedingIdeaId: string | null
   deletingIdeaId: string | null
   showProceedButton?: boolean
@@ -66,6 +67,7 @@ function EnhancedIdeaCard({
   onProceed, 
   onDelete, 
   onLikeToggle,
+  onDiscussion,  // 検討機能追加
   proceedingIdeaId, 
   deletingIdeaId,
   showProceedButton = false 
@@ -105,7 +107,7 @@ function EnhancedIdeaCard({
           onLikeToggle={onLikeToggle}
         />
         
-        {/* 進めるボタン */}
+        {/* 進めるボタン（Our ideas用） */}
         {isOwner && showProceedButton && onProceed && (
           <button 
             className="btn-proceed"
@@ -117,8 +119,13 @@ function EnhancedIdeaCard({
         )}
         
         {/* 検討ボタン（Ideas we're thinking about用） */}
-        {!showProceedButton && (
-          <button className="btn-proceed">検討</button>
+        {!showProceedButton && onDiscussion && (
+          <button 
+            className="btn-proceed"
+            onClick={() => onDiscussion(idea.id)}
+          >
+            検討
+          </button>
         )}
         
         {/* 削除ボタン - コンポーネント化 */}
@@ -242,9 +249,10 @@ function MembersSharingIdeas({ workspaceId }: { workspaceId: string }) {
   )
 }
 
-export function Home() {
+export default function Home() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
   const { user } = useAuth()
+  const navigate = useNavigate()  // 検討画面遷移のために追加
 
   const getCurrentYearMonth = () => {
     const now = new Date()
@@ -282,6 +290,11 @@ export function Home() {
 
   const [deletingIdeaId, setDeletingIdeaId] = useState<string | null>(null)
   const [proceedingIdeaId, setProceedingIdeaId] = useState<string | null>(null)
+
+  // 検討画面への遷移処理（新規追加）
+  const handleDiscussion = (ideaId: string) => {
+    navigate(`/workspace/${workspaceId}/discussion/${ideaId}`)
+  }
 
   const fetchIdeasByStatus = async (status: string): Promise<Idea[]> => {
     if (!workspaceId) throw new Error('ワークスペースIDが不正です')
@@ -746,6 +759,7 @@ export function Home() {
                   currentUser={user}
                   onDelete={handleIdeaDelete}
                   onLikeToggle={handleLikeToggle}
+                  onDiscussion={handleDiscussion}  // 検討画面遷移機能を追加
                   proceedingIdeaId={proceedingIdeaId}
                   deletingIdeaId={deletingIdeaId}
                   showProceedButton={false}
