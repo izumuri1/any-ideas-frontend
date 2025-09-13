@@ -1,8 +1,9 @@
 // src/pages/DiscussionScreen.scss
-// 検討画面専用スタイル - Home画面のヘッダー構造に合わせて修正
+// 検討画面専用スタイル - 提案カード表示機能追加版
 // プロジェクトの_variables.scssを活用してスマホ最適化
 
 @use '../styles/variables' as *;
+@use 'sass:color';
 
 //////////////////////////////////////////////////////////////
 // 画面全体レイアウト
@@ -15,6 +16,19 @@
   flex-direction: column;
   width: 100%;
   overflow-x: hidden;
+  
+  &.loading {
+    @include app-text-style;
+    text-align: center;
+    padding: 2rem;
+    color: $app-gray-medium;
+  }
+  
+  &.error {
+    @include app-error-message;
+    text-align: center;
+    padding: 2rem;
+  }
 }
 
 //////////////////////////////////////////////////////////////
@@ -37,6 +51,8 @@
   padding-right: max($app-padding-mobile, env(safe-area-inset-right));
 
   .header {
+    display: flex;
+    align-items: center;
     gap: $app-padding-mobile;
   }
 }
@@ -111,7 +127,7 @@
 
 .discussion-main {
   @include app-main-content;
-  margin-top: 80px; // Home画面と同じ固定ヘッダー分の余白
+  margin-top: 80px; // 固定ヘッダー分の余白
   padding: $app-padding-mobile;
   padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
 }
@@ -124,37 +140,25 @@
   @include app-section-style;
   margin-bottom: $app-padding-large;
   
-  .section-header {
+  .section-title {
+    @include app-title-style;
+    margin-bottom: 0.5rem;
     text-align: center;
-    margin-bottom: $app-padding-large;
-    
-    .section-title {
-      @include app-title-style;
-      margin-bottom: 0.5rem;
-    }
-    
-    .section-description {
-      @include app-text-style;
-      color: $app-gray-dark;
-      margin: 0;
-    }
   }
-}
-
-//////////////////////////////////////////////////////////////
-// エラーメッセージ
-//////////////////////////////////////////////////////////////
-
-.error-message {
-  @include app-error-message;
-  margin-bottom: 1rem;
+  
+  .section-description {
+    @include app-text-style;
+    color: $app-gray-dark;
+    margin: 0 0 $app-padding-large 0;
+    text-align: center;
+  }
 }
 
 //////////////////////////////////////////////////////////////
 // タブナビゲーション
 //////////////////////////////////////////////////////////////
 
-.tab-navigation {
+.tab-menu {
   display: flex;
   overflow-x: auto;
   margin-bottom: 1.5rem;
@@ -188,11 +192,11 @@
     appearance: none;
 
     &:focus {
-    outline: none;
-    box-shadow: none;
-}
+      outline: none;
+      box-shadow: none;
+    }
     
-    // アニメーション付き下線（ブラウン系グラデーション）
+    // アニメーション付き下線
     &::before {
       content: '';
       position: absolute;
@@ -227,10 +231,6 @@
         box-shadow: 0 0 8px rgba(146, 64, 14, 0.4);
       }
     }
-    
-    &:active {
-      transform: none; // タブボタンはスケール効果なし
-    }
   }
 }
 
@@ -260,7 +260,7 @@
 }
 
 //////////////////////////////////////////////////////////////
-// 提案登録フォーム（Home画面のidea-registration-formと同じ構造）
+// 提案登録フォーム
 //////////////////////////////////////////////////////////////
 
 .proposal-registration-form {
@@ -276,6 +276,24 @@
     .input-field,
     .textarea-field {
       @include app-input-base;
+    }
+    
+    .date-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      .date-field {
+        @include app-input-base;
+        flex: 1;
+      }
+      
+      .date-separator {
+        @include app-text-style;
+        color: $app-gray-medium;
+        font-weight: 500;
+        flex-shrink: 0;
+      }
     }
     
     .textarea-field {
@@ -303,28 +321,129 @@
 }
 
 //////////////////////////////////////////////////////////////
-// 提案一覧セクション（将来実装用）
+// 提案一覧セクション
 //////////////////////////////////////////////////////////////
 
 .proposals-section {
   @include app-section-style;
-  text-align: center;
+  margin-top: $app-padding-xlarge;
   
   .proposals-title {
     @include app-title-style;
+    margin-bottom: $app-padding-large;
+    text-align: center;
+  }
+}
+
+.proposals-by-type {
+  display: flex;
+  flex-direction: column;
+  gap: $app-padding-large;
+}
+
+.proposal-type-section {
+  .proposal-type-title {
+    @include app-subtitle-style;
     margin-bottom: 1rem;
+    color: $app-btn-primary;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid $app-gray-light;
   }
   
-  .proposals-description {
+  .proposal-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .no-proposals {
     @include app-text-style;
     color: $app-gray-medium;
     font-style: italic;
+    text-align: center;
+    padding: 2rem 1rem;
     margin: 0;
   }
 }
 
 //////////////////////////////////////////////////////////////
-// レスポンシブ調整 - Home画面と同じ構造
+// 提案カード
+//////////////////////////////////////////////////////////////
+
+.proposal-card {
+  background-color: $app-white;
+  border: 1px solid $app-gray-light;
+  border-radius: $app-radius-card;
+  padding: $app-padding-large;
+  box-shadow: $app-shadow-card;
+  transition: all $app-animation-fast $app-ease-out;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+// 提案カード - ヘッダー部分
+.proposal-header {
+  margin-bottom: $app-padding-mobile;
+  text-align: right;
+  
+  .proposal-owner {
+    @include app-small-text-style;
+    color: $app-gray-medium;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+}
+
+// 提案カード - コンテンツ部分
+.proposal-content {
+  margin-bottom: $app-padding-mobile;
+  text-align: left;
+  
+  p {
+    @include app-text-style;
+    color: $app-text-color;
+    line-height: 1.4;
+    margin: 0;
+  }
+}
+
+// 提案カード - アクション部分
+.proposal-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: $app-padding-mobile;
+  
+  // いいねボタンのスタイルは LikeButton.scss で定義済み
+  
+  .btn-adopt {
+    @include app-button-base;
+    background-color: $app-btn-primary;
+    color: $app-white;
+    padding: 0.5rem 1rem;
+    font-size: $app-font-body;
+    min-height: auto;
+    flex: none;
+    min-width: 80px;
+    
+    &:hover:not(:disabled) {
+      background-color: color.adjust($app-btn-primary, $lightness: -10%);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+  
+  // 削除ボタンのスタイルは DeleteButton.scss で定義済み
+}
+
+//////////////////////////////////////////////////////////////
+// レスポンシブ調整
 //////////////////////////////////////////////////////////////
 
 @media (min-width: 768px) {
@@ -350,7 +469,7 @@
     }
   }
   
-  .tab-navigation {
+  .tab-menu {
     justify-content: center;
     overflow-x: visible;
     
@@ -364,6 +483,17 @@
     max-width: 600px;
     margin: 0 auto;
   }
+  
+  .proposals-by-type {
+    gap: $app-padding-xlarge;
+  }
+  
+  .proposal-card {
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+  }
 }
 
 @media (min-width: 1024px) {
@@ -373,6 +503,13 @@
 
   .idea-info {
     margin-left: $app-padding-xlarge;
+  }
+  
+  // デスクトップでは提案カードを2カラムで表示
+  .proposal-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
   }
 }
 
@@ -398,7 +535,8 @@
 // フォーカス時のアウトライン強化
 .tab-button:focus,
 .input-field:focus,
-.btn-primary:focus {
+.btn-primary:focus,
+.btn-adopt:focus {
   outline: 2px solid $app-btn-primary;
   outline-offset: 2px;
 }
@@ -409,12 +547,28 @@
     background-color: $app-btn-primary;
     color: $app-white;
   }
+  
+  .proposal-card {
+    border-color: $app-gray-dark;
+  }
 }
 
 // リデュースモーション対応
 @media (prefers-reduced-motion: reduce) {
   .tab-content {
     animation: none;
+    transition: none;
+  }
+  
+  .proposal-card {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+  }
+  
+  .tab-button::before {
     transition: none;
   }
 }
