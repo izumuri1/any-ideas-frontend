@@ -1,7 +1,6 @@
 // src/pages/DiscussionScreen.scss
-// 検討画面専用スタイル - Any Ideas? プロジェクト仕様準拠
+// 検討画面専用スタイル - Home画面のヘッダー構造に合わせて修正
 // プロジェクトの_variables.scssを活用してスマホ最適化
-// Home画面のフォーム構造と統一したデザインシステム対応版
 
 @use '../styles/variables' as *;
 
@@ -14,53 +13,95 @@
   background-color: $app-bg-color;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 //////////////////////////////////////////////////////////////
-// ヘッダー
+// ヘッダー - Home画面の構造に合わせて修正
 //////////////////////////////////////////////////////////////
 
-.screen-header {
+.discussion-header {
   @include app-page-header;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  width: 100%;
+  background-color: $app-gray-light;
   
-  .header-left {
+  // セーフエリア対応（Home画面と同じ）
+  padding-top: max($app-padding-mobile, env(safe-area-inset-top));
+  padding-left: max($app-padding-mobile, env(safe-area-inset-left));
+  padding-right: max($app-padding-mobile, env(safe-area-inset-right));
+
+  .header {
+    gap: $app-padding-mobile;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アイデア情報表示 - Home画面のワークスペース情報表示と同じ構造
+//////////////////////////////////////////////////////////////
+
+.idea-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+  min-width: 0;
+  margin-left: $app-padding-mobile;
+  
+  .idea-name,
+  .idea-owner {
     display: flex;
-    align-items: center;
+    align-items: baseline;
+    gap: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
   }
   
-  .header-right {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    justify-content: flex-end;
-    min-width: 0; // テキストオーバーフロー対応
+  .label {
+    @include app-small-text-style;
+    color: $app-gray-medium;
+    font-size: 0.8rem;
+    font-weight: 500;
+    flex-shrink: 0;
   }
   
-  .idea-info {
-    text-align: right;
+  .value {
+    @include app-subtitle-style;
+    margin: 0;
+    padding: 0;
+    color: $app-gray-dark;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
     min-width: 0;
-    
-    .idea-name {
-      @include app-subtitle-style;
-      margin: 0;
-      font-weight: $app-weight-bold;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 200px;
+  }
+  
+  .idea-owner {
+    .label {
+      font-size: 0.75rem;
     }
     
-    .idea-owner {
-      @include app-small-text-style;
-      margin: 0;
-      color: $app-gray-medium;
+    .value {
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0.9;
     }
+  }
+
+  .loading-text,
+  .error-text {
+    @include app-small-text-style;
+    margin: 0;
+    padding: 0;
+    color: $app-gray-dark;
+    font-style: italic;
   }
 }
 
@@ -68,9 +109,11 @@
 // メインコンテンツ
 //////////////////////////////////////////////////////////////
 
-.main-content {
+.discussion-main {
   @include app-main-content;
+  margin-top: 80px; // Home画面と同じ固定ヘッダー分の余白
   padding: $app-padding-mobile;
+  padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
 }
 
 //////////////////////////////////////////////////////////////
@@ -244,25 +287,30 @@
 }
 
 //////////////////////////////////////////////////////////////
-// レスポンシブ調整
+// レスポンシブ調整 - Home画面と同じ構造
 //////////////////////////////////////////////////////////////
 
 @media (min-width: 768px) {
-  .screen-header {
-    padding: 1.5rem 2rem;
-    
-    .idea-info {
-      .idea-name {
-        max-width: 300px;
-        font-size: $app-font-title;
-      }
-    }
+  .discussion-main {
+    max-width: 600px;
+    margin: 80px auto 0;
   }
-  
-  .main-content {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
+
+  .idea-info {
+    margin-left: $app-padding-large;
+    
+    .idea-name .label,
+    .idea-owner .label {
+      font-size: 0.85rem;
+    }
+    
+    .idea-name .value {
+      font-size: 1.1rem;
+    }
+    
+    .idea-owner .value {
+      font-size: 1rem;
+    }
   }
   
   .tab-navigation {
@@ -278,6 +326,16 @@
   .proposal-registration-form {
     max-width: 600px;
     margin: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .discussion-main {
+    max-width: 800px;
+  }
+
+  .idea-info {
+    margin-left: $app-padding-xlarge;
   }
 }
 

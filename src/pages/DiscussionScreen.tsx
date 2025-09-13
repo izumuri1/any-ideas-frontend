@@ -1,7 +1,5 @@
 // src/pages/DiscussionScreen.tsx
-// 検討画面 - How about？セクション
-// Home画面のフォーム構造と統一したデザインシステム対応版
-// URLパラメータからアイデア情報を取得してSupabase連携
+// 修正版 - Home画面のヘッダー構造に合わせる
 
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
@@ -202,12 +200,15 @@ export default function DiscussionScreen() {
   if (loading) {
     return (
       <div className="discussion-screen">
-        <header className="screen-header">
-          <div className="header-left">
+        <header className="discussion-header">
+          <div className="header">
             <HamburgerMenu currentPage="other" />
+            <div className="idea-info">
+              <p className="loading-text">読み込み中...</p>
+            </div>
           </div>
         </header>
-        <main className="main-content">
+        <main className="discussion-main">
           <p>アイデア情報を読み込み中...</p>
         </main>
       </div>
@@ -218,12 +219,15 @@ export default function DiscussionScreen() {
   if (!ideaInfo) {
     return (
       <div className="discussion-screen">
-        <header className="screen-header">
-          <div className="header-left">
+        <header className="discussion-header">
+          <div className="header">
             <HamburgerMenu currentPage="other" />
+            <div className="idea-info">
+              <p className="error-text">アイデア情報を取得できませんでした</p>
+            </div>
           </div>
         </header>
-        <main className="main-content">
+        <main className="discussion-main">
           <p>アイデア情報を取得できませんでした。</p>
         </main>
       </div>
@@ -232,22 +236,26 @@ export default function DiscussionScreen() {
 
   return (
     <div className="discussion-screen">
-      {/* ヘッダー */}
-      <header className="screen-header">
-        <div className="header-left">
+      {/* ヘッダー - Home画面の構造に合わせて修正 */}
+      <header className="discussion-header">
+        <div className="header">
           <HamburgerMenu currentPage="other" />
-        </div>
-        
-        <div className="header-right">
+          
           <div className="idea-info">
-            <div className="idea-name">{ideaInfo.idea_name}</div>
-            <div className="idea-owner">by {ideaInfo.profiles.username}</div>
+            <div className="idea-name">
+              <span className="label">アイデア名：</span>
+              <span className="value">{ideaInfo.idea_name}</span>
+            </div>
+            <div className="idea-owner">
+              <span className="label">アイデアオーナー：</span>
+              <span className="value">{ideaInfo.profiles.username}</span>
+            </div>
           </div>
         </div>
       </header>
 
       {/* メインコンテンツ */}
-      <main className="main-content">
+      <main className="discussion-main">
         <section className="how-about-section">
           <div className="section-header">
             <h2 className="section-title">How about？</h2>
