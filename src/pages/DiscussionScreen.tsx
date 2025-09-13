@@ -1,7 +1,7 @@
 // src/pages/DiscussionScreen.tsx
-// 修正版 - Home画面のヘッダー構造に合わせる
+// 修正版 - TabContentの再レンダリング問題を解決
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -184,18 +184,6 @@ export default function DiscussionScreen() {
     }
   }
 
-  // タブコンテンツコンポーネント
-  const TabContent = ({ type, title, children }: { 
-    type: string; 
-    title: string; 
-    children: React.ReactNode 
-  }) => (
-    <div className={`tab-content ${activeTab === type ? 'active' : ''}`}>
-      <h3 className="tab-title">{title}</h3>
-      {children}
-    </div>
-  )
-
   // ローディング中の表示
   if (loading) {
     return (
@@ -297,121 +285,133 @@ export default function DiscussionScreen() {
             </button>
           </div>
 
-          {/* タブコンテンツ */}
+          {/* タブコンテンツ - TabContentコンポーネントを使わずに直接描画 */}
           <div className="tab-contents">
             {/* いつから・いつまで */}
-            <TabContent type="period" title="実施希望時期">
-              <div className="proposal-registration-form">
-                <div className="form-row">
-                  <input
-                    type="date"
-                    value={proposalForm.period.startDate}
-                    onChange={(e) => handleFormChange('period', 'startDate', e.target.value)}
-                    className="input-field"
-                    placeholder="いつから"
-                  />
-                </div>
-                
-                <div className="form-row">
-                  <input
-                    type="date"
-                    value={proposalForm.period.endDate}
-                    onChange={(e) => handleFormChange('period', 'endDate', e.target.value)}
-                    className="input-field"
-                    placeholder="いつまで"
-                  />
-                </div>
+            {activeTab === 'period' && (
+              <div className="tab-content active">
+                <h3 className="tab-title">実施希望時期</h3>
+                <div className="proposal-registration-form">
+                  <div className="form-row">
+                    <input
+                      type="date"
+                      value={proposalForm.period.startDate}
+                      onChange={(e) => handleFormChange('period', 'startDate', e.target.value)}
+                      className="input-field"
+                      placeholder="いつから"
+                    />
+                  </div>
+                  
+                  <div className="form-row">
+                    <input
+                      type="date"
+                      value={proposalForm.period.endDate}
+                      onChange={(e) => handleFormChange('period', 'endDate', e.target.value)}
+                      className="input-field"
+                      placeholder="いつまで"
+                    />
+                  </div>
 
-                <button
-                  onClick={() => handleProposalSubmit('period')}
-                  disabled={isSubmitting}
-                  className="btn-primary"
-                >
-                  {isSubmitting ? '提案中...' : '提案'}
-                </button>
+                  <button
+                    onClick={() => handleProposalSubmit('period')}
+                    disabled={isSubmitting}
+                    className="btn-primary"
+                  >
+                    {isSubmitting ? '提案中...' : '提案'}
+                  </button>
+                </div>
               </div>
-            </TabContent>
+            )}
 
             {/* やりたいこと */}
-            <TabContent type="todo" title="やりたいこと">
-              <div className="proposal-registration-form">
-                <div className="form-row">
-                  <textarea
-                    value={proposalForm.todo.text}
-                    onChange={(e) => handleFormChange('todo', 'text', e.target.value)}
-                    className="input-field textarea-field"
-                    placeholder="やりたいことを記入"
-                    rows={4}
-                    maxLength={500}
-                  />
-                  <div className="character-count">
-                    {proposalForm.todo.text.length}/500
+            {activeTab === 'todo' && (
+              <div className="tab-content active">
+                <h3 className="tab-title">やりたいこと</h3>
+                <div className="proposal-registration-form">
+                  <div className="form-row">
+                    <textarea
+                      value={proposalForm.todo.text}
+                      onChange={(e) => handleFormChange('todo', 'text', e.target.value)}
+                      className="input-field textarea-field"
+                      placeholder="やりたいことを記入"
+                      rows={4}
+                      maxLength={500}
+                    />
+                    <div className="character-count">
+                      {proposalForm.todo.text.length}/500
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={() => handleProposalSubmit('todo')}
-                  disabled={isSubmitting}
-                  className="btn-primary"
-                >
-                  {isSubmitting ? '提案中...' : '提案'}
-                </button>
+                  <button
+                    onClick={() => handleProposalSubmit('todo')}
+                    disabled={isSubmitting}
+                    className="btn-primary"
+                  >
+                    {isSubmitting ? '提案中...' : '提案'}
+                  </button>
+                </div>
               </div>
-            </TabContent>
+            )}
 
             {/* やらなくても良いこと */}
-            <TabContent type="notTodo" title="やらなくても良いこと">
-              <div className="proposal-registration-form">
-                <div className="form-row">
-                  <textarea
-                    value={proposalForm.notTodo.text}
-                    onChange={(e) => handleFormChange('notTodo', 'text', e.target.value)}
-                    className="input-field textarea-field"
-                    placeholder="やらなくても良いことを記入"
-                    rows={4}
-                    maxLength={500}
-                  />
-                  <div className="character-count">
-                    {proposalForm.notTodo.text.length}/500
+            {activeTab === 'notTodo' && (
+              <div className="tab-content active">
+                <h3 className="tab-title">やらなくても良いこと</h3>
+                <div className="proposal-registration-form">
+                  <div className="form-row">
+                    <textarea
+                      value={proposalForm.notTodo.text}
+                      onChange={(e) => handleFormChange('notTodo', 'text', e.target.value)}
+                      className="input-field textarea-field"
+                      placeholder="やらなくても良いことを記入"
+                      rows={4}
+                      maxLength={500}
+                    />
+                    <div className="character-count">
+                      {proposalForm.notTodo.text.length}/500
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={() => handleProposalSubmit('notTodo')}
-                  disabled={isSubmitting}
-                  className="btn-primary"
-                >
-                  {isSubmitting ? '提案中...' : '提案'}
-                </button>
+                  <button
+                    onClick={() => handleProposalSubmit('notTodo')}
+                    disabled={isSubmitting}
+                    className="btn-primary"
+                  >
+                    {isSubmitting ? '提案中...' : '提案'}
+                  </button>
+                </div>
               </div>
-            </TabContent>
+            )}
 
             {/* 想定予算 */}
-            <TabContent type="budget" title="想定予算">
-              <div className="proposal-registration-form">
-                <div className="form-row">
-                  <textarea
-                    value={proposalForm.budget.text}
-                    onChange={(e) => handleFormChange('budget', 'text', e.target.value)}
-                    className="input-field textarea-field"
-                    placeholder="想定予算を記入"
-                    rows={4}
-                    maxLength={500}
-                  />
-                  <div className="character-count">
-                    {proposalForm.budget.text.length}/500
+            {activeTab === 'budget' && (
+              <div className="tab-content active">
+                <h3 className="tab-title">想定予算</h3>
+                <div className="proposal-registration-form">
+                  <div className="form-row">
+                    <textarea
+                      value={proposalForm.budget.text}
+                      onChange={(e) => handleFormChange('budget', 'text', e.target.value)}
+                      className="input-field textarea-field"
+                      placeholder="想定予算を記入"
+                      rows={4}
+                      maxLength={500}
+                    />
+                    <div className="character-count">
+                      {proposalForm.budget.text.length}/500
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={() => handleProposalSubmit('budget')}
-                  disabled={isSubmitting}
-                  className="btn-primary"
-                >
-                  {isSubmitting ? '提案中...' : '提案'}
-                </button>
+                  <button
+                    onClick={() => handleProposalSubmit('budget')}
+                    disabled={isSubmitting}
+                    className="btn-primary"
+                  >
+                    {isSubmitting ? '提案中...' : '提案'}
+                  </button>
+                </div>
               </div>
-            </TabContent>
+            )}
           </div>
         </section>
 
