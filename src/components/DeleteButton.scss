@@ -1,0 +1,19 @@
+// src/components/DeleteButton.scss
+@use '../styles/variables' as *;
+
+.btn-delete {
+  @include app-button-base;
+  background-color: $app-gray-medium;
+  color: $app-white;
+  padding: 0.5rem 1rem;
+  font-size: $app-font-body;
+  min-height: auto;
+  flex: none;
+  order: 2;
+  margin-left: auto;
+  min-width: 80px;
+  
+  &:hover:not(:disabled) {
+    background-color: $app-gray-darker;
+  }
+}

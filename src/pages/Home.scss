@@ -287,33 +287,15 @@
   flex-wrap: wrap;
   
   // ボタンスタイル（進める・削除ボタン）
-  .btn-proceed,
-  .btn-delete {
+  .btn-proceed {
     order: 2;
     margin-left: auto;
     min-width: 80px;
-  }
-  
-  .btn-proceed {
     @include app-button-primary;
     padding: 0.5rem 1rem;
     font-size: $app-font-body;
     min-height: auto;
     flex: 1;
-  }
-  
-  .btn-delete {
-    @include app-button-base;
-    background-color: $app-gray-medium;
-    color: $app-white;
-    padding: 0.5rem 1rem;
-    font-size: $app-font-body;
-    min-height: auto;
-    flex: none;
-    
-    &:hover:not(:disabled) {
-      background-color: $app-gray-darker;
-    }
   }
 }
 

@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { HamburgerMenu } from '../components/HamburgerMenu'
 import { LikeButton, type LikeableItem } from '../components/LikeButton'
+import { DeleteButton } from '../components/DeleteButton'
 import './Home.scss'
 
 // 型定義
@@ -120,16 +121,14 @@ function EnhancedIdeaCard({
           <button className="btn-proceed">検討</button>
         )}
         
-        {/* 削除ボタン */}
-        {isOwner && (
-          <button 
-            className="btn-delete"
-            onClick={() => onDelete(idea.id)}
-            disabled={deletingIdeaId === idea.id}
-          >
-            {deletingIdeaId === idea.id ? '削除中...' : '削除'}
-          </button>
-        )}
+        {/* 削除ボタン - コンポーネント化 */}
+        <DeleteButton
+          ideaId={idea.id}
+          currentUser={currentUser}
+          creatorId={idea.creator_id}
+          isDeleting={deletingIdeaId === idea.id}
+          onDelete={onDelete}
+        />
       </div>
     </div>
   )
