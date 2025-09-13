@@ -2,6 +2,7 @@
 // スマホ向けアプリ特化版 - いいね機能付きリファクタリング版
 @use '../styles/variables' as *;
 @use 'sass:color'; // color モジュールをインポート
+@use '../components/LikeButton.scss';
 
 //////////////////////////////////////////////////////////////
 // メイン コンテナ & レイアウト
@@ -276,7 +277,7 @@
   }
 }
 
-// アイデアカード - アクション部分（いいね機能強化版）
+// アイデアカード - アクション部分
 .idea-actions {
   display: flex;
   align-items: center;
@@ -315,139 +316,6 @@
     }
   }
 }
-
-//////////////////////////////////////////////////////////////
-// ===== いいねボタン関連スタイル（一箇所に集約） =====
-//////////////////////////////////////////////////////////////
-
-// いいねセクションのレイアウト
-.like-section {
-  flex-shrink: 0;
-  order: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-// いいねボタンスタイル
-.like-button {
-  @include app-button-base;
-  background-color: transparent;
-  color: $app-error-color;
-  border: none;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.9rem;
-  min-height: auto;
-  border-radius: $app-radius-button;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-  
-  &:hover:not(:disabled) {
-    background-color: rgba($app-error-color, 0.1);
-    transform: translateY(-1px);
-  }
-  
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-  
-  &.liked {
-    color: #e53e3e;
-    font-weight: 600;
-  }
-  
-  &.liking {
-    pointer-events: none;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.4),
-        transparent
-      );
-      animation: shimmer 1s infinite;
-    }
-  }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-  
-  // いいね数の数字
-  .like-count {
-    font-size: 0.85rem;
-    margin-left: 0.2rem;
-  }
-}
-
-// シマーアニメーション
-@keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
-
-// ツールチップスタイル
-.like-tooltip {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 8px;
-  z-index: 1000;
-  pointer-events: none;
-  animation: fadeInUp 0.2s ease-out;
-  
-  .tooltip-content {
-    background-color: rgba(0, 0, 0, 0.8);
-    color: $app-white;
-    padding: 0.5rem 0.75rem;
-    border-radius: $app-radius-button;
-    font-size: $app-font-small;
-    white-space: nowrap;
-    max-width: 200px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    
-    // ツールチップの矢印
-    &::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: rgba(0, 0, 0, 0.8);
-    }
-  }
-}
-
-// フェードインアップアニメーション
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 10px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-//////////////////////////////////////////////////////////////
-// ===== いいねボタン関連スタイルここまで =====
-//////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////
 // メンバーセクション - $app-font-theme 修正済み
@@ -497,20 +365,6 @@
 //////////////////////////////////////////////////////////////
 
 @media (max-width: 767px) {
-  .like-tooltip {
-    .tooltip-content {
-      max-width: 150px;
-      font-size: 0.75rem;
-      padding: 0.4rem 0.6rem;
-    }
-  }
-  
-  .like-button {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.85rem;
-    min-width: 45px;
-  }
-  
   .idea-actions {
     gap: 0.5rem;
     

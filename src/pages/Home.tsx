@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { HamburgerMenu } from '../components/HamburgerMenu'
+import { LikeButton, type LikeableItem } from '../components/LikeButton'
 import './Home.scss'
 
 // 型定義
@@ -21,18 +22,7 @@ interface IdeaFormData {
   what_text: string
 }
 
-interface IdeaLike {
-  id: string
-  idea_id: string
-  user_id: string
-  created_at: string
-  profiles: {
-    username: string
-  }
-}
-
-interface Idea {
-  id: string
+interface Idea extends LikeableItem {
   idea_name: string
   when_text: string | null
   who_text: string | null
@@ -43,74 +33,7 @@ interface Idea {
   profiles: {
     username: string
   }
-  idea_likes?: IdeaLike[]
-  like_count?: number
-  user_has_liked?: boolean
 }
-
-// ===== いいねボタン関連のコードをここに集約 =====
-
-interface LikeButtonProps {
-  idea: Idea
-  currentUser: any
-  onLikeToggle?: (ideaId: string) => void
-}
-
-// いいねボタンコンポーネント
-function LikeButton({ idea, currentUser, onLikeToggle }: LikeButtonProps) {
-  const [liking, setLiking] = useState(false)
-  const [showTooltip, setShowTooltip] = useState(false)
-
-  // いいねのトグル処理
-  const handleLikeToggle = async () => {
-    if (!currentUser || liking || !onLikeToggle) return
-
-    setLiking(true)
-    try {
-      await onLikeToggle(idea.id)
-    } finally {
-      setLiking(false)
-    }
-  }
-
-  // いいねしたユーザー一覧のツールチップ
-  const renderLikeTooltip = () => {
-    if (!showTooltip || !idea.like_count || idea.like_count === 0) return null
-
-    return (
-      <div className="like-tooltip">
-        <div className="tooltip-content">
-          {idea.idea_likes?.map((like, index) => (
-            <span key={like.id}>
-              {like.profiles.username}
-              {index < (idea.idea_likes?.length || 0) - 1 ? ', ' : ''}
-            </span>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div 
-      className="like-section"
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-    >
-      <button
-        className={`like-button ${idea.user_has_liked ? 'liked' : ''} ${liking ? 'liking' : ''}`}
-        onClick={handleLikeToggle}
-        disabled={liking || !currentUser}
-        title={idea.user_has_liked ? 'いいねを取り消す' : 'いいねする'}
-      >
-        {idea.user_has_liked ? '♥' : '♡'} {idea.like_count || 0}
-      </button>
-      {renderLikeTooltip()}
-    </div>
-  )
-}
-
-// ===== いいねボタン関連のコードここまで =====
 
 interface IdeaCardProps {
   idea: Idea
@@ -176,7 +99,7 @@ function EnhancedIdeaCard({
       <div className="idea-actions">
         {/* いいねボタンをコンポーネント化で一箇所に集約 */}
         <LikeButton 
-          idea={idea}
+          item={idea}
           currentUser={currentUser}
           onLikeToggle={onLikeToggle}
         />
