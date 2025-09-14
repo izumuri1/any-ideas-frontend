@@ -459,7 +459,7 @@
 .adopted-proposals-section {
   margin-top: $app-padding-xlarge;
   padding: $app-padding-large;
-  background-color: $app-white;
+  background-color: $app-bg-color;
   border-radius: $app-radius-card;
   box-shadow: $app-shadow-card;
 }
@@ -486,18 +486,25 @@
 
 // 採用されたカードのスタイル
 .adopted-card {
-  border-left: 4px solid $app-btn-primary;
-  background-color: rgba($app-btn-primary, 0.05);
+  background-color: $app-white;
+  border: 1px solid $app-gray-light;
+  border-radius: $app-radius-card;
+  padding: $app-padding-large;
+  box-shadow: $app-shadow-card;
+  transition: all $app-animation-fast $app-ease-out;
   
   &:hover {
-    background-color: rgba($app-btn-primary, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 }
 
 // 採用提案のアクション部分
 .adopted-actions {
-  justify-content: flex-start;
+  display: flex;  // ←この行を追加
+  align-items: center;  // ←この行を追加
   gap: 1rem;
+  margin-top: $app-padding-mobile;
   
   .btn-return {
     @include app-button-base;
