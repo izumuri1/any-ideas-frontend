@@ -321,17 +321,27 @@
 }
 
 //////////////////////////////////////////////////////////////
-// 提案一覧セクション
+// 提案一覧セクション - 元の状態に完全復元
 //////////////////////////////////////////////////////////////
 
 .proposals-section {
-  @include app-section-style;
+  @include app-section-style;  // 元のシャドウ付きスタイル
   margin-top: $app-padding-xlarge;
   
   .proposals-title {
-    @include app-title-style;
+    @include app-title-style;  // 元のスタイル
+    margin-bottom: $app-padding-large;
+    text-align: center;  // 元の中央揃え
+  }
+  
+  // 新規追加分のみ - 元のデザインを保持
+  .proposals-description {
+    @include app-text-style;
+    color: $app-gray-medium;
     margin-bottom: $app-padding-large;
     text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 }
 
