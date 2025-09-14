@@ -508,9 +508,9 @@
   
   .btn-return {
     @include app-button-base;
-    background-color: $app-gray-light;
-    color: $app-text-color;
-    border: 1px solid $app-gray-medium;
+    background-color: $app-btn-primary;         // ← 黒色に変更
+    color: $app-white;                          // ← 白文字に変更
+    border: 1px solid $app-btn-primary;         // ← 黒ボーダーに変更
     padding: 0.5rem 1rem;
     font-size: $app-font-body;
     min-height: auto;
