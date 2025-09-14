@@ -384,20 +384,7 @@
   }
 }
 
-// 提案カード - ヘッダー部分
-.proposal-header {
-  margin-bottom: $app-padding-mobile;
-  text-align: right;
-  
-  .proposal-owner {
-    @include app-small-text-style;
-    color: $app-gray-medium;
-    font-size: 0.85rem;
-    margin: 0;
-  }
-}
-
-// 提案カード - コンテンツ部分
+// 提案カード - コンテンツ部分（1行目に移動）
 .proposal-content {
   margin-bottom: $app-padding-mobile;
   text-align: left;
@@ -406,6 +393,19 @@
     @include app-text-style;
     color: $app-text-color;
     line-height: 1.4;
+    margin: 0;
+  }
+}
+
+// 提案カード - ヘッダー部分（2行目に移動、左端寄せ）
+.proposal-header {
+  margin-bottom: $app-padding-mobile;
+  text-align: left;
+  
+  .proposal-owner {
+    @include app-small-text-style;
+    color: $app-gray-medium;
+    font-size: 0.85rem;
     margin: 0;
   }
 }
@@ -426,8 +426,8 @@
     padding: 0.5rem 1rem;
     font-size: $app-font-body;
     min-height: auto;
-    flex: none;
-    min-width: 80px;
+    flex: 1;
+    min-width: 120px;
     
     &:hover:not(:disabled) {
       background-color: color.adjust($app-btn-primary, $lightness: -10%);

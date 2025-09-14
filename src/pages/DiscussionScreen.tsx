@@ -99,12 +99,12 @@ function ProposalCard({
 
   return (
     <div className="proposal-card">
-      <div className="proposal-header">
-        <span className="proposal-owner">by {proposal.profiles.username}</span>
-      </div>
-      
       <div className="proposal-content">
         <p>{getProposalContent()}</p>
+      </div>
+      
+      <div className="proposal-header">
+        <span className="proposal-owner">by {proposal.profiles.username}</span>
       </div>
       
       <div className="proposal-actions">
@@ -127,13 +127,15 @@ function ProposalCard({
         )}
         
         {/* 削除ボタン（提案者のみ） */}
+        {currentUser && currentUser.id === proposal.proposer_id && (
         <DeleteButton
-          ideaId={proposal.id}
-          currentUser={currentUser}
-          creatorId={proposal.proposer_id}
-          isDeleting={deletingProposalId === proposal.id}
-          onDelete={onDelete}
+        item={proposal}
+        currentUser={currentUser}
+        creatorId={proposal.proposer_id}
+        isDeleting={deletingProposalId === proposal.id}
+        onDelete={onDelete}
         />
+        )}
       </div>
     </div>
   )

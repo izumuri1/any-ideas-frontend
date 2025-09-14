@@ -2,19 +2,23 @@
 import './DeleteButton.scss'
 
 interface DeleteButtonProps {
-  ideaId: string
+  item: { id: string }  // アイデアでも提案でも使える
   currentUser: any
-  creatorId: string
+  creatorId: string     // アイデアのcreator_idまたは提案のproposer_id
   isDeleting: boolean
-  onDelete: (ideaId: string) => void
+  onDelete: (itemId: string) => void
+  deleteText?: string   // オプション
+  deletingText?: string // オプション
 }
 
 export function DeleteButton({ 
-  ideaId, 
+  item, 
   currentUser, 
   creatorId, 
   isDeleting, 
-  onDelete 
+  onDelete,
+  deleteText = "削除",
+  deletingText = "削除中..."
 }: DeleteButtonProps) {
   const isOwner = currentUser && currentUser.id === creatorId
 
@@ -25,10 +29,10 @@ export function DeleteButton({
   return (
     <button 
       className="btn-delete"
-      onClick={() => onDelete(ideaId)}
+      onClick={() => onDelete(item.id)}
       disabled={isDeleting}
     >
-      {isDeleting ? '削除中...' : '削除'}
+      {isDeleting ? deletingText : deleteText}
     </button>
   )
 }

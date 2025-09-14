@@ -130,7 +130,7 @@ function EnhancedIdeaCard({
         
         {/* 削除ボタン - コンポーネント化 */}
         <DeleteButton
-          ideaId={idea.id}
+          item={idea}
           currentUser={currentUser}
           creatorId={idea.creator_id}
           isDeleting={deletingIdeaId === idea.id}
