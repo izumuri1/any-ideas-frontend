@@ -1,5 +1,5 @@
 // src/components/LikeButton.scss
-@use '../styles/variables' as *;
+@use "../styles/variables" as *;
 
 //////////////////////////////////////////////////////////////
 // ===== いいねボタンコンポーネント専用スタイル =====
@@ -27,26 +27,33 @@
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  
+
   &:hover:not(:disabled) {
     background-color: rgba($app-error-color, 0.1);
     transform: translateY(-1px);
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
-  
+
+  // いいね済みの状態 - 赤で塗る
   &.liked {
-    color: #e53e3e;
+    color: #e53e3e; // 赤色
     font-weight: 600;
+
+    // ハート記号自体も赤にする
+    &:hover:not(:disabled) {
+      color: #c53030; // より濃い赤
+      background-color: rgba(#e53e3e, 0.1);
+    }
   }
-  
+
   &.liking {
     pointer-events: none;
-    
+
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: -100%;
@@ -61,13 +68,13 @@
       animation: shimmer 1s infinite;
     }
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
   }
-  
+
   // いいね数の数字
   .like-count {
     font-size: 0.85rem;
@@ -77,11 +84,15 @@
 
 // シマーアニメーション
 @keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
-// ツールチップスタイル
+// ツールチップスタイル（ユーザー名表示用）
 .like-tooltip {
   position: absolute;
   bottom: 100%;
@@ -91,28 +102,64 @@
   z-index: 1000;
   pointer-events: none;
   animation: fadeInUp 0.2s ease-out;
-  
+
   .tooltip-content {
-    background-color: rgba(0, 0, 0, 0.8);
-    color: $app-white;
+    background-color: $app-gray-light;
+    color: $app-text-color;
     padding: 0.5rem 0.75rem;
     border-radius: $app-radius-button;
-    font-size: $app-font-small;
+    font-size: 0.8rem;
     white-space: nowrap;
     max-width: 200px;
     text-align: center;
     position: relative;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    
+
     // ツールチップの矢印
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 100%;
       left: 50%;
       transform: translateX(-50%);
       border: 5px solid transparent;
-      border-top-color: rgba(0, 0, 0, 0.8);
+      border-top-color: $app-gray-light;
+    }
+  }
+}
+
+// いいね取り消しメッセージスタイル（四角いメッセージウインドウ）
+.cancel-message {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  z-index: 1001;
+  pointer-events: none;
+  animation: fadeInUp 0.2s ease-out;
+
+  .message-content {
+    background-color: rgba(0, 0, 0, 0.9);
+    color: $app-white;
+    padding: 0.6rem 1rem;
+    border-radius: 4px; // 四角っぽい形にする
+    font-size: 0.8rem;
+    white-space: nowrap;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    // 四角いメッセージウインドウの矢印
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, 0.9);
     }
   }
 }
@@ -141,10 +188,73 @@
       padding: 0.4rem 0.6rem;
     }
   }
-  
+
+  .cancel-message {
+    .message-content {
+      font-size: 0.75rem;
+      padding: 0.5rem 0.8rem;
+    }
+  }
+
   .like-button {
     padding: 0.3rem 0.5rem;
     font-size: 0.85rem;
     min-width: 45px;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// ダークモード対応（必要に応じて）
+//////////////////////////////////////////////////////////////
+
+@media (prefers-color-scheme: dark) {
+  .like-tooltip {
+    .tooltip-content {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: $app-text-color;
+
+      &::after {
+        border-top-color: rgba(255, 255, 255, 0.9);
+      }
+    }
+  }
+
+  .cancel-message {
+    .message-content {
+      background-color: rgba(255, 255, 255, 0.95);
+      color: $app-text-color;
+      border-color: rgba(0, 0, 0, 0.1);
+
+      &::after {
+        border-bottom-color: rgba(255, 255, 255, 0.95);
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アクセシビリティ対応
+//////////////////////////////////////////////////////////////
+
+@media (prefers-reduced-motion: reduce) {
+  .like-button {
+    transition: none;
+
+    &:hover:not(:disabled) {
+      transform: none;
+    }
+
+    &:active:not(:disabled) {
+      transform: none;
+    }
+
+    &.liking::after {
+      animation: none;
+    }
+  }
+
+  .like-tooltip,
+  .cancel-message {
+    animation: none;
   }
 }

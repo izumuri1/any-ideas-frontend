@@ -446,6 +446,28 @@
 // レスポンシブ調整
 //////////////////////////////////////////////////////////////
 
+// スマホ対応（767px以下）- Home画面と同じ構成
+@media (max-width: 767px) {
+  .proposal-actions {
+    gap: 0.5rem;
+    
+    // スマホでは縦積み（Home画面と同じ）
+    flex-direction: column;
+    align-items: stretch;
+    
+    .like-section {
+      order: 1;
+      align-self: flex-start;
+    }
+    
+    .btn-adopt,
+    .btn-delete {
+      order: 2;
+      margin-left: 0;
+    }
+  }
+}
+
 @media (min-width: 768px) {
   .discussion-main {
     max-width: 600px;

@@ -46,7 +46,6 @@ interface Proposal extends LikeableItem {
   budget_text: string | null
   is_adopted: boolean
   created_at: string
-  is_liked_by_current_user: boolean
   profiles: {
     username: string
   }
@@ -238,6 +237,10 @@ export default function DiscussionScreen() {
             .select('user_id, profiles:user_id(username)')
             .eq('proposal_id', proposal.id)
 
+          if (likesError) {
+            console.error('Error fetching likes for proposal:', proposal.id, likesError)
+          }
+
           return {
             ...proposal,
             profiles: {
@@ -245,14 +248,20 @@ export default function DiscussionScreen() {
                 proposal.profiles[0]?.username : 
                 proposal.profiles?.username
             },
-            likes: likesError ? [] : (likes || []).map((like: any) => ({
+            // LikeButtonコンポーネント用にidea_likesとして構造を合わせる
+            idea_likes: likesError ? [] : (likes || []).map((like: any) => ({
+              id: `${proposal.id}-${like.user_id}`,
+              idea_id: proposal.id, // proposal_idではなくidea_idとして設定
               user_id: like.user_id,
-              username: Array.isArray(like.profiles) ? 
-                like.profiles[0]?.username : 
-                like.profiles?.username
+              created_at: new Date().toISOString(),
+              profiles: {
+                username: Array.isArray(like.profiles) ? 
+                  like.profiles[0]?.username : 
+                  like.profiles?.username
+              }
             })),
             like_count: likesError ? 0 : (likes || []).length,
-            is_liked_by_current_user: user ? (likes || []).some((like: any) => like.user_id === user.id) : false
+            user_has_liked: user ? (likes || []).some((like: any) => like.user_id === user.id) : false
           }
         })
       )
@@ -367,7 +376,7 @@ export default function DiscussionScreen() {
       const proposal = proposals.find(p => p.id === proposalId)
       if (!proposal) return
 
-      if (proposal.is_liked_by_current_user) {
+      if (proposal.user_has_liked) {
         // いいね削除
         const { error } = await supabase
           .from('proposal_likes')

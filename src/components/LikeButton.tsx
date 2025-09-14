@@ -37,6 +37,7 @@ export function LikeButton({
 }: LikeButtonProps) {
   const [liking, setLiking] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
+  const [showCancelMessage, setShowCancelMessage] = useState(false)
 
   // いいねのトグル処理
   const handleLikeToggle = async () => {
@@ -48,6 +49,28 @@ export function LikeButton({
     } finally {
       setLiking(false)
     }
+  }
+
+  // マウスホバー処理
+  const handleMouseEnter = () => {
+    console.log('Mouse entered - like_count:', item.like_count, 'user_has_liked:', item.user_has_liked)
+    
+    // いいねが1件以上ある場合は常に上側にユーザー名を表示
+    if (item.like_count && item.like_count > 0) {
+      console.log('Showing tooltip')
+      setShowTooltip(true)
+    }
+    
+    // 自分がいいね済みの場合は下側に「取り消し」メッセージを表示
+    if (currentUser && item.user_has_liked) {
+      console.log('Showing cancel message')
+      setShowCancelMessage(true)
+    }
+  }
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false)
+    setShowCancelMessage(false)
   }
 
   // いいねしたユーザー一覧のツールチップ
@@ -68,11 +91,24 @@ export function LikeButton({
     )
   }
 
+  // いいね取り消しメッセージ
+  const renderCancelMessage = () => {
+    if (!showCancelMessage) return null
+
+    return (
+      <div className="cancel-message">
+        <div className="message-content">
+          いいねを取り消す
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div 
       className={`like-section ${className}`}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <button
         className={`like-button ${item.user_has_liked ? 'liked' : ''} ${liking ? 'liking' : ''}`}
@@ -83,6 +119,7 @@ export function LikeButton({
         {item.user_has_liked ? '♥' : '♡'} {item.like_count || 0}
       </button>
       {renderLikeTooltip()}
+      {renderCancelMessage()}
     </div>
   )
 }
