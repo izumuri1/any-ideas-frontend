@@ -381,10 +381,46 @@ export default function Home() {
     }
   }
 
+  // Home.tsx の handleLikeToggle 関数を楽観的更新版に修正
   const handleLikeToggle = async (ideaId: string) => {
     if (!user) return
 
     try {
+      // ★ 楽観的更新：DB更新前にローカルstateを先に更新
+      const updateIdeasOptimistically = (ideas: Idea[]) => 
+        ideas.map(idea => {
+          if (idea.id === ideaId) {
+            const currentlyLiked = idea.user_has_liked
+            const currentCount = idea.like_count || 0
+            
+            return {
+              ...idea,
+              user_has_liked: !currentlyLiked,
+              like_count: currentlyLiked ? currentCount - 1 : currentCount + 1,
+              // idea_likesも適切に更新
+              idea_likes: currentlyLiked 
+                ? // いいね取り消し：現在のユーザーのいいねを削除
+                  idea.idea_likes?.filter(like => like.user_id !== user.id) || []
+                : // いいね追加：新しいいいねを追加
+                  [...(idea.idea_likes || []), { 
+                    id: 'temp-' + Date.now(), // 一時的なID
+                    idea_id: ideaId, 
+                    user_id: user.id, 
+                    created_at: new Date().toISOString(),
+                    profiles: { 
+                      username: user.user_metadata?.username || user.email?.split('@')[0] || 'Unknown' 
+                    }
+                  }]
+            }
+          }
+          return idea
+        })
+
+      // 両方のstateを楽観的に更新（即座にUI反映）
+      setIdeas(prev => updateIdeasOptimistically(prev))
+      setThinkingIdeas(prev => updateIdeasOptimistically(prev))
+
+      // ★ ここからDB更新処理（既存のロジック）
       const { data: existingLike, error: checkError } = await supabase
         .from('idea_likes')
         .select('id')
@@ -397,6 +433,7 @@ export default function Home() {
       }
 
       if (existingLike) {
+        // いいね削除
         const { error } = await supabase
           .from('idea_likes')
           .delete()
@@ -405,6 +442,7 @@ export default function Home() {
 
         if (error) throw error
       } else {
+        // いいね追加
         const { error } = await supabase
           .from('idea_likes')
           .insert({
@@ -415,9 +453,19 @@ export default function Home() {
         if (error) throw error
       }
 
-      await fetchAllIdeas()
+      // ★ 成功時：楽観的更新で十分なので fetchAllIdeas() は呼ばない
+      // 必要に応じて正確なデータで検証したい場合のみ以下をコメントアウト
+      // await fetchAllIdeas()
+
     } catch (error) {
+      // ★ エラー時のみ：全データ再取得でロールバック
       console.error('いいねの操作でエラーが発生しました:', error)
+      
+      // UIを元の状態に戻すために全データを再取得
+      await fetchAllIdeas()
+      
+      // ユーザーにエラーを通知（オプション）
+      // alert('いいねの処理中にエラーが発生しました。再度お試しください。')
     }
   }
 
