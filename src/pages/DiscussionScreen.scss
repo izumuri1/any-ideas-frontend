@@ -464,11 +464,27 @@
   box-shadow: $app-shadow-card;
 }
 
-.adopted-proposals-title {
-  @include app-title-style;
-  color: $app-btn-primary;
-  text-align: center;
-  margin-bottom: $app-padding-mobile;
+.adopted-proposals-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; 
+  margin-bottom: 1rem;
+  
+  .title-icon {
+    width: 28px; // ← 適切なサイズに戻す
+    height: 28px;
+    transition: transform $app-animation-fast $app-ease-out;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+  
+  .adopted-proposals-title {
+    @include app-logo-style;
+    margin: 0;
+  }
 }
 
 .adopted-proposals-description {

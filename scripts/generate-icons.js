@@ -14,6 +14,7 @@ const iconConfigs = [
   { source: 'icon-small.svg', output: 'icon-192x192.png', size: 192 },
   { source: 'icon-large.svg', output: 'icon-512x512.png', size: 512 },
   { source: 'icon-small.svg', output: 'apple-touch-icon.png', size: 180 },
+  { source: 'go-icon.svg', output: 'go-icon-48x48.png', size: 48 }, // 48pxに変更
 ];
 
 async function generateIcons() {
@@ -25,8 +26,16 @@ async function generateIcons() {
       const outputPath = join(iconsOutput, config.output);
       
       await sharp(sourcePath)
-        .resize(config.size, config.size)
-        .png({ quality: 100 })
+        .resize(config.size, config.size, {
+          kernel: sharp.kernel.lanczos3,
+          fit: 'contain',
+          background: { r: 244, g: 193, b: 78, alpha: 1 }
+        })
+        .png({ 
+          quality: 100,
+          compressionLevel: 0,
+          adaptiveFiltering: false
+        })
         .toFile(outputPath);
       
       console.log(`✅ Generated ${config.output} (${config.size}x${config.size})`);
