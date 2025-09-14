@@ -153,6 +153,7 @@ export default function DiscussionScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [adoptingProposalId, setAdoptingProposalId] = useState<string | null>(null)
   const [deletingProposalId, setDeletingProposalId] = useState<string | null>(null)
+  const [returningProposalId, setReturningProposalId] = useState<string | null>(null)
   
   // フォームデータ
   const [proposalForm, setProposalForm] = useState<ProposalFormData>({
@@ -456,6 +457,49 @@ export default function DiscussionScreen() {
     }
   }
 
+
+  // 提案を戻す処理
+    const handleReturn = async (proposalId: string) => {
+    if (!user || !ideaId || !ideaInfo) return
+
+    // アイデアオーナーのみ戻せる
+    if (user.id !== ideaInfo.creator_id) {
+        setError('この操作は許可されていません')
+        return
+    }
+
+    setReturningProposalId(proposalId)
+    setError(null)
+
+    try {
+      // is_adopted を false に、adopted_at と adopted_by をクリアする
+      const { error: returnError } = await supabase
+        .from('proposals')
+        .update({
+          is_adopted: false,
+          adopted_at: null,
+          adopted_by: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', proposalId)
+        .eq('idea_id', ideaId) // セキュリティ上、アイデアIDも確認
+
+      if (returnError) {
+        console.error('Return error:', returnError)
+        throw returnError
+      }
+
+      // 提案一覧を再取得
+      await fetchProposals()
+      
+    } catch (err) {
+      console.error('Error returning proposal:', err)
+      setError('提案の取り消しに失敗しました')
+    } finally {
+      setReturningProposalId(null)
+    }
+  }
+
   if (loading) {
     return <div className="discussion-screen loading">読み込み中...</div>
   }
@@ -753,6 +797,186 @@ export default function DiscussionScreen() {
                   ))}
                 {proposals.filter(p => p.proposal_type === 'budget').length === 0 && (
                   <p className="no-proposals">想定予算の提案はまだありません</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+    {/* 👇 ここにLet's go with that!セクションを追加 */}
+        <section className="adopted-proposals-section">
+          <h3 className="adopted-proposals-title">Let's go with that!</h3>
+          <p className="adopted-proposals-description">採用された提案で実行を決定しよう</p>
+          
+          <div className="adopted-proposals-by-type">
+            {/* 採用された実施時期の提案 */}
+            <div className="proposal-type-section">
+              <h4 className="proposal-type-title">実施時期</h4>
+              <div className="proposal-cards">
+                {proposals
+                  .filter(p => p.proposal_type === 'period' && p.is_adopted)
+                  .map(proposal => (
+                    <div key={proposal.id} className="proposal-card adopted-card">
+                      <div className="proposal-content">
+                        <p>{proposal.start_date && proposal.end_date ? 
+                          `${new Date(proposal.start_date).toLocaleDateString('ja-JP')} 〜 ${new Date(proposal.end_date).toLocaleDateString('ja-JP')}` : 
+                          proposal.content}
+                        </p>
+                      </div>
+                      <div className="proposal-header">
+                        <span className="proposal-owner">by {proposal.profiles.username}</span>
+                      </div>
+                      
+                      <div className="proposal-actions adopted-actions">
+                        {/* 戻すボタン（アイデアオーナーのみ） */}
+                        {user?.id === ideaInfo.creator_id && (
+                          <button 
+                            className="btn-return"
+                            onClick={() => handleReturn(proposal.id)}
+                            disabled={returningProposalId === proposal.id}
+                          >
+                            {returningProposalId === proposal.id ? '戻し中...' : '戻す'}
+                          </button>
+                        )}
+                        
+                        {/* 削除ボタン（提案者のみ） */}
+                        <DeleteButton
+                          item={proposal}
+                          currentUser={user}
+                          creatorId={proposal.proposer_id}
+                          isDeleting={deletingProposalId === proposal.id}
+                          onDelete={handleDelete}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                {proposals.filter(p => p.proposal_type === 'period' && p.is_adopted).length === 0 && (
+                  <p className="no-proposals">採用された実施時期はありません</p>
+                )}
+              </div>
+            </div>
+
+            {/* 採用されたやりたいことの提案 */}
+            <div className="proposal-type-section">
+              <h4 className="proposal-type-title">やりたいこと</h4>
+              <div className="proposal-cards">
+                {proposals
+                  .filter(p => p.proposal_type === 'todo' && p.is_adopted)
+                  .map(proposal => (
+                    <div key={proposal.id} className="proposal-card adopted-card">
+                      <div className="proposal-content">
+                        <p>{proposal.todo_text || proposal.content}</p>
+                      </div>
+                      <div className="proposal-header">
+                        <span className="proposal-owner">by {proposal.profiles.username}</span>
+                      </div>
+                      
+                      <div className="proposal-actions adopted-actions">
+                        {user?.id === ideaInfo.creator_id && (
+                          <button 
+                            className="btn-return"
+                            onClick={() => handleReturn(proposal.id)}
+                            disabled={returningProposalId === proposal.id}
+                          >
+                            {returningProposalId === proposal.id ? '戻し中...' : '戻す'}
+                          </button>
+                        )}
+                        
+                        <DeleteButton
+                          item={proposal}
+                          currentUser={user}
+                          creatorId={proposal.proposer_id}
+                          isDeleting={deletingProposalId === proposal.id}
+                          onDelete={handleDelete}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                {proposals.filter(p => p.proposal_type === 'todo' && p.is_adopted).length === 0 && (
+                  <p className="no-proposals">採用されたやりたいことはありません</p>
+                )}
+              </div>
+            </div>
+
+            {/* 採用されたやらなくても良いことの提案 */}
+            <div className="proposal-type-section">
+              <h4 className="proposal-type-title">やらなくても良いこと</h4>
+              <div className="proposal-cards">
+                {proposals
+                  .filter(p => p.proposal_type === 'not_todo' && p.is_adopted)
+                  .map(proposal => (
+                    <div key={proposal.id} className="proposal-card adopted-card">
+                      <div className="proposal-content">
+                        <p>{proposal.not_todo_text || proposal.content}</p>
+                      </div>
+                      <div className="proposal-header">
+                        <span className="proposal-owner">by {proposal.profiles.username}</span>
+                      </div>
+                      
+                      <div className="proposal-actions adopted-actions">
+                        {user?.id === ideaInfo.creator_id && (
+                          <button 
+                            className="btn-return"
+                            onClick={() => handleReturn(proposal.id)}
+                            disabled={returningProposalId === proposal.id}
+                          >
+                            {returningProposalId === proposal.id ? '戻し中...' : '戻す'}
+                          </button>
+                        )}
+                        
+                        <DeleteButton
+                          item={proposal}
+                          currentUser={user}
+                          creatorId={proposal.proposer_id}
+                          isDeleting={deletingProposalId === proposal.id}
+                          onDelete={handleDelete}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                {proposals.filter(p => p.proposal_type === 'not_todo' && p.is_adopted).length === 0 && (
+                  <p className="no-proposals">採用されたやらなくても良いことはありません</p>
+                )}
+              </div>
+            </div>
+
+            {/* 採用された想定予算の提案 */}
+            <div className="proposal-type-section">
+              <h4 className="proposal-type-title">想定予算</h4>
+              <div className="proposal-cards">
+                {proposals
+                  .filter(p => p.proposal_type === 'budget' && p.is_adopted)
+                  .map(proposal => (
+                    <div key={proposal.id} className="proposal-card adopted-card">
+                      <div className="proposal-content">
+                        <p>{proposal.budget_text || proposal.content}</p>
+                      </div>
+                      <div className="proposal-header">
+                        <span className="proposal-owner">by {proposal.profiles.username}</span>
+                      </div>
+                      
+                      <div className="proposal-actions adopted-actions">
+                        {user?.id === ideaInfo.creator_id && (
+                          <button 
+                            className="btn-return"
+                            onClick={() => handleReturn(proposal.id)}
+                            disabled={returningProposalId === proposal.id}
+                          >
+                            {returningProposalId === proposal.id ? '戻し中...' : '戻す'}
+                          </button>
+                        )}
+                        
+                        <DeleteButton
+                          item={proposal}
+                          currentUser={user}
+                          creatorId={proposal.proposer_id}
+                          isDeleting={deletingProposalId === proposal.id}
+                          onDelete={handleDelete}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                {proposals.filter(p => p.proposal_type === 'budget' && p.is_adopted).length === 0 && (
+                  <p className="no-proposals">採用された想定予算はありません</p>
                 )}
               </div>
             </div>
