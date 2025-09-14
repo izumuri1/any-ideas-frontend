@@ -804,16 +804,7 @@ export default function DiscussionScreen() {
     </section>
     {/* 👇 ここにLet's go with that!セクションを追加 */}
         <section className="adopted-proposals-section">
-            <div className="adopted-proposals-title-container">
-            <img 
-                src="/icons/go-icon-48x48.png"
-                alt="GO!"
-                className="title-icon"
-                width="48"
-                height="48"
-            />
-            <h3 className="adopted-proposals-title">Let's go with that!</h3>
-            </div>
+        <h3 className="adopted-proposals-title">Let's go with that!</h3>
           <p className="adopted-proposals-description">採用された提案で実行を決定しよう</p>
           
           <div className="adopted-proposals-by-type">

@@ -14,7 +14,6 @@ const iconConfigs = [
   { source: 'icon-small.svg', output: 'icon-192x192.png', size: 192 },
   { source: 'icon-large.svg', output: 'icon-512x512.png', size: 512 },
   { source: 'icon-small.svg', output: 'apple-touch-icon.png', size: 180 },
-  { source: 'go-icon.svg', output: 'go-icon-48x48.png', size: 48 }, // 48pxに変更
 ];
 
 async function generateIcons() {
