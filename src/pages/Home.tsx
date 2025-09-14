@@ -42,10 +42,12 @@ interface IdeaCardProps {
   onProceed?: (ideaId: string) => void
   onDelete: (ideaId: string) => void
   onLikeToggle?: (ideaId: string) => void
-  onDiscussion?: (ideaId: string) => void  // 検討機能追加
+  onDiscussion?: (ideaId: string) => void
   proceedingIdeaId: string | null
   deletingIdeaId: string | null
   showProceedButton?: boolean
+  onViewDetails?: (ideaId: string) => void
+  showDetailsButton?: boolean
 }
 
 // 追加：Members sharing ideas用の型定義
@@ -67,40 +69,41 @@ function EnhancedIdeaCard({
   onProceed, 
   onDelete, 
   onLikeToggle,
-  onDiscussion,  // 検討機能追加
+  onDiscussion, 
+  onViewDetails,  // 追加
   proceedingIdeaId, 
   deletingIdeaId,
-  showProceedButton = false 
+  showProceedButton = false,
+  showDetailsButton = false  // 追加
 }: IdeaCardProps) {
   const isOwner = currentUser && currentUser.id === idea.creator_id
 
   return (
     <div className="idea-card">
-      <div className="idea-header">
-        <h3 className="idea-name">{idea.idea_name}</h3>
-        <span className="idea-owner">by {idea.profiles.username}</span>
-      </div>
-      
-      <div className="idea-details">
-        {idea.when_text && (
-          <div className="idea-detail">
-            <span className="detail-value">{idea.when_text}</span>
-          </div>
-        )}
-        
-        {idea.who_text && (
-          <div className="idea-detail">
-            <span className="detail-value">{idea.who_text}</span>
-          </div>
-        )}
-        
+    <div className="idea-header">
+      <h3 className="idea-name">{idea.idea_name}</h3>
+      <span className="idea-owner">by {idea.profiles.username}</span>
+    </div>
+
+    <div className="idea-details">
+      {idea.when_text && (
         <div className="idea-detail">
-          <span className="detail-value">{idea.what_text}</span>
+          <span className="detail-value">{idea.when_text}</span>
         </div>
+      )}
+      
+      {idea.who_text && (
+        <div className="idea-detail">
+          <span className="detail-value">{idea.who_text}</span>
+        </div>
+      )}
+      
+      <div className="idea-detail">
+        <span className="detail-value">{idea.what_text}</span>
       </div>
+    </div>
       
       <div className="idea-actions">
-        {/* いいねボタンをコンポーネント化で一箇所に集約 */}
         <LikeButton 
           item={idea}
           currentUser={currentUser}
@@ -118,8 +121,8 @@ function EnhancedIdeaCard({
           </button>
         )}
         
-        {/* 検討ボタン（Ideas we're thinking about用） */}
-        {!showProceedButton && onDiscussion && (
+        {/* 検討ボタン（Ideas we're thinking about用）- 条件を更新 */}
+        {!showProceedButton && !showDetailsButton && onDiscussion && (
           <button 
             className="btn-proceed"
             onClick={() => onDiscussion(idea.id)}
@@ -127,8 +130,17 @@ function EnhancedIdeaCard({
             検討
           </button>
         )}
-        
-        {/* 削除ボタン - コンポーネント化 */}
+  
+        {/* 詳細ボタン（Ideas we're trying用）- 新規追加 */}
+        {showDetailsButton && onViewDetails && (
+          <button 
+            className="btn-proceed"
+            onClick={() => onViewDetails(idea.id)}
+          >
+            詳細
+          </button>
+        )}
+
         <DeleteButton
           item={idea}
           currentUser={currentUser}
@@ -286,14 +298,20 @@ export default function Home() {
 
   const [ideas, setIdeas] = useState<Idea[]>([])
   const [thinkingIdeas, setThinkingIdeas] = useState<Idea[]>([])
+  const [tryingIdeas, setTryingIdeas] = useState<Idea[]>([])
   const [loadingIdeas, setLoadingIdeas] = useState(false)
 
   const [deletingIdeaId, setDeletingIdeaId] = useState<string | null>(null)
   const [proceedingIdeaId, setProceedingIdeaId] = useState<string | null>(null)
 
-  // 検討画面への遷移処理（新規追加）
+  // 検討画面への遷移処理
   const handleDiscussion = (ideaId: string) => {
     navigate(`/workspace/${workspaceId}/discussion/${ideaId}`)
+  }
+
+  // 詳細画面への遷移処理
+  const handleViewDetails = (ideaId: string) => {
+    navigate(`/details/${ideaId}`)
   }
 
   const fetchIdeasByStatus = async (status: string): Promise<Idea[]> => {
@@ -366,13 +384,15 @@ export default function Home() {
     try {
       setLoadingIdeas(true)
       
-      const [ourIdeasData, thinkingIdeasData] = await Promise.all([
+      const [ourIdeasData, thinkingIdeasData, tryingIdeasData] = await Promise.all([
         fetchIdeasByStatus('our_ideas'),
-        fetchIdeasByStatus('thinking_about')
+        fetchIdeasByStatus('thinking_about'),
+        fetchIdeasByStatus('trying')
       ])
 
       setIdeas(ourIdeasData)
       setThinkingIdeas(thinkingIdeasData)
+      setTryingIdeas(tryingIdeasData)
 
     } catch (error) {
       handleError(error, 'アイデア一覧の取得に失敗しました')
@@ -821,7 +841,24 @@ export default function Home() {
           <h2 className="zone-title">Ideas we're trying</h2>
           <p className="zone-description">これまでに検討したアイデアを確認しよう</p>
           <div className="ideas-cards">
-            <p>（実行中アイデア一覧は次のステップで実装予定）</p>
+            {tryingIdeas.length === 0 ? (
+              <p>実行中のアイデアはありません。検討を完了してみましょう！</p>
+            ) : (
+              tryingIdeas.map((idea) => (
+                <EnhancedIdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  currentUser={user}
+                  onDelete={handleIdeaDelete}
+                  onLikeToggle={handleLikeToggle}
+                  onViewDetails={handleViewDetails}
+                  deletingIdeaId={deletingIdeaId}
+                  proceedingIdeaId={proceedingIdeaId}
+                  showProceedButton={false}
+                  showDetailsButton={true}
+                />
+              ))
+            )}
           </div>
         </section>
 
