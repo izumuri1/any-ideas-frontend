@@ -1,6 +1,6 @@
 // src/pages/DiscussionScreen.tsx
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { HamburgerMenu } from '../components/HamburgerMenu'
@@ -143,6 +143,7 @@ function ProposalCard({
 export default function DiscussionScreen() {
   const { ideaId } = useParams<{ ideaId: string }>()
   const { user } = useAuth()
+  const navigate = useNavigate()
   
   // 状態管理
   const [ideaInfo, setIdeaInfo] = useState<IdeaInfo | null>(null)
@@ -153,6 +154,7 @@ export default function DiscussionScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [adoptingProposalId, setAdoptingProposalId] = useState<string | null>(null)
   const [deletingProposalId, setDeletingProposalId] = useState<string | null>(null)
+  const [isDeciding, setIsDeciding] = useState(false);
   const [returningProposalId, setReturningProposalId] = useState<string | null>(null)
   
   // フォームデータ
@@ -457,6 +459,32 @@ export default function DiscussionScreen() {
     }
   }
 
+  // 決定処理（Ideas we're tryingへ移動）
+    const handleDecision = async () => {
+    if (!user || !ideaInfo || user.id !== ideaInfo.creator_id) return;
+    
+    setIsDeciding(true);
+    try {
+        // アイデアのステータスを 'trying' に更新
+        const { error } = await supabase
+        .from('ideas')
+        .update({ 
+            status: 'trying',
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', ideaId);
+
+        if (error) throw error;
+
+        // ホーム画面に戻る
+        navigate('/home');
+    } catch (error) {
+        console.error('決定エラー:', error);
+        alert('決定に失敗しました');
+    } finally {
+        setIsDeciding(false);
+    }
+    };
 
   // 提案を戻す処理
     const handleReturn = async (proposalId: string) => {
@@ -981,6 +1009,20 @@ export default function DiscussionScreen() {
               </div>
             </div>
           </div>
+
+          {/* 決定ボタン（アイデアオーナーのみ、採用された提案がある場合のみ表示） */}
+          {user?.id === ideaInfo.creator_id && 
+           proposals.some(p => p.is_adopted) && (
+            <div className="decision-button-container">
+              <button
+                className="btn-primary decision-button"
+                onClick={handleDecision}
+                disabled={isDeciding}
+              >
+                {isDeciding ? '決定中...' : '決定'}
+              </button>
+            </div>
+          )}
         </section>
       </main>
     </div>

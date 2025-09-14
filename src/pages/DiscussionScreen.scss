@@ -540,6 +540,39 @@
   }
 }
 
+.adopted-proposals-by-type {
+  display: flex;
+  flex-direction: column;
+  gap: $app-padding-xlarge;
+}
+
+// 決定ボタンコンテナ
+.decision-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: $app-padding-xlarge;
+  padding-top: $app-padding-large;
+  border-top: 1px solid $app-gray-light;
+}
+
+// 決定ボタン（提案ボタンと同じスタイル）
+.decision-button {
+  @include app-button-primary;  // ← app-button-baseからapp-button-primaryに変更
+  padding: 0.75rem 2rem;
+  font-size: $app-font-body;
+  font-weight: 600;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust($app-btn-primary, $lightness: -5%);
+    border-color: color.adjust($app-btn-primary, $lightness: -5%);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 //////////////////////////////////////////////////////////////
 // レスポンシブ調整
 //////////////////////////////////////////////////////////////
