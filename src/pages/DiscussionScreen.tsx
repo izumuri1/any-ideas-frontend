@@ -694,114 +694,114 @@ export default function DiscussionScreen() {
           </div>
         </section>
 
-        {/* 提案一覧セクション */}
-        <section className="proposals-section">
-          <h3 className="proposals-title">Proposal</h3>
-          <p className="proposals-description">提案を評価して採用しよう</p>
-          
-          {/* タブ別提案表示 */}
-          <div className="proposals-by-type">
-            {/* 実施時期の提案 */}
-            <div className="proposal-type-section">
-              <h4 className="proposal-type-title">実施時期</h4>
-              <div className="proposal-cards">
-                {proposals
-                  .filter(p => p.proposal_type === 'period')
-                  .map(proposal => (
-                    <ProposalCard
-                      key={proposal.id}
-                      proposal={proposal}
-                      currentUser={user}
-                      ideaCreatorId={ideaInfo.creator_id}
-                      onLikeToggle={handleLikeToggle}
-                      onAdopt={handleAdopt}
-                      onDelete={handleDelete}
-                      adoptingProposalId={adoptingProposalId}
-                      deletingProposalId={deletingProposalId}
-                    />
-                  ))}
-                {proposals.filter(p => p.proposal_type === 'period').length === 0 && (
-                  <p className="no-proposals">実施時期の提案はまだありません</p>
-                )}
-              </div>
-            </div>
+    {/* 提案一覧セクション */}
+    <section className="proposals-section">
+    <h3 className="proposals-title">Proposal</h3>
+    <p className="proposals-description">提案を評価して採用しよう</p>
+    
+    {/* タブ別提案表示 */}
+    <div className="proposals-by-type">
+        {/* 実施時期の提案 */}
+        <div className="proposal-type-section">
+        <h4 className="proposal-type-title">実施時期</h4>
+        <div className="proposal-cards">
+            {proposals
+            .filter(p => p.proposal_type === 'period' && !p.is_adopted) // 👈 !p.is_adopted を追加
+            .map(proposal => (
+                <ProposalCard
+                key={proposal.id}
+                proposal={proposal}
+                currentUser={user}
+                ideaCreatorId={ideaInfo.creator_id}
+                onLikeToggle={handleLikeToggle}
+                onAdopt={handleAdopt}
+                onDelete={handleDelete}
+                adoptingProposalId={adoptingProposalId}
+                deletingProposalId={deletingProposalId}
+                />
+            ))}
+            {proposals.filter(p => p.proposal_type === 'period' && !p.is_adopted).length === 0 && ( // 👈 !p.is_adopted を追加
+            <p className="no-proposals">実施時期の提案はまだありません</p>
+            )}
+        </div>
+        </div>
 
-            {/* やりたいことの提案 */}
-            <div className="proposal-type-section">
-              <h4 className="proposal-type-title">やりたいこと</h4>
-              <div className="proposal-cards">
-                {proposals
-                  .filter(p => p.proposal_type === 'todo')
-                  .map(proposal => (
-                    <ProposalCard
-                      key={proposal.id}
-                      proposal={proposal}
-                      currentUser={user}
-                      ideaCreatorId={ideaInfo.creator_id}
-                      onLikeToggle={handleLikeToggle}
-                      onAdopt={handleAdopt}
-                      onDelete={handleDelete}
-                      adoptingProposalId={adoptingProposalId}
-                      deletingProposalId={deletingProposalId}
-                    />
-                  ))}
-                {proposals.filter(p => p.proposal_type === 'todo').length === 0 && (
-                  <p className="no-proposals">やりたいことの提案はまだありません</p>
-                )}
-              </div>
-            </div>
+        {/* やりたいことの提案 */}
+        <div className="proposal-type-section">
+        <h4 className="proposal-type-title">やりたいこと</h4>
+        <div className="proposal-cards">
+            {proposals
+            .filter(p => p.proposal_type === 'todo' && !p.is_adopted) // 👈 !p.is_adopted を追加
+            .map(proposal => (
+                <ProposalCard
+                key={proposal.id}
+                proposal={proposal}
+                currentUser={user}
+                ideaCreatorId={ideaInfo.creator_id}
+                onLikeToggle={handleLikeToggle}
+                onAdopt={handleAdopt}
+                onDelete={handleDelete}
+                adoptingProposalId={adoptingProposalId}
+                deletingProposalId={deletingProposalId}
+                />
+            ))}
+            {proposals.filter(p => p.proposal_type === 'todo' && !p.is_adopted).length === 0 && ( // 👈 !p.is_adopted を追加
+            <p className="no-proposals">やりたいことの提案はまだありません</p>
+            )}
+        </div>
+        </div>
 
-            {/* やらなくても良いことの提案 */}
-            <div className="proposal-type-section">
-              <h4 className="proposal-type-title">やらなくても良いこと</h4>
-              <div className="proposal-cards">
-                {proposals
-                  .filter(p => p.proposal_type === 'not_todo')
-                  .map(proposal => (
-                    <ProposalCard
-                      key={proposal.id}
-                      proposal={proposal}
-                      currentUser={user}
-                      ideaCreatorId={ideaInfo.creator_id}
-                      onLikeToggle={handleLikeToggle}
-                      onAdopt={handleAdopt}
-                      onDelete={handleDelete}
-                      adoptingProposalId={adoptingProposalId}
-                      deletingProposalId={deletingProposalId}
-                    />
-                  ))}
-                {proposals.filter(p => p.proposal_type === 'not_todo').length === 0 && (
-                  <p className="no-proposals">やらなくても良いことの提案はまだありません</p>
-                )}
-              </div>
-            </div>
+        {/* やらなくても良いことの提案 */}
+        <div className="proposal-type-section">
+        <h4 className="proposal-type-title">やらなくても良いこと</h4>
+        <div className="proposal-cards">
+            {proposals
+            .filter(p => p.proposal_type === 'not_todo' && !p.is_adopted) // 👈 !p.is_adopted を追加
+            .map(proposal => (
+                <ProposalCard
+                key={proposal.id}
+                proposal={proposal}
+                currentUser={user}
+                ideaCreatorId={ideaInfo.creator_id}
+                onLikeToggle={handleLikeToggle}
+                onAdopt={handleAdopt}
+                onDelete={handleDelete}
+                adoptingProposalId={adoptingProposalId}
+                deletingProposalId={deletingProposalId}
+                />
+            ))}
+            {proposals.filter(p => p.proposal_type === 'not_todo' && !p.is_adopted).length === 0 && ( // 👈 !p.is_adopted を追加
+            <p className="no-proposals">やらなくても良いことの提案はまだありません</p>
+            )}
+        </div>
+        </div>
 
-            {/* 想定予算の提案 */}
-            <div className="proposal-type-section">
-              <h4 className="proposal-type-title">想定予算</h4>
-              <div className="proposal-cards">
-                {proposals
-                  .filter(p => p.proposal_type === 'budget')
-                  .map(proposal => (
-                    <ProposalCard
-                      key={proposal.id}
-                      proposal={proposal}
-                      currentUser={user}
-                      ideaCreatorId={ideaInfo.creator_id}
-                      onLikeToggle={handleLikeToggle}
-                      onAdopt={handleAdopt}
-                      onDelete={handleDelete}
-                      adoptingProposalId={adoptingProposalId}
-                      deletingProposalId={deletingProposalId}
-                    />
-                  ))}
-                {proposals.filter(p => p.proposal_type === 'budget').length === 0 && (
-                  <p className="no-proposals">想定予算の提案はまだありません</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* 想定予算の提案 */}
+        <div className="proposal-type-section">
+        <h4 className="proposal-type-title">想定予算</h4>
+        <div className="proposal-cards">
+            {proposals
+            .filter(p => p.proposal_type === 'budget' && !p.is_adopted) // 👈 !p.is_adopted を追加
+            .map(proposal => (
+                <ProposalCard
+                key={proposal.id}
+                proposal={proposal}
+                currentUser={user}
+                ideaCreatorId={ideaInfo.creator_id}
+                onLikeToggle={handleLikeToggle}
+                onAdopt={handleAdopt}
+                onDelete={handleDelete}
+                adoptingProposalId={adoptingProposalId}
+                deletingProposalId={deletingProposalId}
+                />
+            ))}
+            {proposals.filter(p => p.proposal_type === 'budget' && !p.is_adopted).length === 0 && ( // 👈 !p.is_adopted を追加
+            <p className="no-proposals">想定予算の提案はまだありません</p>
+            )}
+        </div>
+        </div>
+    </div>
+    </section>
     {/* 👇 ここにLet's go with that!セクションを追加 */}
         <section className="adopted-proposals-section">
           <h3 className="adopted-proposals-title">Let's go with that!</h3>
