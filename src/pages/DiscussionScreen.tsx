@@ -434,7 +434,6 @@ export default function DiscussionScreen() {
         .from('proposals')
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', proposalId)
-        .eq('proposer_id', user.id)
 
       if (error) throw error
 
