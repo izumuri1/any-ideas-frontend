@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { HamburgerMenu } from '../components/HamburgerMenu'
 import { LikeButton, type LikeableItem } from '../components/LikeButton'
 import { DeleteButton } from '../components/DeleteButton'
+import PageHeader from '../components/PageHeader'
 import './DiscussionScreen.scss'
 
 // 型定義
@@ -547,8 +548,7 @@ export default function DiscussionScreen() {
 
   return (
     <div className="discussion-screen">
-      <header className="discussion-header">
-        <div className="header">
+      <PageHeader className="discussion-header">
           <HamburgerMenu />
           
           <div className="idea-info">
@@ -561,8 +561,7 @@ export default function DiscussionScreen() {
               <span className="value">{ideaInfo.profiles.username}</span>
             </div>
           </div>
-        </div>
-      </header>
+      </PageHeader>
 
       <main className="discussion-main">
         {/* How about? セクション */}

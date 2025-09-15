@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { HamburgerMenu } from '../components/HamburgerMenu'
 import { LikeButton, type LikeableItem } from '../components/LikeButton'
 import { DeleteButton } from '../components/DeleteButton'
+import PageHeader from '../components/PageHeader'
 import './Home.scss'
 
 // 型定義
@@ -722,26 +723,24 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <header className="home-header">
-        <div className="header">
-          <HamburgerMenu currentPage="home" />
-          
-          <div className="workspace-info">
-            {workspaceInfo && (
-              <>
-                <div className="workspace-name">
-                  <span className="label">ワークスペース名：</span>
-                  <span className="value">{workspaceInfo.name}</span>
-                </div>
-                <div className="workspace-owner">
-                  <span className="label">ワークスペースオーナー：</span>
-                  <span className="value">{workspaceInfo.owner_username}</span>
-                </div>
-              </>
-            )}
-          </div>
+      <PageHeader className="home-header">
+        <HamburgerMenu currentPage="home" />
+        
+        <div className="workspace-info">
+          {workspaceInfo && (
+            <>
+              <div className="workspace-name">
+                <span className="label">ワークスペース名：</span>
+                <span className="value">{workspaceInfo.name}</span>
+              </div>
+              <div className="workspace-owner">
+                <span className="label">ワークスペースオーナー：</span>
+                <span className="value">{workspaceInfo.owner_username}</span>
+              </div>
+            </>
+          )}
         </div>
-      </header>
+      </PageHeader>
 
       <main className="home-main">
         <section className="idea-form-section">

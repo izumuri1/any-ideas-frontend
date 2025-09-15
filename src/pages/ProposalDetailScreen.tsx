@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { HamburgerMenu } from '../components/HamburgerMenu'
 import { supabase } from '../lib/supabase'
+import PageHeader from '../components/PageHeader'
 import './ProposalDetailScreen.scss'
 
 interface Idea {
@@ -199,8 +200,7 @@ export function ProposalDetailScreen() {
   return (
     <div className="proposal-detail-screen">
       {/* ヘッダー部分 - Discussion画面と同じ構造 */}
-      <header className="proposal-detail-header">
-        <div className="header">
+      <PageHeader className="proposal-detail-header">
           <HamburgerMenu currentPage="other" />
           
           {/* アイデア情報表示 - Discussion画面と同じ構造 */}
@@ -216,8 +216,7 @@ export function ProposalDetailScreen() {
               </p>
             </div>
           </div>
-        </div>
-      </header>
+      </PageHeader>
 
       {/* メインコンテンツ */}
         <main className="proposal-detail-main">

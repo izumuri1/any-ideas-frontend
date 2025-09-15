@@ -31,31 +31,7 @@
   }
 }
 
-//////////////////////////////////////////////////////////////
-// ヘッダー - Home画面の構造に合わせて修正
-//////////////////////////////////////////////////////////////
 
-.discussion-header {
-  @include app-page-header;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  width: 100%;
-  background-color: $app-gray-light;
-  
-  // セーフエリア対応（Home画面と同じ）
-  padding-top: max($app-padding-mobile, env(safe-area-inset-top));
-  padding-left: max($app-padding-mobile, env(safe-area-inset-left));
-  padding-right: max($app-padding-mobile, env(safe-area-inset-right));
-
-  .header {
-    display: flex;
-    align-items: center;
-    gap: $app-padding-mobile;
-  }
-}
 
 //////////////////////////////////////////////////////////////
 // アイデア情報表示 - Home画面のワークスペース情報表示と同じ構造

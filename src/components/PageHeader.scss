@@ -1,0 +1,22 @@
+// src/components/PageHeader.scss
+@use '../styles/variables' as *;
+
+.page-header {
+  @include app-page-header;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  width: 100%;
+  background-color: $app-gray-light;
+  
+  // セーフエリア対応
+  padding-top: max($app-padding-mobile, env(safe-area-inset-top));
+  padding-left: max($app-padding-mobile, env(safe-area-inset-left));
+  padding-right: max($app-padding-mobile, env(safe-area-inset-right));
+
+  .header {
+    gap: $app-padding-mobile;
+  }
+}
