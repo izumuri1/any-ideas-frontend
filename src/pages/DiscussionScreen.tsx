@@ -121,7 +121,7 @@ function ProposalCard({
             onClick={() => onAdopt(proposal.id)}
             disabled={adoptingProposalId === proposal.id}
           >
-            {adoptingProposalId === proposal.id ? '採用中...' : '採用'}
+            {adoptingProposalId === proposal.id ? '提案を採用中...' : '提案を採用する'}
           </button>
         )}
         
@@ -568,7 +568,7 @@ export default function DiscussionScreen() {
         {/* How about? セクション */}
         <section className="how-about-section">
           <h2 className="section-title">How about?</h2>
-          <p className="section-description">具体的な提案をしてみよう</p>
+          <p className="section-description">提案してアイデアを具体化しよう</p>
           
           {/* タブメニュー */}
           <div className="tab-menu">
@@ -838,7 +838,7 @@ export default function DiscussionScreen() {
     {/* 👇 ここにLet's go with that!セクションを追加 */}
         <section className="adopted-proposals-section">
         <h3 className="adopted-proposals-title">Let's go with that!</h3>
-          <p className="adopted-proposals-description">採用された提案で実行を決定しよう</p>
+          <p className="adopted-proposals-description">採用された提案を決定して実行しよう</p>
           
           <div className="adopted-proposals-by-type">
             {/* 採用された実施時期の提案 */}
@@ -867,7 +867,7 @@ export default function DiscussionScreen() {
                             onClick={() => handleReturn(proposal.id)}
                             disabled={returningProposalId === proposal.id}
                           >
-                            {returningProposalId === proposal.id ? '戻し中...' : '戻す'}
+                            {returningProposalId === proposal.id ? '提案へ戻し中...' : '提案へ戻す'}
                           </button>
                         )}
                         
@@ -910,7 +910,7 @@ export default function DiscussionScreen() {
                             onClick={() => handleReturn(proposal.id)}
                             disabled={returningProposalId === proposal.id}
                           >
-                            {returningProposalId === proposal.id ? '戻し中...' : '戻す'}
+                            {returningProposalId === proposal.id ? '提案へ戻し中...' : '提案へ戻す'}
                           </button>
                         )}
                         
@@ -1024,7 +1024,7 @@ export default function DiscussionScreen() {
                 onClick={handleDecision}
                 disabled={isDeciding}
               >
-                {isDeciding ? '決定中...' : '決定'}
+                {isDeciding ? '決定中...' : '決定して実行する'}
               </button>
             </div>
           )}

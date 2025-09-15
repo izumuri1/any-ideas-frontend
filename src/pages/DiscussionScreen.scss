@@ -332,6 +332,9 @@
     @include app-title-style;  // 元のスタイル
     margin-bottom: $app-padding-large;
     text-align: center;  // 元の中央揃え
+    /* 🔥 新規追加: Proposalタイトル下に横線を追加（Home画面のOur ideasと同じスタイル） */
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid $app-btn-primary;
   }
   
   // 新規追加分のみ - 元のデザインを保持
@@ -357,7 +360,8 @@
     margin-bottom: 1rem;
     color: $app-btn-primary;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid $app-text-color;
+    /* 🔥 修正: 黒い横線を薄いグレーに変更 */
+    border-bottom: 2px solid $app-gray-light;
   }
   
   .proposal-cards {
@@ -462,6 +466,16 @@
   background-color: $app-bg-color;
   border-radius: $app-radius-card;
   box-shadow: $app-shadow-card;
+  
+  /* 🔥 新規追加: Let's go with that!タイトルのスタイルに横線を追加 */
+  .adopted-proposals-title {
+    @include app-title-style;
+    margin-bottom: $app-padding-large;
+    text-align: center;
+    /* 🔥 新規追加: Let's go with that!タイトル下に横線を追加（Home画面のOur ideasと同じスタイル） */
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid $app-btn-primary;
+  }
 }
 
 .adopted-proposals-description {

@@ -117,7 +117,7 @@ function EnhancedIdeaCard({
             onClick={() => onProceed(idea.id)}
             disabled={proceedingIdeaId === idea.id}
           >
-            {proceedingIdeaId === idea.id ? '進める中...' : '進める'}
+            {proceedingIdeaId === idea.id ? '検討を進める中...' : '検討を進める'}
           </button>
         )}
         
@@ -127,7 +127,7 @@ function EnhancedIdeaCard({
             className="btn-proceed"
             onClick={() => onDiscussion(idea.id)}
           >
-            検討
+            具体的に検討する
           </button>
         )}
   
