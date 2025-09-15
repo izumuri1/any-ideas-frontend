@@ -46,9 +46,12 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
       case 'logout':
         try {
           await signOut()
-          navigate('/login')
+          // ログアウト成功後、明示的にログイン画面にリダイレクト
+          window.location.href = '/login'
         } catch (error) {
           console.error('ログアウトエラー:', error)
+          // エラー時も強制的にログイン画面に遷移
+          window.location.href = '/login'
         }
         break
       default:
