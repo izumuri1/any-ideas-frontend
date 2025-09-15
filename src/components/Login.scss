@@ -20,7 +20,7 @@
   // 縦画面での中央配置調整
   justify-content: flex-start;
   padding-top: $app-padding-xlarge;
-  padding-bottom: calc($app-padding-xlarge + 1rem); // 下部に追加スペースを確保
+  padding-bottom: calc($app-padding-xlarge + 2rem); // 下部により多くのスペースを確保
 
   .logo {
     @include app-logo-style;
@@ -61,7 +61,7 @@
   gap: 1.5rem;
   width: 100%;
   animation: fadeInUp 0.8s $app-ease-out 0.6s both;
-  margin-bottom: 1rem; // 下部にマージンを追加
+  margin-bottom: 2rem; // 下部にマージンを追加
 
   .form-group {
     @include app-form-group-style;
