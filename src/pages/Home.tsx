@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'  // useNavigateを追加
+import { useState, useEffect, useRef } from 'react'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { HamburgerMenu } from '../components/HamburgerMenu'
@@ -265,6 +265,8 @@ export default function Home() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()  // 検討画面遷移のために追加
+  const location = useLocation()
+  const tryingIdeasRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
   const getCurrentYearMonth = () => {
     const now = new Date()
@@ -538,6 +540,45 @@ export default function Home() {
   useEffect(() => {
     fetchAllIdeas()
   }, [workspaceId])
+
+  useEffect(() => {
+    const state = location.state as { scrollToIdeaId?: string; message?: string } | null;
+    if (state?.scrollToIdeaId) {
+      // アイデアデータが読み込まれるまで待つ
+      const scrollToTarget = () => {
+        const targetElement = tryingIdeasRefs.current[state.scrollToIdeaId!];
+        if (targetElement) {
+          // スクロール前に少し時間を置く（アニメーション効果）
+          setTimeout(() => {
+            targetElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'nearest'
+            });
+            
+            // ハイライト効果（オプション）
+            targetElement.style.transition = 'box-shadow 0.3s ease';
+            targetElement.style.boxShadow = '0 4px 20px rgba(255, 193, 7, 0.5)';
+            setTimeout(() => {
+              targetElement.style.boxShadow = '';
+            }, 2000);
+          }, 300);
+          
+          // 状態をクリアして再スクロールを防ぐ
+          window.history.replaceState({}, document.title);
+        }
+      };
+
+      // tryingIdeasが読み込まれるまで待つ
+      if (tryingIdeas.length > 0) {
+        scrollToTarget();
+      } else {
+        // データ読み込み待ち
+        const timeout = setTimeout(scrollToTarget, 500);
+        return () => clearTimeout(timeout);
+      }
+    }
+  }, [location.state, tryingIdeas]);
 
   const handleIdeaFormChange = (field: keyof IdeaFormData, value: string) => {
     setIdeaForm(prev => ({
@@ -821,17 +862,17 @@ export default function Home() {
               <p>検討中のアイデアはありません。Our ideasから進めてみましょう！</p>
             ) : (
               thinkingIdeas.map((idea) => (
-                <EnhancedIdeaCard
-                  key={idea.id}
-                  idea={idea}
-                  currentUser={user}
-                  onDelete={handleIdeaDelete}
-                  onLikeToggle={handleLikeToggle}
-                  onDiscussion={handleDiscussion}  // 検討画面遷移機能を追加
-                  proceedingIdeaId={proceedingIdeaId}
-                  deletingIdeaId={deletingIdeaId}
-                  showProceedButton={false}
-                />
+              <EnhancedIdeaCard
+                key={idea.id}
+                idea={idea}
+                currentUser={user}
+                onDelete={handleIdeaDelete}
+                onLikeToggle={handleLikeToggle}
+                onDiscussion={handleDiscussion}
+                proceedingIdeaId={proceedingIdeaId}
+                deletingIdeaId={deletingIdeaId}
+                showProceedButton={false}
+              />
               ))
             )}
           </div>
@@ -842,21 +883,29 @@ export default function Home() {
           <p className="zone-description">これまでに検討したアイデアを確認しよう</p>
           <div className="ideas-cards">
             {tryingIdeas.length === 0 ? (
-              <p>実行中のアイデアはありません。検討を完了してみましょう！</p>
+              <p>実行中のアイデアはありません。検討を進めてみましょう！</p>
             ) : (
               tryingIdeas.map((idea) => (
-                <EnhancedIdeaCard
+                <div 
                   key={idea.id}
+                  ref={(el) => {
+                    tryingIdeasRefs.current[idea.id] = el;
+                  }}
+                  className="idea-card-wrapper"
+                  data-idea-id={idea.id}
+                >
+                <EnhancedIdeaCard
                   idea={idea}
                   currentUser={user}
                   onDelete={handleIdeaDelete}
                   onLikeToggle={handleLikeToggle}
                   onViewDetails={handleViewDetails}
-                  deletingIdeaId={deletingIdeaId}
                   proceedingIdeaId={proceedingIdeaId}
+                  deletingIdeaId={deletingIdeaId}
                   showProceedButton={false}
                   showDetailsButton={true}
                 />
+                </div>
               ))
             )}
           </div>

@@ -141,7 +141,7 @@ function ProposalCard({
 }
 
 export default function DiscussionScreen() {
-  const { ideaId } = useParams<{ ideaId: string }>()
+  const { workspaceId, ideaId } = useParams<{ workspaceId: string; ideaId: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
   
@@ -459,31 +459,36 @@ export default function DiscussionScreen() {
     }
   }
 
-  // 決定処理（Ideas we're tryingへ移動）
+    // 決定処理（Ideas we're tryingへ移動）
     const handleDecision = async () => {
-    if (!user || !ideaInfo || user.id !== ideaInfo.creator_id) return;
-    
-    setIsDeciding(true);
-    try {
-        // アイデアのステータスを 'trying' に更新
-        const { error } = await supabase
-        .from('ideas')
-        .update({ 
-            status: 'trying',
-            updated_at: new Date().toISOString()
-        })
-        .eq('id', ideaId);
+        if (!user || !ideaInfo || user.id !== ideaInfo.creator_id) return;
+        
+        setIsDeciding(true);
+        try {
+            // アイデアのステータスを 'trying' に更新
+            const { error } = await supabase
+            .from('ideas')
+            .update({ 
+                status: 'trying',
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', ideaId);
 
-        if (error) throw error;
+            if (error) throw error;
 
-        // ホーム画面に戻る
-        navigate('/home');
-    } catch (error) {
-        console.error('決定エラー:', error);
-        alert('決定に失敗しました');
-    } finally {
-        setIsDeciding(false);
-    }
+            // ホーム画面に戻り、該当アイデアにスクロール
+            navigate(`/workspace/${workspaceId}`, { 
+                state: { 
+                scrollToIdeaId: ideaId,
+                message: `「${ideaInfo.idea_name}」を実行に移しました！`
+                } 
+            });
+        } catch (error) {
+            console.error('決定エラー:', error);
+            alert('決定に失敗しました');
+        } finally {
+            setIsDeciding(false);
+        }
     };
 
   // 提案を戻す処理
