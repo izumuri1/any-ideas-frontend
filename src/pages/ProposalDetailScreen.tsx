@@ -1,6 +1,6 @@
 // src/pages/ProposalDetailScreen.tsx
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { HamburgerMenu } from '../components/HamburgerMenu'
 import { supabase } from '../lib/supabase'
 import './ProposalDetailScreen.scss'
@@ -19,7 +19,6 @@ interface Idea {
 
 export function ProposalDetailScreen() {
   const { workspaceId, ideaId } = useParams<{ workspaceId: string; ideaId: string }>()
-  const navigate = useNavigate()
   
   const [idea, setIdea] = useState<Idea | null>(null)
   const [loading, setLoading] = useState(true)
@@ -143,21 +142,51 @@ export function ProposalDetailScreen() {
       </header>
 
       {/* メインコンテンツ */}
-      <main className="proposal-detail-main">
-        {/* ここに今後、採用された提案と採用されなかった提案のコンテンツが入る */}
-        <div className="content-placeholder">
-          <h2>検討詳細画面</h2>
-          <p>アイデア「{idea.idea_name}」の詳細情報をここに表示予定</p>
-          
-          {/* 一時的な戻るボタン */}
-          <button 
-            className="btn-back"
-            onClick={() => navigate(`/workspace/${workspaceId}`)}
-          >
-            Homeに戻る
-          </button>
-        </div>
-      </main>
+        <main className="proposal-detail-main">
+        {/* Ideas we're trying セクション */}
+        <section className="adopted-proposals-section">
+            <h3 className="adopted-proposals-title">Ideas we're trying</h3>
+            <p className="adopted-proposals-description">採用された提案</p>
+            
+            <div className="adopted-proposals-by-type">
+            {/* 実施時期 */}
+            <div className="proposal-type-section">
+                <h4 className="proposal-type-title">実施時期</h4>
+                <div className="proposal-cards">
+                {/* 採用された実施時期の提案をここに表示 */}
+                <p className="no-proposals">実施時期の提案はまだありません</p>
+                </div>
+            </div>
+
+            {/* やりたいこと */}
+            <div className="proposal-type-section">
+                <h4 className="proposal-type-title">やりたいこと</h4>
+                <div className="proposal-cards">
+                {/* 採用されたやりたいことの提案をここに表示 */}
+                <p className="no-proposals">やりたいことの提案はまだありません</p>
+                </div>
+            </div>
+
+            {/* やらなくても良いこと */}
+            <div className="proposal-type-section">
+                <h4 className="proposal-type-title">やらなくても良いこと</h4>
+                <div className="proposal-cards">
+                {/* 採用されたやらなくても良いことの提案をここに表示 */}
+                <p className="no-proposals">やらなくても良いことの提案はまだありません</p>
+                </div>
+            </div>
+
+            {/* 想定予算 */}
+            <div className="proposal-type-section">
+                <h4 className="proposal-type-title">想定予算</h4>
+                <div className="proposal-cards">
+                {/* 採用された想定予算の提案をここに表示 */}
+                <p className="no-proposals">想定予算の提案はまだありません</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        </main>
     </div>
   )
 }
