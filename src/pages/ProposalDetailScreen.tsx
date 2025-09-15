@@ -111,46 +111,54 @@ export function ProposalDetailScreen() {
         if (!ideaId) return
 
         const fetchProposals = async () => {
-        try {
-            const { data, error } = await supabase
-            .from('proposals')
-            .select(`
-                id,
-                idea_id,
-                proposer_id,
-                proposal_type,
-                content,
-                start_date,
-                end_date,
-                todo_text,
-                not_todo_text,
-                budget_text,
-                is_adopted,
-                created_at,
-                profiles:proposer_id (
-                username
-                )
-            `)
-            .eq('idea_id', ideaId)
-            .eq('is_adopted', true)  // 採用された提案のみ
-            .is('deleted_at', null)
-            .order('created_at', { ascending: false })
+            console.log('📊 提案データ取得開始 - アイデアID:', ideaId) // 🔥 追加
+            
+            try {
+                const { data, error } = await supabase
+                .from('proposals')
+                .select(`
+                    id,
+                    idea_id,
+                    proposer_id,
+                    proposal_type,
+                    content,
+                    start_date,
+                    end_date,
+                    todo_text,
+                    not_todo_text,
+                    budget_text,
+                    is_adopted,
+                    created_at,
+                    profiles:proposer_id (
+                    username
+                    )
+                `)
+                .eq('idea_id', ideaId)
+                .eq('is_adopted', true)  // 採用された提案のみ
+                .is('deleted_at', null)
+                .order('created_at', { ascending: false })
 
-            if (error) throw error
-            
-            const formattedProposals = (data || []).map((proposal: any) => ({
-            ...proposal,
-            profiles: {
-                username: Array.isArray(proposal.profiles) 
-                ? (proposal.profiles[0] as any)?.username || 'Unknown'
-                : (proposal.profiles as any)?.username || 'Unknown'
+                if (error) {
+                    console.error('❌ 提案取得エラー:', error) // 🔥 追加
+                    throw error
+                }
+                
+                console.log('📋 取得した提案データ:', data) // 🔥 追加
+                console.log('📊 採用済み提案数:', data?.length || 0) // 🔥 追加
+                
+                const formattedProposals = (data || []).map((proposal: any) => ({
+                ...proposal,
+                profiles: {
+                    username: Array.isArray(proposal.profiles) 
+                    ? (proposal.profiles[0] as any)?.username || 'Unknown'
+                    : (proposal.profiles as any)?.username || 'Unknown'
+                }
+                }))
+                
+                setProposals(formattedProposals)
+            } catch (err) {
+                console.error('提案取得エラー:', err)
             }
-            }))
-            
-            setProposals(formattedProposals)
-        } catch (err) {
-            console.error('提案取得エラー:', err)
-        }
         }
 
         fetchProposals()
@@ -249,8 +257,21 @@ export function ProposalDetailScreen() {
             <div className="proposal-type-section">
                 <h4 className="proposal-type-title">やりたいこと</h4>
                 <div className="proposal-cards">
-                {/* 採用されたやりたいことの提案をここに表示 */}
-                <p className="no-proposals">やりたいことの提案はまだありません</p>
+                    {proposals
+                        .filter(p => p.proposal_type === 'todo')
+                        .map(proposal => (
+                        <div key={proposal.id} className="proposal-card adopted-card">
+                            <div className="proposal-content">
+                            <p>{proposal.todo_text || proposal.content}</p>
+                            </div>
+                            <div className="proposal-header">
+                            <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown'}</span>
+                            </div>
+                        </div>
+                        ))}
+                    {proposals.filter(p => p.proposal_type === 'todo').length === 0 && (
+                        <p className="no-proposals">採用されたやりたいことはありません</p>
+                    )}
                 </div>
             </div>
 
@@ -258,8 +279,21 @@ export function ProposalDetailScreen() {
             <div className="proposal-type-section">
                 <h4 className="proposal-type-title">やらなくても良いこと</h4>
                 <div className="proposal-cards">
-                {/* 採用されたやらなくても良いことの提案をここに表示 */}
-                <p className="no-proposals">やらなくても良いことの提案はまだありません</p>
+                    {proposals
+                        .filter(p => p.proposal_type === 'not_todo')
+                        .map(proposal => (
+                        <div key={proposal.id} className="proposal-card adopted-card">
+                            <div className="proposal-content">
+                            <p>{proposal.not_todo_text || proposal.content}</p>
+                            </div>
+                            <div className="proposal-header">
+                            <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown'}</span>
+                            </div>
+                        </div>
+                        ))}
+                    {proposals.filter(p => p.proposal_type === 'not_todo').length === 0 && (
+                        <p className="no-proposals">採用されたやらなくても良いことはありません</p>
+                    )}
                 </div>
             </div>
 
@@ -267,8 +301,21 @@ export function ProposalDetailScreen() {
             <div className="proposal-type-section">
                 <h4 className="proposal-type-title">想定予算</h4>
                 <div className="proposal-cards">
-                {/* 採用された想定予算の提案をここに表示 */}
-                <p className="no-proposals">想定予算の提案はまだありません</p>
+                    {proposals
+                        .filter(p => p.proposal_type === 'budget')
+                        .map(proposal => (
+                        <div key={proposal.id} className="proposal-card adopted-card">
+                            <div className="proposal-content">
+                            <p>{proposal.budget_text || proposal.content}</p>
+                            </div>
+                            <div className="proposal-header">
+                            <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown'}</span>
+                            </div>
+                        </div>
+                        ))}
+                    {proposals.filter(p => p.proposal_type === 'budget').length === 0 && (
+                        <p className="no-proposals">採用された想定予算はありません</p>
+                    )}
                 </div>
             </div>
             </div>
