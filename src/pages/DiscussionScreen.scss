@@ -174,40 +174,40 @@
     
     // アニメーション付き下線
     &::before {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 50%;
-      width: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #92400E, #D97706);
-      border-radius: 2px 2px 0 0;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      transform: translateX(-50%);
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $app-accent-orange-dark, $app-accent-orange-light);
+    border-radius: 2px 2px 0 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-50%);
     }
-    
+
     &:hover {
-      background: rgba(146, 64, 14, 0.03);
-      color: #92400E;
-      
-      &::before {
+    background: $app-tab-hover-bg;
+    color: $app-accent-orange-dark;
+    
+    &::before {
         width: 30%;
         opacity: 0.5;
-      }
     }
-    
+    }
+
     &.active {
-      background: rgba(146, 64, 14, 0.06);
-      color: #92400E;
-      font-weight: $app-weight-bold;
-      
-      &::before {
+    background: $app-tab-active-bg;
+    color: $app-accent-orange-dark;
+    font-weight: $app-weight-bold;
+    
+    &::before {
         width: 80%;
         opacity: 1;
-        box-shadow: 0 0 8px rgba(146, 64, 14, 0.4);
-      }
+        box-shadow: 0 0 8px rgba($app-accent-orange-dark, 0.4);
     }
-  }
+    }
+    }
 }
 
 //////////////////////////////////////////////////////////////
