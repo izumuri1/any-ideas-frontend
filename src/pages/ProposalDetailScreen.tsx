@@ -17,12 +17,32 @@ interface Idea {
   } | null
 }
 
+interface Proposal {
+  id: string
+  idea_id: string
+  proposer_id: string
+  proposal_type: 'period' | 'todo' | 'not_todo' | 'budget'
+  content: string
+  start_date: string | null
+  end_date: string | null
+  todo_text: string | null
+  not_todo_text: string | null
+  budget_text: string | null
+  is_adopted: boolean
+  created_at: string
+  profiles?: {
+    username: string
+  } | null
+}
+
 export function ProposalDetailScreen() {
   const { workspaceId, ideaId } = useParams<{ workspaceId: string; ideaId: string }>()
   
   const [idea, setIdea] = useState<Idea | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const [proposals, setProposals] = useState<Proposal[]>([])
 
   // アイデア情報を取得
   useEffect(() => {
@@ -85,6 +105,56 @@ export function ProposalDetailScreen() {
 
     fetchIdea()
   }, [ideaId, workspaceId])
+
+    // 提案データを取得
+    useEffect(() => {
+        if (!ideaId) return
+
+        const fetchProposals = async () => {
+        try {
+            const { data, error } = await supabase
+            .from('proposals')
+            .select(`
+                id,
+                idea_id,
+                proposer_id,
+                proposal_type,
+                content,
+                start_date,
+                end_date,
+                todo_text,
+                not_todo_text,
+                budget_text,
+                is_adopted,
+                created_at,
+                profiles:proposer_id (
+                username
+                )
+            `)
+            .eq('idea_id', ideaId)
+            .eq('is_adopted', true)  // 採用された提案のみ
+            .is('deleted_at', null)
+            .order('created_at', { ascending: false })
+
+            if (error) throw error
+            
+            const formattedProposals = (data || []).map((proposal: any) => ({
+            ...proposal,
+            profiles: {
+                username: Array.isArray(proposal.profiles) 
+                ? (proposal.profiles[0] as any)?.username || 'Unknown'
+                : (proposal.profiles as any)?.username || 'Unknown'
+            }
+            }))
+            
+            setProposals(formattedProposals)
+        } catch (err) {
+            console.error('提案取得エラー:', err)
+        }
+        }
+
+        fetchProposals()
+    }, [ideaId])
 
   // ローディング状態
   if (loading) {
@@ -153,9 +223,26 @@ export function ProposalDetailScreen() {
             <div className="proposal-type-section">
                 <h4 className="proposal-type-title">実施時期</h4>
                 <div className="proposal-cards">
-                {/* 採用された実施時期の提案をここに表示 */}
-                <p className="no-proposals">実施時期の提案はまだありません</p>
-                </div>
+                {/* 採用された実施時期の提案 */}
+                    {proposals
+                        .filter(p => p.proposal_type === 'period')
+                        .map(proposal => (
+                        <div key={proposal.id} className="proposal-card adopted-card">
+                            <div className="proposal-content">
+                            <p>{proposal.start_date && proposal.end_date ? 
+                                `${new Date(proposal.start_date).toLocaleDateString('ja-JP')} 〜 ${new Date(proposal.end_date).toLocaleDateString('ja-JP')}` : 
+                                proposal.content}
+                            </p>
+                            </div>
+                            <div className="proposal-header">
+                            <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown'}</span>
+                            </div>
+                        </div>
+                        ))}
+                    {proposals.filter(p => p.proposal_type === 'period').length === 0 && (
+                        <p className="no-proposals">採用された実施時期はありません</p>
+                    )}
+                    </div>
             </div>
 
             {/* やりたいこと */}

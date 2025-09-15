@@ -201,29 +201,56 @@
 }
 
 .proposal-type-section {
-  .proposal-type-title {
-    @include app-subtitle-style;
-    margin-bottom: 1rem;
-    color: $app-btn-primary;
-    padding-bottom: 0.5rem;
-    /* 薄いグレーの横線 */
-    border-bottom: 2px solid $app-gray-light;
-  }
+    .proposal-type-title {
+        @include app-subtitle-style;
+        margin-bottom: 1rem;
+        color: $app-btn-primary;
+        padding-bottom: 0.5rem;
+        /* 薄いグレーの横線 */
+        border-bottom: 2px solid $app-gray-light;
+    }
   
-  .proposal-cards {
+    .proposal-cards {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    }
+}
+
+.adopted-card {
+  background-color: $app-white;
+  border: 1px solid $app-gray-light;
+  border-radius: $app-radius-card;
+  padding: $app-padding-large;
+  box-shadow: $app-shadow-card;
+  
+  .proposal-content {
+    margin-bottom: $app-padding-mobile;
+    
+    p {
+      @include app-text-style;
+      color: $app-text-color;
+      line-height: 1.4;
+      margin: 0;
+    }
   }
   
-  .no-proposals {
-    @include app-text-style;
-    color: $app-gray-medium;
-    font-style: italic;
-    text-align: center;
-    padding: 2rem 1rem;
-    margin: 0;
+  .proposal-header {
+    .proposal-owner {
+      @include app-text-style;
+      color: $app-gray-medium;
+      font-size: 0.8rem;
+    }
   }
+}
+
+.no-proposals {
+  @include app-text-style;
+  color: $app-gray-medium;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem 1rem;
+  margin: 0;
 }
 
 //////////////////////////////////////////////////////////////
