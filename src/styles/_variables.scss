@@ -385,9 +385,9 @@ $app-ease-in-out:        ease-in-out;
   place-items: center;
   padding: $app-padding-mobile;
   
-  // セーフエリア対応
+  // セーフエリア対応 - 下部に追加スペースを確保
   padding-top: max($app-padding-mobile, env(safe-area-inset-top));
-  padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
+  padding-bottom: max(calc($app-padding-mobile + 1rem), env(safe-area-inset-bottom));
   padding-left: max($app-padding-mobile, env(safe-area-inset-left));
   padding-right: max($app-padding-mobile, env(safe-area-inset-right));
   
