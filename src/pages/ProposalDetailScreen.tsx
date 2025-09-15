@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { HamburgerMenu } from '../components/HamburgerMenu'
 import { supabase } from '../lib/supabase'
 import PageHeader from '../components/PageHeader'
+import IdeaInfo from '../components/IdeaInfo'
 import './ProposalDetailScreen.scss'
 
 interface Idea {
@@ -166,36 +167,36 @@ export function ProposalDetailScreen() {
     }, [ideaId])
 
   // ローディング状態
-  if (loading) {
+    if (loading) {
     return (
-      <div className="proposal-detail-screen loading">
-        <div className="proposal-detail-header">
-          <div className="header">
+        <div className="proposal-detail-screen loading">
+        <PageHeader className="proposal-detail-header">
             <HamburgerMenu currentPage="other" />
-            <div className="idea-info">
-              <p className="loading-text">アイデア情報を読み込み中...</p>
-            </div>
-          </div>
+            <IdeaInfo 
+            ideaName=""
+            ownerName=""
+            loading={true}
+            />
+        </PageHeader>
         </div>
-      </div>
     )
-  }
+    }
 
   // エラー状態
-  if (error || !idea) {
+    if (error || !idea) {
     return (
-      <div className="proposal-detail-screen error">
-        <div className="proposal-detail-header">
-          <div className="header">
+        <div className="proposal-detail-screen error">
+        <PageHeader className="proposal-detail-header">
             <HamburgerMenu currentPage="other" />
-            <div className="idea-info">
-              <p className="error-text">{error || 'アイデアが見つかりません'}</p>
-            </div>
-          </div>
+            <IdeaInfo 
+            ideaName=""
+            ownerName=""
+            error={error || 'アイデアが見つかりません'}
+            />
+        </PageHeader>
         </div>
-      </div>
     )
-  }
+    }
 
   return (
     <div className="proposal-detail-screen">
@@ -204,18 +205,10 @@ export function ProposalDetailScreen() {
           <HamburgerMenu currentPage="other" />
           
           {/* アイデア情報表示 - Discussion画面と同じ構造 */}
-          <div className="idea-info">
-            <div className="idea-name">
-              <span className="label">アイデア名:</span>
-              <h1 className="value">{idea.idea_name}</h1>
-            </div>
-            <div className="idea-owner">
-              <span className="label">アイデアオーナー:</span>
-              <p className="value">
-                {idea.profiles?.username || 'Unknown User'}
-              </p>
-            </div>
-          </div>
+            <IdeaInfo 
+            ideaName={idea.idea_name}
+            ownerName={idea.profiles?.username || 'Unknown User'}
+            />
       </PageHeader>
 
       {/* メインコンテンツ */}

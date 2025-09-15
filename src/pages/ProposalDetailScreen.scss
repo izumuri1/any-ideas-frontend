@@ -32,78 +32,6 @@
 }
 
 
-
-//////////////////////////////////////////////////////////////
-// アイデア情報表示 - Discussion画面と全く同じ構造
-//////////////////////////////////////////////////////////////
-
-.idea-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  text-align: left;
-  min-width: 0;
-  margin-left: $app-padding-mobile;
-  
-  .idea-name,
-  .idea-owner {
-    display: flex;
-    align-items: baseline;
-    gap: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  
-  .label {
-    @include app-small-text-style;
-    color: $app-gray-medium;
-    font-size: 0.8rem;
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-  
-  .value {
-    @include app-subtitle-style;
-    margin: 0;
-    padding: 0;
-    color: $app-gray-dark;
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-  }
-  
-  .idea-owner .value {
-    font-size: 0.85rem;
-    font-weight: 500;
-    opacity: 0.9;
-  }
-
-  // スマホ対応
-  @media (max-width: 767px) {
-    .label {
-      font-size: 0.75rem;
-    }
-    
-    .value {
-      font-size: 0.9rem;
-      font-weight: 500;
-      opacity: 0.9;
-    }
-  }
-
-  .loading-text,
-  .error-text {
-    @include app-small-text-style;
-    margin: 0;
-    padding: 0;
-    color: $app-gray-dark;
-    font-style: italic;
-  }
-}
-
 //////////////////////////////////////////////////////////////
 // メインコンテンツ
 //////////////////////////////////////////////////////////////
@@ -251,33 +179,12 @@
     max-width: 600px;
     margin: 80px auto 0;
   }
-
-  .idea-info {
-    margin-left: $app-padding-large;
-    
-    .idea-name .label,
-    .idea-owner .label {
-      font-size: 0.85rem;
-    }
-    
-    .idea-name .value {
-      font-size: 1.1rem;
-    }
-    
-    .idea-owner .value {
-      font-size: 1rem;
-    }
-  }
 }
 
 // デスクトップ（1024px以上）
 @media (min-width: 1024px) {
   .proposal-detail-main {
     max-width: 800px;
-  }
-
-  .idea-info {
-    margin-left: $app-padding-xlarge;
   }
 }
 

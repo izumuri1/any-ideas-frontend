@@ -7,6 +7,7 @@ import { HamburgerMenu } from '../components/HamburgerMenu'
 import { LikeButton, type LikeableItem } from '../components/LikeButton'
 import { DeleteButton } from '../components/DeleteButton'
 import PageHeader from '../components/PageHeader'
+import IdeaInfo from '../components/IdeaInfo'
 import './DiscussionScreen.scss'
 
 // 型定義
@@ -551,16 +552,10 @@ export default function DiscussionScreen() {
       <PageHeader className="discussion-header">
           <HamburgerMenu />
           
-          <div className="idea-info">
-            <div className="idea-name">
-              <span className="label">アイデア名：</span>
-              <span className="value">{ideaInfo.idea_name}</span>
-            </div>
-            <div className="idea-owner">
-              <span className="label">アイデアオーナー：</span>
-              <span className="value">{ideaInfo.profiles.username}</span>
-            </div>
-          </div>
+          <IdeaInfo 
+            ideaName={ideaInfo.idea_name}
+            ownerName={ideaInfo.profiles.username}
+            />
       </PageHeader>
 
       <main className="discussion-main">
