@@ -1,0 +1,238 @@
+// src/pages/ProposalDetailScreen.scss
+// 検討詳細画面専用スタイル - Discussion画面のヘッダーと同じ構造
+// プロジェクトの_variables.scssを活用してスマホ最適化
+
+@use '../styles/variables' as *;
+@use 'sass:color';
+
+//////////////////////////////////////////////////////////////
+// 画面全体レイアウト
+//////////////////////////////////////////////////////////////
+
+.proposal-detail-screen {
+  min-height: 100vh;
+  background-color: $app-bg-color;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+  
+  &.loading {
+    @include app-text-style;
+    text-align: center;
+    padding: 2rem;
+    color: $app-gray-medium;
+  }
+  
+  &.error {
+    @include app-error-message;
+    text-align: center;
+    padding: 2rem;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// ヘッダー - Discussion画面と全く同じ構造
+//////////////////////////////////////////////////////////////
+
+.proposal-detail-header {
+  @include app-page-header;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  width: 100%;
+  background-color: $app-gray-light;
+  
+  // セーフエリア対応（Home画面と同じ）
+  padding-top: max($app-padding-mobile, env(safe-area-inset-top));
+  padding-left: max($app-padding-mobile, env(safe-area-inset-left));
+  padding-right: max($app-padding-mobile, env(safe-area-inset-right));
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: $app-padding-mobile;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アイデア情報表示 - Discussion画面と全く同じ構造
+//////////////////////////////////////////////////////////////
+
+.idea-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+  min-width: 0;
+  margin-left: $app-padding-mobile;
+  
+  .idea-name,
+  .idea-owner {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  .label {
+    @include app-small-text-style;
+    color: $app-gray-medium;
+    font-size: 0.8rem;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  
+  .value {
+    @include app-subtitle-style;
+    margin: 0;
+    padding: 0;
+    color: $app-gray-dark;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  
+  .idea-owner .value {
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
+  // スマホ対応
+  @media (max-width: 767px) {
+    .label {
+      font-size: 0.75rem;
+    }
+    
+    .value {
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+  }
+
+  .loading-text,
+  .error-text {
+    @include app-small-text-style;
+    margin: 0;
+    padding: 0;
+    color: $app-gray-dark;
+    font-style: italic;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// メインコンテンツ
+//////////////////////////////////////////////////////////////
+
+.proposal-detail-main {
+  @include app-main-content;
+  margin-top: 80px; // 固定ヘッダー分の余白
+  padding: $app-padding-mobile;
+  padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
+}
+
+//////////////////////////////////////////////////////////////
+// 一時的なプレースホルダーコンテンツ
+//////////////////////////////////////////////////////////////
+
+.content-placeholder {
+  @include app-section-style;
+  text-align: center;
+  padding: $app-padding-xlarge;
+  
+  h2 {
+    @include app-title-style;
+    margin-bottom: $app-padding-large;
+    color: $app-btn-primary;
+  }
+  
+  p {
+    @include app-text-style;
+    color: $app-gray-medium;
+    margin-bottom: $app-padding-large;
+  }
+  
+  .btn-back {
+    @include app-button-primary;
+    margin-top: $app-padding-large;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// レスポンシブ調整
+//////////////////////////////////////////////////////////////
+
+// スマホ対応（767px以下）- Discussion画面と同じ構成
+@media (max-width: 767px) {
+  .proposal-detail-main {
+    padding: $app-padding-mobile;
+  }
+}
+
+// タブレット以上（768px以上）
+@media (min-width: 768px) {
+  .proposal-detail-main {
+    max-width: 600px;
+    margin: 80px auto 0;
+  }
+
+  .idea-info {
+    margin-left: $app-padding-large;
+    
+    .idea-name .label,
+    .idea-owner .label {
+      font-size: 0.85rem;
+    }
+    
+    .idea-name .value {
+      font-size: 1.1rem;
+    }
+    
+    .idea-owner .value {
+      font-size: 1rem;
+    }
+  }
+}
+
+// デスクトップ（1024px以上）
+@media (min-width: 1024px) {
+  .proposal-detail-main {
+    max-width: 800px;
+  }
+
+  .idea-info {
+    margin-left: $app-padding-xlarge;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アクセシビリティ対応
+//////////////////////////////////////////////////////////////
+
+// フォーカス時のアウトライン強化
+.btn-back:focus {
+  outline: 2px solid $app-btn-primary;
+  outline-offset: 2px;
+}
+
+// 高コントラストモード対応
+@media (prefers-contrast: high) {
+  .content-placeholder {
+    border-color: $app-gray-dark;
+  }
+}
+
+// リデュースモーション対応
+@media (prefers-reduced-motion: reduce) {
+  .proposal-detail-screen {
+    transition: none;
+  }
+}

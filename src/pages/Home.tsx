@@ -313,7 +313,7 @@ export default function Home() {
 
   // 詳細画面への遷移処理
   const handleViewDetails = (ideaId: string) => {
-    navigate(`/details/${ideaId}`)
+    navigate(`/workspace/${workspaceId}/idea/${ideaId}/detail`)
   }
 
   const fetchIdeasByStatus = async (status: string): Promise<Idea[]> => {

@@ -6,6 +6,7 @@ import { SignUp } from './components/SignUp'
 import { CreateWorkspace } from './components/CreateWorkspace'
 import Home from './pages/Home'
 import DiscussionScreen from './pages/DiscussionScreen'
+import { ProposalDetailScreen } from './pages/ProposalDetailScreen'
 import './App.scss'
 
 function App() {
@@ -38,6 +39,9 @@ function App() {
             
             {/* 検討画面 */}
             <Route path="/workspace/:workspaceId/discussion/:ideaId" element={<DiscussionScreen />} />
+            
+            {/* 検討詳細画面 - 新規追加 */}
+            <Route path="/workspace/:workspaceId/idea/:ideaId/detail" element={<ProposalDetailScreen />} />
             
             {/* すでにログイン済みのユーザーをログインページから追い出したい場合 */}
             <Route path="/login" element={<Navigate to="/" replace />} />
