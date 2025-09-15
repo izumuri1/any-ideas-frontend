@@ -641,29 +641,30 @@ export default function Home() {
   }
 
   const handleIdeaDelete = async (ideaId: string) => {
-    if (!user) return
-    
-    const ideaToDelete = [...ideas, ...thinkingIdeas].find(idea => idea.id === ideaId)
-    if (!ideaToDelete || ideaToDelete.creator_id !== user.id) {
-      alert('自分が作成したアイデアのみ削除できます')
-      return
-    }
+      if (!user) return
+      
+      // 修正: tryingIdeas も含めて検索するように変更
+      const ideaToDelete = [...ideas, ...thinkingIdeas, ...tryingIdeas].find(idea => idea.id === ideaId)
+      if (!ideaToDelete || ideaToDelete.creator_id !== user.id) {
+        alert('自分が作成したアイデアのみ削除できます')
+        return
+      }
 
-    setDeletingIdeaId(ideaId)
-    try {
-      const { error } = await supabase
-        .from('ideas')
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', ideaId)
+      setDeletingIdeaId(ideaId)
+      try {
+        const { error } = await supabase
+          .from('ideas')
+          .update({ deleted_at: new Date().toISOString() })
+          .eq('id', ideaId)
 
-      if (error) throw error
-      await fetchAllIdeas()
-    } catch (error) {
-      console.error('アイデア削除でエラーが発生しました:', error)
-    } finally {
-      setDeletingIdeaId(null)
+        if (error) throw error
+        await fetchAllIdeas()
+      } catch (error) {
+        console.error('アイデア削除でエラーが発生しました:', error)
+      } finally {
+        setDeletingIdeaId(null)
+      }
     }
-  }
 
   const handleIdeaProceed = async (ideaId: string) => {
     if (!user) return
