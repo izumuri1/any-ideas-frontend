@@ -186,12 +186,12 @@
     border-bottom: 2px solid black;
   }
   
-  .adopted-proposals-description {
-    @include app-text-style;
-    text-align: center;
-    color: $app-gray-medium;
-    margin-bottom: $app-padding-xlarge;
-  }
+    .adopted-proposals-description {
+        @include app-text-style;
+        text-align: center;
+        color: $app-gray-medium;
+        margin-bottom: $app-padding-xlarge;
+    }
 }
 
 .adopted-proposals-by-type {
@@ -242,6 +242,11 @@
       font-size: 0.8rem;
     }
   }
+}
+
+// 採用されなかった提案のカード背景色
+.non-adopted-card {
+  background-color: $app-gray-light !important;
 }
 
 .no-proposals {

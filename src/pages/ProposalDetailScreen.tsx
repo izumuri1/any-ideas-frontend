@@ -106,12 +106,12 @@ export function ProposalDetailScreen() {
     fetchIdea()
   }, [ideaId, workspaceId])
 
-    // 提案データを取得
+    // 提案データを取得（採用・非採用問わず全て取得）
     useEffect(() => {
         if (!ideaId) return
 
         const fetchProposals = async () => {
-            console.log('📊 提案データ取得開始 - アイデアID:', ideaId) // 🔥 追加
+            console.log('📊 提案データ取得開始 - アイデアID:', ideaId)
             
             try {
                 const { data, error } = await supabase
@@ -134,17 +134,17 @@ export function ProposalDetailScreen() {
                     )
                 `)
                 .eq('idea_id', ideaId)
-                .eq('is_adopted', true)  // 採用された提案のみ
+                // .eq('is_adopted', true)  // 🔥 削除：採用・非採用問わず全て取得
                 .is('deleted_at', null)
                 .order('created_at', { ascending: false })
 
                 if (error) {
-                    console.error('❌ 提案取得エラー:', error) // 🔥 追加
+                    console.error('❌ 提案取得エラー:', error)
                     throw error
                 }
                 
-                console.log('📋 取得した提案データ:', data) // 🔥 追加
-                console.log('📊 採用済み提案数:', data?.length || 0) // 🔥 追加
+                console.log('📋 取得した提案データ:', data)
+                console.log('📊 全提案数:', data?.length || 0)
                 
                 const formattedProposals = (data || []).map((proposal: any) => ({
                 ...proposal,
@@ -233,7 +233,7 @@ export function ProposalDetailScreen() {
                 <div className="proposal-cards">
                 {/* 採用された実施時期の提案 */}
                     {proposals
-                        .filter(p => p.proposal_type === 'period')
+                        .filter(p => p.proposal_type === 'period' && p.is_adopted)
                         .map(proposal => (
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
@@ -247,7 +247,7 @@ export function ProposalDetailScreen() {
                             </div>
                         </div>
                         ))}
-                    {proposals.filter(p => p.proposal_type === 'period').length === 0 && (
+                    {proposals.filter(p => p.proposal_type === 'period' && p.is_adopted).length === 0 && (
                         <p className="no-proposals">採用された実施時期はありません</p>
                     )}
                     </div>
@@ -258,7 +258,7 @@ export function ProposalDetailScreen() {
                 <h4 className="proposal-type-title">やりたいこと</h4>
                 <div className="proposal-cards">
                     {proposals
-                        .filter(p => p.proposal_type === 'todo')
+                        .filter(p => p.proposal_type === 'todo' && p.is_adopted)
                         .map(proposal => (
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
@@ -269,7 +269,7 @@ export function ProposalDetailScreen() {
                             </div>
                         </div>
                         ))}
-                    {proposals.filter(p => p.proposal_type === 'todo').length === 0 && (
+                    {proposals.filter(p => p.proposal_type === 'todo' && p.is_adopted).length === 0 && (
                         <p className="no-proposals">採用されたやりたいことはありません</p>
                     )}
                 </div>
@@ -280,7 +280,7 @@ export function ProposalDetailScreen() {
                 <h4 className="proposal-type-title">やらなくても良いこと</h4>
                 <div className="proposal-cards">
                     {proposals
-                        .filter(p => p.proposal_type === 'not_todo')
+                        .filter(p => p.proposal_type === 'not_todo' && p.is_adopted)
                         .map(proposal => (
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
@@ -291,7 +291,7 @@ export function ProposalDetailScreen() {
                             </div>
                         </div>
                         ))}
-                    {proposals.filter(p => p.proposal_type === 'not_todo').length === 0 && (
+                    {proposals.filter(p => p.proposal_type === 'not_todo' && p.is_adopted).length === 0 && (
                         <p className="no-proposals">採用されたやらなくても良いことはありません</p>
                     )}
                 </div>
@@ -302,7 +302,7 @@ export function ProposalDetailScreen() {
                 <h4 className="proposal-type-title">想定予算</h4>
                 <div className="proposal-cards">
                     {proposals
-                        .filter(p => p.proposal_type === 'budget')
+                        .filter(p => p.proposal_type === 'budget' && p.is_adopted)
                         .map(proposal => (
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
@@ -313,12 +313,111 @@ export function ProposalDetailScreen() {
                             </div>
                         </div>
                         ))}
-                    {proposals.filter(p => p.proposal_type === 'budget').length === 0 && (
+                    {proposals.filter(p => p.proposal_type === 'budget' && p.is_adopted).length === 0 && (
                         <p className="no-proposals">採用された想定予算はありません</p>
                     )}
                 </div>
             </div>
             </div>
+        </section>
+        
+        {/* 採用されなかった提案セクション */}
+        <section className="adopted-proposals-section">
+          <h3 className="adopted-proposals-title">Ideas we're trying</h3>
+          <p className="adopted-proposals-description">採用されなかった提案</p>
+          
+          <div className="adopted-proposals-by-type">
+            {/* 実施時期 */}
+            <div className="proposal-type-section">
+              <h4 className="proposal-type-title">実施時期</h4>
+              <div className="proposal-cards">
+                {proposals
+                  .filter(p => p.proposal_type === 'period' && !p.is_adopted)
+                  .map(proposal => (
+                    <div key={proposal.id} className="proposal-card adopted-card non-adopted-card">
+                      <div className="proposal-content">
+                        <p>{proposal.start_date && proposal.end_date ?
+                          `${new Date(proposal.start_date).toLocaleDateString('ja-JP')} 〜 ${new Date(proposal.end_date).toLocaleDateString('ja-JP')}` :
+                          proposal.content}
+                        </p>
+                      </div>
+                      <div className="proposal-header">
+                        <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown User'}</span>
+                      </div>
+                    </div>
+                  ))}
+                {proposals.filter(p => p.proposal_type === 'period' && !p.is_adopted).length === 0 && (
+                  <p className="no-proposals">採用されなかった提案はありません</p>
+                )}
+              </div>
+            </div>
+
+            {/* やりたいこと */}
+            <div className="proposal-type-section">
+              <h4 className="proposal-type-title">やりたいこと</h4>
+              <div className="proposal-cards">
+                {proposals
+                  .filter(p => p.proposal_type === 'todo' && !p.is_adopted)
+                  .map(proposal => (
+                    <div key={proposal.id} className="proposal-card adopted-card non-adopted-card">
+                      <div className="proposal-content">
+                        <p>{proposal.todo_text || proposal.content}</p>
+                      </div>
+                      <div className="proposal-header">
+                        <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown User'}</span>
+                      </div>
+                    </div>
+                  ))}
+                {proposals.filter(p => p.proposal_type === 'todo' && !p.is_adopted).length === 0 && (
+                  <p className="no-proposals">採用されなかった提案はありません</p>
+                )}
+              </div>
+            </div>
+
+            {/* やらなくても良いこと */}
+            <div className="proposal-type-section">
+              <h4 className="proposal-type-title">やらなくても良いこと</h4>
+              <div className="proposal-cards">
+                {proposals
+                  .filter(p => p.proposal_type === 'not_todo' && !p.is_adopted)
+                  .map(proposal => (
+                    <div key={proposal.id} className="proposal-card adopted-card non-adopted-card">
+                      <div className="proposal-content">
+                        <p>{proposal.not_todo_text || proposal.content}</p>
+                      </div>
+                      <div className="proposal-header">
+                        <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown User'}</span>
+                      </div>
+                    </div>
+                  ))}
+                {proposals.filter(p => p.proposal_type === 'not_todo' && !p.is_adopted).length === 0 && (
+                  <p className="no-proposals">採用されなかった提案はありません</p>
+                )}
+              </div>
+            </div>
+
+            {/* 想定予算 */}
+            <div className="proposal-type-section">
+              <h4 className="proposal-type-title">想定予算</h4>
+              <div className="proposal-cards">
+                {proposals
+                  .filter(p => p.proposal_type === 'budget' && !p.is_adopted)
+                  .map(proposal => (
+                    <div key={proposal.id} className="proposal-card adopted-card non-adopted-card">
+                      <div className="proposal-content">
+                        <p>{proposal.budget_text || proposal.content}</p>
+                      </div>
+                      <div className="proposal-header">
+                        <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown User'}</span>
+                      </div>
+                    </div>
+                  ))}
+                {proposals.filter(p => p.proposal_type === 'budget' && !p.is_adopted).length === 0 && (
+                  <p className="no-proposals">採用されなかった提案はありません</p>
+                )}
+              </div>
+            </div>
+          </div>
         </section>
         </main>
     </div>
