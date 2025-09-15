@@ -729,8 +729,8 @@ export default function DiscussionScreen() {
 
     {/* 提案一覧セクション */}
     <section className="proposals-section">
-    <h3 className="proposals-title">Proposal</h3>
-    <p className="proposals-description">提案を評価して採用しよう</p>
+    <h3 className="proposals-title">Go for it</h3>
+    <p className="proposals-description">提案を採用しよう</p>
     
     {/* タブ別提案表示 */}
     <div className="proposals-by-type">
@@ -838,7 +838,7 @@ export default function DiscussionScreen() {
     {/* 👇 ここにLet's go with that!セクションを追加 */}
         <section className="adopted-proposals-section">
         <h3 className="adopted-proposals-title">Let's go with that!</h3>
-          <p className="adopted-proposals-description">採用された提案を決定して実行しよう</p>
+          <p className="adopted-proposals-description">採用された提案を実行しよう</p>
           
           <div className="adopted-proposals-by-type">
             {/* 採用された実施時期の提案 */}
@@ -952,7 +952,7 @@ export default function DiscussionScreen() {
                             onClick={() => handleReturn(proposal.id)}
                             disabled={returningProposalId === proposal.id}
                           >
-                            {returningProposalId === proposal.id ? '戻し中...' : '戻す'}
+                            {returningProposalId === proposal.id ? '提案へ戻し中...' : '提案へ戻す'}
                           </button>
                         )}
                         
@@ -994,7 +994,7 @@ export default function DiscussionScreen() {
                             onClick={() => handleReturn(proposal.id)}
                             disabled={returningProposalId === proposal.id}
                           >
-                            {returningProposalId === proposal.id ? '戻し中...' : '戻す'}
+                            {returningProposalId === proposal.id ? '提案へ戻し中...' : '提案へ戻す'}
                           </button>
                         )}
                         
