@@ -1,0 +1,143 @@
+// src/components/IdeaCard/IdeaCard.scss
+@use '../../styles/variables' as *;
+
+//////////////////////////////////////////////////////////////
+// アイデアカードの基本スタイル（元のHome.scssから）
+//////////////////////////////////////////////////////////////
+
+.idea-card {
+  @include app-card-style($app-white);
+  padding: $app-padding-large;
+  margin-bottom: $app-padding-mobile;
+  transition: all $app-animation-fast $app-ease-out;
+  
+  &:hover {
+    box-shadow: $app-shadow-hover;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// ヘッダー部分（元のHome.scssから）
+//////////////////////////////////////////////////////////////
+
+.idea-header {
+  margin-bottom: $app-padding-mobile;
+  text-align: left;
+}
+
+.idea-name {
+  @include app-title-style;
+  font-size: $app-font-subtitle;
+  margin: 0;
+  color: $app-text-color;
+  line-height: 1.3;
+  display: inline;
+}
+
+.idea-owner {
+  @include app-small-text-style;
+  color: $app-gray-medium;
+  font-size: 0.85rem;
+  margin-left: 1rem;
+  display: inline;
+}
+
+//////////////////////////////////////////////////////////////
+// 詳細情報部分（元のHome.scssから - ラベル表示なし）
+//////////////////////////////////////////////////////////////
+
+.idea-details {
+  margin-bottom: $app-padding-mobile;
+  
+  .idea-detail {
+    margin-bottom: 0.5rem;
+    text-align: left;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .detail-value {
+      @include app-text-style;
+      color: $app-text-color;
+      line-height: 1.4;
+      display: block;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アクション部分（元のHome.scssから）
+//////////////////////////////////////////////////////////////
+
+.idea-actions {
+  @include app-card-action-group;
+  padding-top: $app-padding-mobile;
+  border-top: 1px solid $app-gray-light;
+}
+
+.btn-proceed {
+  @include app-button-primary;
+  padding: 0.5rem 1rem;
+  font-size: $app-font-body;
+  min-height: auto;
+  flex: 1;
+  min-width: 80px;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// レスポンシブ対応（元のHome.scssから）
+//////////////////////////////////////////////////////////////
+
+@media (max-width: 480px) {
+  .idea-card {
+    padding: 1rem;
+  }
+
+  .idea-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .idea-owner {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+
+  .idea-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .btn-proceed {
+      flex: 1;
+      min-width: 80px;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アクセシビリティ
+//////////////////////////////////////////////////////////////
+
+@media (prefers-reduced-motion: reduce) {
+  .idea-card {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .idea-card {
+    border-width: 2px;
+  }
+  
+  .btn-proceed {
+    border-width: 2px;
+    font-weight: $app-weight-medium;
+  }
+}

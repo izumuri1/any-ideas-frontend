@@ -85,6 +85,7 @@ $app-button-height:       44px;     // ボタンの最小高さ
 // シャドウ効果
 $app-shadow-card:         0 4px 6px rgba(0, 0, 0, 0.1);
 $app-shadow-button:       0 2px 4px rgba(0, 0, 0, 0.1);
+$app-shadow-hover:        0 8px 25px rgba(0, 0, 0, 0.15);
 
 // 固定ヘッダーの高さ
 $app-header-height: 80px;
@@ -616,6 +617,52 @@ $app-ease-in-out:        ease-in-out;
     padding: 0.5rem 1rem; font-size: $app-font-body; min-height: auto; flex: none;
     &:hover:not(:disabled) { background-color: $app-gray-darker; }
   }
+  
+  // IdeaCard専用の追加ボタンスタイル
+  .idea-card__action-btn {
+    @include app-button-base;
+    padding: 0.5rem 1rem;
+    font-size: $app-font-body;
+    min-height: auto;
+    flex: none;
+
+    // 進めるボタン（Our ideas用）
+    &--proceed {
+      @include app-button-primary;
+      flex: 1;
+      min-width: 80px;
+    }
+
+    // 検討するボタン（Ideas we're thinking about用）
+    &--discussion {
+      background-color: $app-btn-secondary;
+      color: $app-white;
+      border: 1px solid $app-btn-secondary;
+      
+      &:hover:not(:disabled) {
+        background-color: $app-gray-darker;
+        border-color: $app-gray-darker;
+      }
+    }
+
+    // 詳細ボタン（Ideas we're trying用）
+    &--details {
+      background-color: transparent;
+      color: $app-btn-primary;
+      border: 1px solid $app-btn-primary;
+      
+      &:hover:not(:disabled) {
+        background-color: $app-btn-primary;
+        color: $app-white;
+      }
+    }
+
+    // ローディング状態
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
 }
 
 // フォーム用ボタングループ（主要アクション + 補助アクション）
@@ -765,6 +812,8 @@ $app-ease-in-out:        ease-in-out;
   
   .card-actions { @include app-card-action-group; } // カードアクション用の統一レイアウトを適用
 }
+
+
 
 //////////////////////////////////////////////////////////////
 /// 【ユーティリティMixins】レスポンシブ対応

@@ -1,18 +1,18 @@
-// src/pages/Home.tsx - 正しいリファクタリング版（フォーム部分のみ変更）
+// src/pages/Home.tsx - IdeaCardコンポーネント化版（元のコードベース完全維持）
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { HamburgerMenu } from '../components/HamburgerMenu'
-import { LikeButton, type LikeableItem } from '../components/LikeButton'
-import { DeleteButton } from '../components/DeleteButton'
+import { type LikeableItem } from '../components/LikeButton'
 import PageHeader from '../components/PageHeader'
 import { MembersList } from '../components/MembersList'
-import FormField from '../components/common/FormField'  // ← 新規import
-import { useForm } from '../hooks/useForm'  // ← 新規import
+import FormField from '../components/common/FormField'  // ← 既存import
+import { useForm } from '../hooks/useForm'  // ← 既存import
+import IdeaCard from '../components/IdeaCard/IdeaCard' // ← 新規import（IdeaCard化のみの追加）
 import './Home.scss'
 
-// 型定義（変更なし）
+// 型定義（元のまま完全維持）
 interface WorkspaceInfo {
   id: string
   name: string
@@ -38,111 +38,6 @@ interface Idea extends LikeableItem {
   profiles: {
     username: string
   }
-}
-
-interface IdeaCardProps {
-  idea: Idea
-  currentUser: any
-  onProceed?: (ideaId: string) => void
-  onDelete: (ideaId: string) => void
-  onLikeToggle?: (ideaId: string) => void
-  onDiscussion?: (ideaId: string) => void
-  proceedingIdeaId: string | null
-  deletingIdeaId: string | null
-  showProceedButton?: boolean
-  onViewDetails?: (ideaId: string) => void
-  showDetailsButton?: boolean
-}
-
-// EnhancedIdeaCardコンポーネント（変更なし - 元のまま）
-function EnhancedIdeaCard({ 
-  idea, 
-  currentUser, 
-  onProceed, 
-  onDelete, 
-  onLikeToggle,
-  onDiscussion, 
-  onViewDetails,
-  proceedingIdeaId, 
-  deletingIdeaId,
-  showProceedButton = false,
-  showDetailsButton = false
-}: IdeaCardProps) {
-  const isOwner = currentUser && currentUser.id === idea.creator_id
-
-  return (
-    <div className="idea-card">
-      <div className="idea-header">
-        <h3 className="idea-name">{idea.idea_name}</h3>
-        <span className="idea-owner">by {idea.profiles.username}</span>
-      </div>
-
-      <div className="idea-details">
-        {idea.when_text && (
-          <div className="idea-detail">
-            <span className="detail-value">{idea.when_text}</span>
-          </div>
-        )}
-        
-        {idea.who_text && (
-          <div className="idea-detail">
-            <span className="detail-value">{idea.who_text}</span>
-          </div>
-        )}
-        
-        <div className="idea-detail">
-          <span className="detail-value">{idea.what_text}</span>
-        </div>
-      </div>
-        
-      <div className="idea-actions">
-        <LikeButton 
-          item={idea}
-          currentUser={currentUser}
-          onLikeToggle={onLikeToggle}
-        />
-        
-        {/* 進めるボタン（Our ideas用） */}
-        {isOwner && showProceedButton && onProceed && (
-          <button 
-            className="btn-proceed"
-            onClick={() => onProceed(idea.id)}
-            disabled={proceedingIdeaId === idea.id}
-          >
-            {proceedingIdeaId === idea.id ? '検討を進める中...' : '検討を進める'}
-          </button>
-        )}
-        
-        {/* 検討ボタン（Ideas we're thinking about用）- 条件を更新 */}
-        {!showProceedButton && !showDetailsButton && onDiscussion && (
-          <button 
-            className="btn-proceed"
-            onClick={() => onDiscussion(idea.id)}
-          >
-            具体的に検討する
-          </button>
-        )}
-  
-        {/* 詳細ボタン（Ideas we're trying用）- 新規追加 */}
-        {showDetailsButton && onViewDetails && (
-          <button 
-            className="btn-proceed"
-            onClick={() => onViewDetails(idea.id)}
-          >
-            詳細
-          </button>
-        )}
-
-        <DeleteButton
-          item={idea}
-          currentUser={currentUser}
-          creatorId={idea.creator_id}
-          isDeleting={deletingIdeaId === idea.id}
-          onDelete={onDelete}
-        />
-      </div>
-    </div>
-  )
 }
 
 export default function Home() {
@@ -173,12 +68,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  // ❌ 削除：元の手動state管理
-  // const [ideaForm, setIdeaForm] = useState<IdeaFormData>({...})
-  // const [isSubmittingIdea, setIsSubmittingIdea] = useState(false)
-  // const [ideaSubmitError, setIdeaSubmitError] = useState<string | null>(null)
-  
-  // ✅ 追加：統一されたフォーム管理
+  // 統一されたフォーム管理（元のまま）
   const ideaForm = useForm<IdeaFormData>({
     initialValues: {
       idea_name: '',
@@ -209,17 +99,17 @@ export default function Home() {
   const [deletingIdeaId, setDeletingIdeaId] = useState<string | null>(null)
   const [proceedingIdeaId, setProceedingIdeaId] = useState<string | null>(null)
 
-  // 検討画面への遷移処理（変更なし）
+  // 検討画面への遷移処理（元のまま）
   const handleDiscussion = (ideaId: string) => {
     navigate(`/workspace/${workspaceId}/discussion/${ideaId}`)
   }
 
-  // 詳細画面への遷移処理（変更なし）
+  // 詳細画面への遷移処理（元のまま）
   const handleViewDetails = (ideaId: string) => {
     navigate(`/workspace/${workspaceId}/idea/${ideaId}/detail`)
   }
 
-  // fetchIdeasByStatus（変更なし）
+  // fetchIdeasByStatus（元のまま）
   const fetchIdeasByStatus = async (status: string): Promise<Idea[]> => {
     if (!workspaceId) throw new Error('ワークスペースIDが不正です')
 
@@ -279,13 +169,13 @@ export default function Home() {
     }))
   }
 
-  // handleError（変更なし）
+  // handleError（元のまま）
   const handleError = (error: any, message: string) => {
     console.error(message, error)
     alert(message)
   }
 
-  // fetchAllIdeas（変更なし）
+  // fetchAllIdeas（元のまま）
   const fetchAllIdeas = async () => {
     if (!workspaceId) return
 
@@ -309,12 +199,12 @@ export default function Home() {
     }
   }
 
-  // handleLikeToggle（変更なし - 元のまま）
+  // handleLikeToggle（元のまま）
   const handleLikeToggle = async (ideaId: string) => {
     if (!user) return
 
     try {
-      // ★ 楽観的更新：DB更新前にローカルstateを先に更新
+      // 楽観的更新：DB更新前にローカルstateを先に更新
       const updateIdeasOptimistically = (ideas: Idea[]) => 
         ideas.map(idea => {
           if (idea.id === ideaId) {
@@ -349,7 +239,7 @@ export default function Home() {
       setThinkingIdeas(prev => updateIdeasOptimistically(prev))
       // 注意：tryingIdeasは更新しない（元のコード通り）
 
-      // ★ ここからDB更新処理（既存のロジック）
+      // ここからDB更新処理（既存のロジック）
       const { data: existingLike, error: checkError } = await supabase
         .from('idea_likes')
         .select('id')
@@ -383,13 +273,13 @@ export default function Home() {
       }
 
     } catch (error) {
-      // ★ エラー時のみ：全データ再取得でロールバック
+      // エラー時のみ：全データ再取得でロールバック
       console.error('いいねの操作でエラーが発生しました:', error)
       await fetchAllIdeas()
     }
   }
 
-  // useEffect群（変更なし）
+  // useEffect群（元のまま）
   useEffect(() => {
     const fetchWorkspaceInfo = async () => {
       if (!workspaceId) {
@@ -473,10 +363,7 @@ export default function Home() {
     }
   }, [location.state, tryingIdeas]);
 
-  // ❌ 削除：元のhandleIdeaFormChange
-  // const handleIdeaFormChange = (field: keyof IdeaFormData, value: string) => {...}
-
-  // ✅ 変更：handleIdeaSubmitをuseFormに合わせて修正
+  // handleIdeaSubmitをuseFormに合わせて修正（元のまま）
   const handleIdeaSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -508,14 +395,13 @@ export default function Home() {
 
     } catch (error: any) {
       console.error('アイデア登録でエラーが発生しました:', error)
-      // エラー処理は既存のままでOK
       alert('アイデアの登録に失敗しました')
     } finally {
       ideaForm.setSubmitting(false)
     }
   }
 
-  // 残りの関数（handleIdeaDelete, handleIdeaProceed）は変更なし
+  // 残りの関数（handleIdeaDelete, handleIdeaProceed）は元のまま
   const handleIdeaDelete = async (ideaId: string) => {
     if (!user) return
     
@@ -565,7 +451,7 @@ export default function Home() {
     }
   }
 
-  // ローディング・エラー表示（変更なし）
+  // ローディング・エラー表示（元のまま）
   if (loading) {
     return (
       <div className="home-container">
@@ -596,13 +482,13 @@ export default function Home() {
     )
   }
 
-  // いつ頃のオプション生成
+  // いつ頃のオプション生成（元のまま）
   const whenOptions = generateWhenOptions().map(option => ({
     value: option,
     label: option
   }))
 
-  // メインレンダリング
+  // メインレンダリング（元のレイアウト完全維持・IdeaCardのactionsとdisplayOptionsを正しく設定）
   return (
     <div className="home-container">
       <PageHeader className="home-header">
@@ -644,7 +530,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* ✅ ここだけ変更：FormFieldコンポーネント使用 */}
+            {/* FormFieldコンポーネント使用（元のまま） */}
             <form onSubmit={handleIdeaSubmit} className="idea-registration-form">
               <FormField
                 type="text"
@@ -688,7 +574,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 以下は全て変更なし - 元のコードのまま */}
+        {/* IdeaCard使用（元のEnhancedIdeaCardの表示形式を維持） */}
         <section className="ideas-zone our-ideas">
           <h2 className="zone-title">Our ideas</h2>
           <p className="zone-description">みんなの共感が得られたら検討を進めよう</p>
@@ -699,16 +585,22 @@ export default function Home() {
               <p>まだアイデアがありません。最初のアイデアを投稿してみましょう！</p>
             ) : (
               ideas.map((idea) => (
-                <EnhancedIdeaCard
+                <IdeaCard
                   key={idea.id}
                   idea={idea}
                   currentUser={user}
-                  onProceed={handleIdeaProceed}
-                  onDelete={handleIdeaDelete}
-                  onLikeToggle={handleLikeToggle}
-                  proceedingIdeaId={proceedingIdeaId}
-                  deletingIdeaId={deletingIdeaId}
-                  showProceedButton={true}
+                  actions={{
+                    onProceed: handleIdeaProceed,
+                    onDelete: handleIdeaDelete,
+                    onLikeToggle: handleLikeToggle
+                  }}
+                  loadingStates={{
+                    proceedingId: proceedingIdeaId,
+                    deletingId: deletingIdeaId
+                  }}
+                  displayOptions={{ 
+                    showProceedButton: true
+                  }}
                 />
               ))
             )}
@@ -723,17 +615,23 @@ export default function Home() {
               <p>検討中のアイデアはありません。Our ideasから進めてみましょう！</p>
             ) : (
               thinkingIdeas.map((idea) => (
-              <EnhancedIdeaCard
-                key={idea.id}
-                idea={idea}
-                currentUser={user}
-                onDelete={handleIdeaDelete}
-                onLikeToggle={handleLikeToggle}
-                onDiscussion={handleDiscussion}
-                proceedingIdeaId={proceedingIdeaId}
-                deletingIdeaId={deletingIdeaId}
-                showProceedButton={false}
-              />
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  currentUser={user}
+                  actions={{
+                    onDelete: handleIdeaDelete,
+                    onLikeToggle: handleLikeToggle,
+                    onDiscussion: handleDiscussion
+                  }}
+                  loadingStates={{
+                    proceedingId: proceedingIdeaId,
+                    deletingId: deletingIdeaId
+                  }}
+                  displayOptions={{ 
+                    showDiscussionButton: true
+                  }}
+                />
               ))
             )}
           </div>
@@ -755,17 +653,22 @@ export default function Home() {
                   className="idea-card-wrapper"
                   data-idea-id={idea.id}
                 >
-                <EnhancedIdeaCard
-                  idea={idea}
-                  currentUser={user}
-                  onDelete={handleIdeaDelete}
-                  onLikeToggle={handleLikeToggle}
-                  onViewDetails={handleViewDetails}
-                  proceedingIdeaId={proceedingIdeaId}
-                  deletingIdeaId={deletingIdeaId}
-                  showProceedButton={false}
-                  showDetailsButton={true}
-                />
+                  <IdeaCard
+                    idea={idea}
+                    currentUser={user}
+                    actions={{
+                      onDelete: handleIdeaDelete,
+                      onLikeToggle: handleLikeToggle,
+                      onViewDetails: handleViewDetails
+                    }}
+                    loadingStates={{
+                      proceedingId: proceedingIdeaId,
+                      deletingId: deletingIdeaId
+                    }}
+                    displayOptions={{ 
+                      showDetailsButton: true
+                    }}
+                  />
                 </div>
               ))
             )}
