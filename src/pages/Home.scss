@@ -19,10 +19,7 @@
 
 
 .home-main {
-  @include app-main-content;
-  margin-top: 80px;
-  padding: $app-padding-mobile;
-  padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
+  @include app-main-with-fixed-header;
 }
 
 //////////////////////////////////////////////////////////////

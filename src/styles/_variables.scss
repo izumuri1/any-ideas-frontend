@@ -86,6 +86,9 @@ $app-button-height:       44px;     // ボタンの最小高さ
 $app-shadow-card:         0 4px 6px rgba(0, 0, 0, 0.1);
 $app-shadow-button:       0 2px 4px rgba(0, 0, 0, 0.1);
 
+// 固定ヘッダーの高さ
+$app-header-height: 80px;
+
 //////////////////////////////////////////////////////////////
 /// 【基本変数】アニメーション設定
 //////////////////////////////////////////////////////////////
@@ -477,6 +480,18 @@ $app-ease-in-out:        ease-in-out;
   color: $app-btn-primary;
   text-align: center;
   animation: fadeInUp 0.8s $app-ease-out 0.3s both;
+}
+
+//////////////////////////////////////////////////////////////
+/// 【共通Mixins】固定ヘッダー対応レイアウト
+//////////////////////////////////////////////////////////////
+
+// 固定ヘッダーがある画面のメインコンテンツ用mixin
+@mixin app-main-with-fixed-header {
+  @include app-main-content;
+  margin-top: $app-header-height;
+  padding: $app-padding-mobile;
+  padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
 }
 
 //////////////////////////////////////////////////////////////

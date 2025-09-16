@@ -38,10 +38,7 @@
 //////////////////////////////////////////////////////////////
 
 .discussion-main {
-  @include app-main-content;
-  margin-top: 80px; // 固定ヘッダー分の余白
-  padding: $app-padding-mobile;
-  padding-bottom: max($app-padding-mobile, env(safe-area-inset-bottom));
+  @include app-main-with-fixed-header;
 }
 
 //////////////////////////////////////////////////////////////
