@@ -36,6 +36,7 @@ import { CreateWorkspace } from './components/CreateWorkspace'
 import Home from './pages/Home'
 import DiscussionScreen from './pages/DiscussionScreen'
 import { ProposalDetailScreen } from './pages/ProposalDetailScreen'
+import { LoadingSpinner } from './components/LoadingSpinner'
 import './App.scss'
 
 function App() {
@@ -43,11 +44,7 @@ function App() {
 
   // ローディング中の表示
   if (loading) {
-    return (
-      <div className="loading-container">
-        <p>読み込み中...</p>
-      </div>
-    )
+    return <LoadingSpinner />
   }
 
   return (

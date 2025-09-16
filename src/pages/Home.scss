@@ -9,12 +9,7 @@
 //////////////////////////////////////////////////////////////
 
 .home-container {
-  min-height: 100vh;
-  background-color: $app-bg-color;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow-x: hidden;
+  @include app-screen-container;
 }
 
 

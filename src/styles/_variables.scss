@@ -551,6 +551,33 @@ $app-ease-in-out:        ease-in-out;
   font-size: $app-font-small;
 }
 
+
+//////////////////////////////////////////////////////////////
+/// 【共通Mixins】画面コンテナの統一
+//////////////////////////////////////////////////////////////
+
+// 基本画面コンテナ（フレックスレイアウト・フルハイト）
+@mixin app-screen-container {
+  min-height: 100vh;
+  background-color: $app-bg-color;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+// 固定ヘッダー付き画面用のコンテナ
+@mixin app-screen-with-header {
+  @include app-screen-container;
+  @include app-screen-states;
+}
+
+// 認証系画面（Login, SignUp, CreateWorkspace）用のコンテナ
+// 既存の app-fullscreen-container を使用
+@mixin app-auth-screen-container {
+  @include app-fullscreen-container;
+}
+
 //////////////////////////////////////////////////////////////
 /// 【レイアウトMixins】ボタングループ（アプリ全体の統一仕様）
 //////////////////////////////////////////////////////////////
