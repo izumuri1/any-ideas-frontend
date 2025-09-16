@@ -1,0 +1,89 @@
+// src/components/common/FormField.scss - 元のHome.scssスタイル構造に合わせた版
+@use '../../styles/variables' as *;
+
+// 元のform-rowクラスに合わせる
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  .form-field-label {
+    @include app-subtitle-style;
+    font-size: $app-font-body;
+    font-weight: $app-weight-medium;
+    margin-bottom: 0.25rem;
+    text-align: left;
+
+    .required-indicator {
+      color: $app-error-color;
+      margin-left: 0.25rem;
+    }
+  }
+
+  // 元のinput-field, textarea-fieldクラス名を保持
+  .input-field,
+  .textarea-field {
+    @include app-input-base;
+
+    &.error {
+      border-color: $app-error-color;
+      
+      &:focus {
+        border-color: $app-error-color;
+        box-shadow: 0 0 0 2px rgba($app-error-color, 0.1);
+      }
+    }
+  }
+
+  .textarea-field {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  // 元のerror-messageクラス名を保持
+  .error-message {
+    @include app-small-text-style;
+    color: $app-error-color;
+    margin: 0.25rem 0 0 0;
+    font-size: 0.8rem;
+  }
+
+  .character-count {
+    @include app-small-text-style;
+    text-align: right;
+    color: $app-gray-medium;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+  }
+}
+
+// selectの特別スタイリング  
+.input-field select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+}
+
+// アクセシビリティ対応
+@media (prefers-reduced-motion: reduce) {
+  .input-field,
+  .textarea-field {
+    transition: none;
+  }
+}
+
+// 高コントラストモード対応
+@media (prefers-contrast: high) {
+  .input-field,
+  .textarea-field {
+    border-width: 2px;
+  }
+  
+  .error-message {
+    font-weight: $app-weight-medium;
+  }
+}
