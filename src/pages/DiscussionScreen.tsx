@@ -1,4 +1,4 @@
-// src/pages/DiscussionScreen.tsx
+// src/pages/DiscussionScreen.tsx - フォーム部分のみuseFormとFormFieldでリファクタリング
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -8,9 +8,11 @@ import { LikeButton, type LikeableItem } from '../components/LikeButton'
 import { DeleteButton } from '../components/DeleteButton'
 import PageHeader from '../components/PageHeader'
 import IdeaInfo from '../components/IdeaInfo'
+import FormField from '../components/common/FormField'  // 追加
+import { useForm } from '../hooks/useForm'  // 追加
 import './DiscussionScreen.scss'
 
-// 型定義
+// 型定義（元のまま）
 interface IdeaInfo {
   id: string
   idea_name: string
@@ -20,20 +22,14 @@ interface IdeaInfo {
   }
 }
 
-interface ProposalFormData {
-  period: {
-    startDate: string
-    endDate: string
-  }
-  todo: {
-    text: string
-  }
-  notTodo: {
-    text: string
-  }
-  budget: {
-    text: string
-  }
+// リファクタリング追加：各タブ用のフォーム型定義
+interface PeriodFormData {
+  startDate: string
+  endDate: string
+}
+
+interface TextFormData {
+  text: string
 }
 
 interface Proposal extends LikeableItem {
@@ -64,7 +60,7 @@ interface ProposalCardProps {
   deletingProposalId: string | null
 }
 
-// 提案カードコンポーネント
+// 提案カードコンポーネント（元のまま）
 function ProposalCard({
   proposal,
   currentUser,
@@ -147,27 +143,53 @@ export default function DiscussionScreen() {
   const { user } = useAuth()
   const navigate = useNavigate()
   
-  // 状態管理
+  // 状態管理（元のまま）
   const [ideaInfo, setIdeaInfo] = useState<IdeaInfo | null>(null)
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'period' | 'todo' | 'notTodo' | 'budget'>('period')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  // フォーム関連の削除された状態は削除
+  // const [isSubmitting, setIsSubmitting] = useState(false)  削除
   const [adoptingProposalId, setAdoptingProposalId] = useState<string | null>(null)
   const [deletingProposalId, setDeletingProposalId] = useState<string | null>(null)
   const [isDeciding, setIsDeciding] = useState(false);
   const [returningProposalId, setReturningProposalId] = useState<string | null>(null)
   
-  // フォームデータ
-  const [proposalForm, setProposalForm] = useState<ProposalFormData>({
-    period: { startDate: '', endDate: '' },
-    todo: { text: '' },
-    notTodo: { text: '' },
-    budget: { text: '' }
+  // フォームデータの削除（元の手動管理を削除）
+  // const [proposalForm, setProposalForm] = useState<ProposalFormData>({...})  削除
+  
+  // リファクタリング：各タブ用のuseFormフック
+  const periodForm = useForm<PeriodFormData>({
+    initialValues: { startDate: '', endDate: '' },
+    validationRules: {
+      startDate: { required: true },
+      endDate: { required: true }
+    }
   })
 
-  // アイデア情報の取得
+  const todoForm = useForm<TextFormData>({
+    initialValues: { text: '' },
+    validationRules: {
+      text: { required: true, maxLength: 500 }
+    }
+  })
+
+  const notTodoForm = useForm<TextFormData>({
+    initialValues: { text: '' },
+    validationRules: {
+      text: { required: true, maxLength: 500 }
+    }
+  })
+
+  const budgetForm = useForm<TextFormData>({
+    initialValues: { text: '' },
+    validationRules: {
+      text: { required: true, maxLength: 500 }
+    }
+  })
+
+  // アイデア情報の取得（元のまま）
   const fetchIdeaInfo = async () => {
     if (!ideaId) return
 
@@ -205,7 +227,7 @@ export default function DiscussionScreen() {
     }
   }
 
-  // 提案一覧の取得
+  // 提案一覧の取得（元のまま）
   const fetchProposals = async () => {
     if (!ideaId) return
 
@@ -278,7 +300,7 @@ export default function DiscussionScreen() {
     }
   }
 
-  // 初期データ読み込み
+  // 初期データ読み込み（元のまま）
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
@@ -292,88 +314,88 @@ export default function DiscussionScreen() {
     loadData()
   }, [ideaId, user])
 
-  // フォーム入力の処理
-  const handleFormChange = (tab: string, field: string, value: string) => {
-    setProposalForm(prev => ({
-      ...prev,
-      [tab]: {
-        ...prev[tab as keyof ProposalFormData],
-        [field]: value
-      }
-    }))
-  }
+  // フォーム入力の処理（削除 - 元の手動管理方法を削除）
+  // const handleFormChange = (tab: string, field: string, value: string) => {...}  削除
 
-  // 提案の送信
+  // リファクタリング：提案の送信処理
   const handleProposalSubmit = async (type: 'period' | 'todo' | 'notTodo' | 'budget') => {
     if (!user || !ideaId) return
 
-    setIsSubmitting(true)
-    setError(null)
+    let currentForm;
+    let formData: any = {};
+
+    // タブごとのフォーム選択とバリデーション
+    switch (type) {
+      case 'period':
+        currentForm = periodForm;
+        if (!currentForm.validateAll()) return;
+        formData = {
+          proposal_type: 'period',
+          content: `${currentForm.values.startDate}～${currentForm.values.endDate}`,
+          start_date: currentForm.values.startDate,
+          end_date: currentForm.values.endDate
+        };
+        break;
+      
+      case 'todo':
+        currentForm = todoForm;
+        if (!currentForm.validateAll()) return;
+        formData = {
+          proposal_type: 'todo',
+          content: currentForm.values.text,
+          todo_text: currentForm.values.text
+        };
+        break;
+      
+      case 'notTodo':
+        currentForm = notTodoForm;
+        if (!currentForm.validateAll()) return;
+        formData = {
+          proposal_type: 'not_todo',
+          content: currentForm.values.text,
+          not_todo_text: currentForm.values.text
+        };
+        break;
+      
+      case 'budget':
+        currentForm = budgetForm;
+        if (!currentForm.validateAll()) return;
+        formData = {
+          proposal_type: 'budget',
+          content: currentForm.values.text,
+          budget_text: currentForm.values.text
+        };
+        break;
+      
+      default:
+        return;
+    }
+
+    currentForm.setSubmitting(true);
+    setError(null);
 
     try {
-      let proposalData: any = {
-        idea_id: ideaId,
-        proposer_id: user.id,
-        proposal_type: type === 'notTodo' ? 'not_todo' : type,
-        content: ''
-      }
-
-      // タイプ別のデータ設定
-      switch (type) {
-        case 'period':
-          if (!proposalForm.period.startDate || !proposalForm.period.endDate) {
-            throw new Error('開始日と終了日を入力してください')
-          }
-          proposalData.start_date = proposalForm.period.startDate
-          proposalData.end_date = proposalForm.period.endDate
-          proposalData.content = `${proposalForm.period.startDate}～${proposalForm.period.endDate}`
-          break
-        case 'todo':
-          if (!proposalForm.todo.text.trim()) {
-            throw new Error('やりたいことを入力してください')
-          }
-          proposalData.todo_text = proposalForm.todo.text
-          proposalData.content = proposalForm.todo.text
-          break
-        case 'notTodo':
-          if (!proposalForm.notTodo.text.trim()) {
-            throw new Error('やらなくても良いことを入力してください')
-          }
-          proposalData.not_todo_text = proposalForm.notTodo.text
-          proposalData.content = proposalForm.notTodo.text
-          break
-        case 'budget':
-          if (!proposalForm.budget.text.trim()) {
-            throw new Error('想定予算を入力してください')
-          }
-          proposalData.budget_text = proposalForm.budget.text
-          proposalData.content = proposalForm.budget.text
-          break
-      }
-
       const { error } = await supabase
         .from('proposals')
-        .insert([proposalData])
+        .insert([{
+          idea_id: ideaId,
+          proposer_id: user.id,
+          ...formData
+        }])
 
       if (error) throw error
 
-      // フォームリセット
-      setProposalForm(prev => ({
-        ...prev,
-        [type]: type === 'period' ? { startDate: '', endDate: '' } : { text: '' }
-      }))
-
-      // 提案一覧を再取得
-      await fetchProposals()
+      currentForm.reset();
+      await fetchProposals();
     } catch (err) {
       console.error('Error submitting proposal:', err)
-      setError(err instanceof Error ? err.message : '提案の送信に失敗しました')
+      setError('提案の送信に失敗しました')
     } finally {
-      setIsSubmitting(false)
+      currentForm.setSubmitting(false);
     }
   }
 
-  // いいねの切り替え
+  // いいねの切り替え（元のまま）
   const handleLikeToggle = async (proposalId: string) => {
     if (!user) return
 
@@ -409,7 +431,7 @@ export default function DiscussionScreen() {
     }
   }
 
-  // 提案の採用
+  // 提案の採用（元のまま）
   const handleAdopt = async (proposalId: string) => {
     if (!user || !ideaInfo || user.id !== ideaInfo.creator_id) return
 
@@ -437,7 +459,7 @@ export default function DiscussionScreen() {
     }
   }
 
-  // 提案の削除
+  // 提案の削除（元のまま）
   const handleDelete = async (proposalId: string) => {
     if (!user) return
 
@@ -461,7 +483,7 @@ export default function DiscussionScreen() {
     }
   }
 
-    // 決定処理（Ideas we're tryingへ移動）
+    // 決定処理（元のまま）
     const handleDecision = async () => {
         if (!user || !ideaInfo || user.id !== ideaInfo.creator_id) return;
         
@@ -493,7 +515,7 @@ export default function DiscussionScreen() {
         }
     };
 
-  // 提案を戻す処理
+  // 提案を戻す処理（元のまま）
     const handleReturn = async (proposalId: string) => {
     if (!user || !ideaId || !ideaInfo) return
 
@@ -535,6 +557,7 @@ export default function DiscussionScreen() {
     }
   }
 
+  // ローディング・エラー表示（元のまま）
   if (loading) {
     return <div className="discussion-screen loading">読み込み中...</div>
   }
@@ -549,6 +572,7 @@ export default function DiscussionScreen() {
 
   return (
     <div className="discussion-screen">
+      {/* 元のPageHeaderとIdeaInfo構造を保持 */}
       <PageHeader className="discussion-header">
           <HamburgerMenu />
           
@@ -559,12 +583,12 @@ export default function DiscussionScreen() {
       </PageHeader>
 
       <main className="discussion-main">
-        {/* How about? セクション */}
+        {/* How about? セクション（元の構造を保持） */}
         <section className="how-about-section">
           <h2 className="section-title">How about?</h2>
           <p className="section-description">提案してアイデアを具体化しよう</p>
           
-          {/* タブメニュー */}
+          {/* タブメニュー（元のまま） */}
           <div className="tab-menu">
             <button 
               className={`tab-button ${activeTab === 'period' ? 'active' : ''}`}
@@ -592,38 +616,32 @@ export default function DiscussionScreen() {
             </button>
           </div>
 
-          {/* タブコンテンツ */}
+          {/* タブコンテンツ（フォーム部分のみリファクタリング） */}
           <div className="tab-contents">
             {/* いつから？ */}
             {activeTab === 'period' && (
               <div className="tab-content active">
                 <h3 className="tab-title">実施希望時期</h3>
                 <div className="proposal-registration-form">
-                  <div className="form-row">
-                    <input
-                      type="date"
-                      value={proposalForm.period.startDate}
-                      onChange={(e) => handleFormChange('period', 'startDate', e.target.value)}
-                      className="input-field"
-                      placeholder="開始日"
-                    />
-                  </div>
-                  <div className="form-row">
-                    <input
-                      type="date"
-                      value={proposalForm.period.endDate}
-                      onChange={(e) => handleFormChange('period', 'endDate', e.target.value)}
-                      className="input-field"
-                      placeholder="終了日"
-                    />
-                  </div>
+                  <FormField
+                    type="date"
+                    placeholder="開始日"
+                    className="input-field"
+                    {...periodForm.getFieldProps('startDate')}
+                  />
+                  <FormField
+                    type="date"
+                    placeholder="終了日"
+                    className="input-field"
+                    {...periodForm.getFieldProps('endDate')}
+                  />
 
                   <button
                     onClick={() => handleProposalSubmit('period')}
-                    disabled={isSubmitting}
+                    disabled={periodForm.isSubmitting}
                     className="btn-primary"
                   >
-                    {isSubmitting ? '提案中...' : '提案'}
+                    {periodForm.isSubmitting ? '提案中...' : '提案'}
                   </button>
                 </div>
               </div>
@@ -635,25 +653,23 @@ export default function DiscussionScreen() {
                 <h3 className="tab-title">やりたいこと</h3>
                 <div className="proposal-registration-form">
                   <div className="form-row">
-                    <textarea
-                      value={proposalForm.todo.text}
-                      onChange={(e) => handleFormChange('todo', 'text', e.target.value)}
-                      className="input-field textarea-field"
+                    <FormField
+                      type="textarea"
                       placeholder="やりたいことを記入"
+                      className="input-field textarea-field"
                       rows={4}
                       maxLength={500}
+                      showCharacterCount={true}
+                      {...todoForm.getFieldProps('text')}
                     />
-                    <div className="character-count">
-                      {proposalForm.todo.text.length}/500
-                    </div>
                   </div>
 
                   <button
                     onClick={() => handleProposalSubmit('todo')}
-                    disabled={isSubmitting}
+                    disabled={todoForm.isSubmitting}
                     className="btn-primary"
                   >
-                    {isSubmitting ? '提案中...' : '提案'}
+                    {todoForm.isSubmitting ? '提案中...' : '提案'}
                   </button>
                 </div>
               </div>
@@ -665,25 +681,23 @@ export default function DiscussionScreen() {
                 <h3 className="tab-title">やらなくても良いこと</h3>
                 <div className="proposal-registration-form">
                   <div className="form-row">
-                    <textarea
-                      value={proposalForm.notTodo.text}
-                      onChange={(e) => handleFormChange('notTodo', 'text', e.target.value)}
-                      className="input-field textarea-field"
+                    <FormField
+                      type="textarea"
                       placeholder="やらなくても良いことを記入"
+                      className="input-field textarea-field"
                       rows={4}
                       maxLength={500}
+                      showCharacterCount={true}
+                      {...notTodoForm.getFieldProps('text')}
                     />
-                    <div className="character-count">
-                      {proposalForm.notTodo.text.length}/500
-                    </div>
                   </div>
 
                   <button
                     onClick={() => handleProposalSubmit('notTodo')}
-                    disabled={isSubmitting}
+                    disabled={notTodoForm.isSubmitting}
                     className="btn-primary"
                   >
-                    {isSubmitting ? '提案中...' : '提案'}
+                    {notTodoForm.isSubmitting ? '提案中...' : '提案'}
                   </button>
                 </div>
               </div>
@@ -695,25 +709,23 @@ export default function DiscussionScreen() {
                 <h3 className="tab-title">想定予算</h3>
                 <div className="proposal-registration-form">
                   <div className="form-row">
-                    <textarea
-                      value={proposalForm.budget.text}
-                      onChange={(e) => handleFormChange('budget', 'text', e.target.value)}
-                      className="input-field textarea-field"
+                    <FormField
+                      type="textarea"
                       placeholder="想定予算を記入"
+                      className="input-field textarea-field"
                       rows={4}
                       maxLength={500}
+                      showCharacterCount={true}
+                      {...budgetForm.getFieldProps('text')}
                     />
-                    <div className="character-count">
-                      {proposalForm.budget.text.length}/500
-                    </div>
                   </div>
 
                   <button
                     onClick={() => handleProposalSubmit('budget')}
-                    disabled={isSubmitting}
+                    disabled={budgetForm.isSubmitting}
                     className="btn-primary"
                   >
-                    {isSubmitting ? '提案中...' : '提案'}
+                    {budgetForm.isSubmitting ? '提案中...' : '提案'}
                   </button>
                 </div>
               </div>
@@ -721,7 +733,7 @@ export default function DiscussionScreen() {
           </div>
         </section>
 
-    {/* 提案一覧セクション */}
+    {/* 提案一覧セクション（元のまま） */}
     <section className="proposals-section">
     <h3 className="proposals-title">Go for it</h3>
     <p className="proposals-description">提案を採用しよう</p>
@@ -733,7 +745,7 @@ export default function DiscussionScreen() {
         <h4 className="proposal-type-title">実施時期</h4>
         <div className="proposal-cards">
             {proposals
-            .filter(p => p.proposal_type === 'period' && !p.is_adopted) // 👈 !p.is_adopted を追加
+            .filter(p => p.proposal_type === 'period' && !p.is_adopted)
             .map(proposal => (
                 <ProposalCard
                 key={proposal.id}
@@ -747,7 +759,7 @@ export default function DiscussionScreen() {
                 deletingProposalId={deletingProposalId}
                 />
             ))}
-            {proposals.filter(p => p.proposal_type === 'period' && !p.is_adopted).length === 0 && ( // 👈 !p.is_adopted を追加
+            {proposals.filter(p => p.proposal_type === 'period' && !p.is_adopted).length === 0 && (
             <p className="no-proposals">実施時期の提案はまだありません</p>
             )}
         </div>
@@ -758,7 +770,7 @@ export default function DiscussionScreen() {
         <h4 className="proposal-type-title">やりたいこと</h4>
         <div className="proposal-cards">
             {proposals
-            .filter(p => p.proposal_type === 'todo' && !p.is_adopted) // 👈 !p.is_adopted を追加
+            .filter(p => p.proposal_type === 'todo' && !p.is_adopted)
             .map(proposal => (
                 <ProposalCard
                 key={proposal.id}
@@ -772,7 +784,7 @@ export default function DiscussionScreen() {
                 deletingProposalId={deletingProposalId}
                 />
             ))}
-            {proposals.filter(p => p.proposal_type === 'todo' && !p.is_adopted).length === 0 && ( // 👈 !p.is_adopted を追加
+            {proposals.filter(p => p.proposal_type === 'todo' && !p.is_adopted).length === 0 && (
             <p className="no-proposals">やりたいことの提案はまだありません</p>
             )}
         </div>
@@ -783,7 +795,7 @@ export default function DiscussionScreen() {
         <h4 className="proposal-type-title">やらなくても良いこと</h4>
         <div className="proposal-cards">
             {proposals
-            .filter(p => p.proposal_type === 'not_todo' && !p.is_adopted) // 👈 !p.is_adopted を追加
+            .filter(p => p.proposal_type === 'not_todo' && !p.is_adopted)
             .map(proposal => (
                 <ProposalCard
                 key={proposal.id}
@@ -797,7 +809,7 @@ export default function DiscussionScreen() {
                 deletingProposalId={deletingProposalId}
                 />
             ))}
-            {proposals.filter(p => p.proposal_type === 'not_todo' && !p.is_adopted).length === 0 && ( // 👈 !p.is_adopted を追加
+            {proposals.filter(p => p.proposal_type === 'not_todo' && !p.is_adopted).length === 0 && (
             <p className="no-proposals">やらなくても良いことの提案はまだありません</p>
             )}
         </div>
@@ -808,7 +820,7 @@ export default function DiscussionScreen() {
         <h4 className="proposal-type-title">想定予算</h4>
         <div className="proposal-cards">
             {proposals
-            .filter(p => p.proposal_type === 'budget' && !p.is_adopted) // 👈 !p.is_adopted を追加
+            .filter(p => p.proposal_type === 'budget' && !p.is_adopted)
             .map(proposal => (
                 <ProposalCard
                 key={proposal.id}
@@ -822,14 +834,14 @@ export default function DiscussionScreen() {
                 deletingProposalId={deletingProposalId}
                 />
             ))}
-            {proposals.filter(p => p.proposal_type === 'budget' && !p.is_adopted).length === 0 && ( // 👈 !p.is_adopted を追加
+            {proposals.filter(p => p.proposal_type === 'budget' && !p.is_adopted).length === 0 && (
             <p className="no-proposals">想定予算の提案はまだありません</p>
             )}
         </div>
         </div>
     </div>
     </section>
-    {/* 👇 ここにLet's go with that!セクションを追加 */}
+    {/* 採用された提案セクション（元のまま） */}
         <section className="adopted-proposals-section">
         <h3 className="adopted-proposals-title">Let's go with that!</h3>
           <p className="adopted-proposals-description">採用された提案を実行しよう</p>
