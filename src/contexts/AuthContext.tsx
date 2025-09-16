@@ -1,3 +1,40 @@
+/*
+  AuthContext.tsx - 認証状態のグローバル管理・共有システム
+  
+  このファイルの役割：
+  - アプリ全体でユーザーの認証状態（ログイン/ログアウト）を一元管理
+  - React Context APIを使用して、全コンポーネントから認証情報にアクセス可能にする
+  - Supabase認証サービスとの連携・認証処理の抽象化を提供
+  
+  主要な構成要素：
+  - AuthContext: 認証データを格納・運搬するためのReact Context（データの入れ物）
+  - AuthProvider: 認証状態を管理し、子コンポーネントにデータを提供するプロバイダー
+  - useAuth: 任意のコンポーネントから認証情報を取得するためのカスタムフック
+  
+  提供する認証機能：
+  - signUp: 新規ユーザー登録（メールアドレス・パスワード・ユーザー名）
+  - signIn: ログイン処理（メールアドレス・パスワード認証）
+  - signOut: ログアウト処理
+  - 認証状態の自動監視・リアルタイム更新（onAuthStateChange）
+  
+  管理する状態データ：
+  - user: 現在ログイン中のユーザー情報（User | null）
+  - session: ログインセッション情報（Session | null）
+  - loading: 認証状態確認中の読み込み状態（boolean）
+  
+  使用方法：
+  1. main.tsxでAuthProviderをアプリ全体にラップ
+  2. 各コンポーネントでuseAuth()を呼び出して認証情報にアクセス
+  3. 認証状態の変化は自動的に全コンポーネントに反映される
+  
+  技術的特徴：
+  - TypeScript完全対応で型安全な認証処理を実現
+  - Supabase Auth APIとの完全統合
+  - リアルタイムでの認証状態変化検知・自動更新機能
+*/
+
+
+
 // src/contexts/AuthContext.tsx
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'

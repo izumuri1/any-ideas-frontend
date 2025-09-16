@@ -1,3 +1,32 @@
+/*
+  App.tsx - アプリケーションのルーティング制御・画面遷移管理コンポーネント
+  
+  このファイルの役割：
+  - URLパスに応じて適切なページコンポーネントを表示する（ルーティング）
+  - ユーザーの認証状態（ログイン済み/未ログイン）に基づいてアクセス可能な画面を制御
+  - 認証が必要な画面への不正アクセスを防ぐ認可機能を提供
+  
+  主要な処理内容：
+  - useAuth: AuthContextから現在のログインユーザー情報と読み込み状態を取得
+  - loading状態: 認証状態の確認中は「読み込み中...」を表示
+  - Routes/Route: react-router-domを使用してURLパスとコンポーネントをマッピング
+  - 条件分岐ルーティング:
+    * ログイン済み（user存在）: ワークスペース、アイデア管理画面などにアクセス可能
+    * 未ログイン（user=null）: ログイン・新規登録画面のみアクセス可能
+  - Navigate: 不正なアクセスや認証状態に応じた自動リダイレクト処理
+  
+  画面遷移フロー：
+  1. 未認証ユーザー → /login または /signup のみアクセス可能
+  2. 認証済みユーザー → 全ての機能画面にアクセス可能
+  3. 認証状態と異なるURLアクセス時 → 適切なページに自動リダイレクト
+  
+  管理する主要画面：
+  - 認証系: Login（ログイン）、SignUp（新規登録）
+  - ワークスペース系: CreateWorkspace（ワークスペース作成・選択）、Home（アイデア一覧）
+  - アイデア系: DiscussionScreen（アイデア検討）、ProposalDetailScreen（提案詳細）
+*/
+
+
 // src/App.tsx
 import { useAuth } from './contexts/AuthContext'
 import { Routes, Route, Navigate } from 'react-router-dom'
