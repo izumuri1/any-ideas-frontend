@@ -76,13 +76,14 @@
     }
   }
 
-  .loading-text,
+  .loading-text {
+    @include app-inline-loading;
+    font-size: 0.9rem;
+  }
+
   .error-text {
-    @include app-small-text-style;
-    margin: 0;
-    padding: 0;
-    color: $app-gray-dark;
-    font-style: italic;
+    @include app-inline-error;
+    font-size: 0.9rem;
   }
 }
 

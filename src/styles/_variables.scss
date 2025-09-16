@@ -495,6 +495,63 @@ $app-ease-in-out:        ease-in-out;
 }
 
 //////////////////////////////////////////////////////////////
+/// 【共通Mixins】ローディング・エラー状態の統一
+//////////////////////////////////////////////////////////////
+
+// 基本的なローディングテキスト
+@mixin app-loading-text {
+  @include app-text-style;
+  color: $app-gray-medium;
+  font-style: italic;
+  margin: 0;
+}
+
+// 基本的なエラーテキスト
+@mixin app-error-text {
+  color: $app-error-color;
+  font-weight: $app-weight-medium;
+  margin: 0;
+}
+
+// 画面全体のローディング状態
+@mixin app-screen-loading {
+  @include app-loading-text;
+  text-align: center;
+  padding: 2rem;
+  font-size: $app-font-body;
+}
+
+// 画面全体のエラー状態
+@mixin app-screen-error {
+  @include app-error-text;
+  text-align: center;
+  padding: 2rem;
+  font-size: $app-font-body;
+}
+
+// 画面コンテナ用の状態クラス（&.loading, &.error）
+@mixin app-screen-states {
+  &.loading {
+    @include app-screen-loading;
+  }
+  
+  &.error {
+    @include app-screen-error;
+  }
+}
+
+// コンポーネント内の部分的なローディング・エラー（小さいサイズ）
+@mixin app-inline-loading {
+  @include app-loading-text;
+  font-size: $app-font-small;
+}
+
+@mixin app-inline-error {
+  @include app-error-text;
+  font-size: $app-font-small;
+}
+
+//////////////////////////////////////////////////////////////
 /// 【レイアウトMixins】ボタングループ（アプリ全体の統一仕様）
 //////////////////////////////////////////////////////////////
 

@@ -17,18 +17,7 @@
   width: 100%;
   overflow-x: hidden;
   
-  &.loading {
-    @include app-text-style;
-    text-align: center;
-    padding: 2rem;
-    color: $app-gray-medium;
-  }
-  
-  &.error {
-    @include app-error-message;
-    text-align: center;
-    padding: 2rem;
-  }
+  @include app-screen-states;
 }
 
 
