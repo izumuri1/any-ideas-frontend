@@ -1,85 +1,127 @@
-// src/components/SignUp.tsx
+// src/components/SignUp.tsx - useForm + FormFieldリファクタリング版
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import './Login.scss' // Login.scssを共有利用
-
+import FormField from './common/FormField'  // 追加
+import { useForm } from '../hooks/useForm'   // 追加（React Hook Form → 自作useFormに変更）
+import './Login.scss'
 
 ////////////////////////////////////////////////////////////////
 // ◆ 実行時の流れ
 // ページ読み込み → コンポーネントが表示される
-// ユーザーが入力 → React Hook Formがリアルタイムでバリデーション
+// ユーザーが入力 → 自作useFormがリアルタイムでバリデーション
 // 新規アカウント登録ボタンクリック → onSubmit関数が実行される
 // 登録成功 → AuthContextが状態を更新 → App.tsxがHome画面に切り替え
 // 登録失敗 → エラーメッセージを表示
 ////////////////////////////////////////////////////////////////
 
 // 1. 準備・設定
-// 新規アカウント登録フォームの型定義
+// 新規アカウント登録フォームの型定義（inviteCodeを削除）
 interface SignUpFormData {
   email: string
   password: string
   confirmPassword: string
   username: string
-  inviteCode?: string // ★★★要修正
 }
 
-
 // 2. 状態管理・フック初期化
-// 新規アカウント登録画面を表示するためのコンポーネントを作成
 export function SignUp() {
   const { signUp, loading } = useAuth()
   const navigate = useNavigate()
   const [submitError, setSubmitError] = useState('')
 
-// 新規アカウント登録フォーム
-// React Hook Formからフォーム管理に必要な3つの道具を取り出す
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors }
-    // React Hook Formを初期化。<SignUpFormData>でフォームの型を指定
-  } = useForm<SignUpFormData>()
-
-  // パスワード確認のためにパスワードの値を監視
-  const watchPassword = watch('password')
-
-// 3. 新規アカウント登録処理ロジック
-// 自作のonSubmit関数でサインアップの結果を取得する非同期処理
-// 関数の引数は新規アカウント登録フォームの入力データ（SignUpFormDataで型を指定）
-// SubmitErrorを初期化➡サインアップ結果取得（取得完了まで次の処理には進まない）
-// ➡サインアップ成功の場合は、監視側で状態更新／エラーの場合は、SubmitErrorを更新してエラーメッセージを表示
-  const onSubmit = async (data: SignUpFormData) => {
-    setSubmitError('')
-    
-    const { error } = await signUp(data.email, data.password, data.username)
-    if (error) {
-      // エラーコードで判定
-      switch (error.code) {
-        case 'user_already_exists':
-          setSubmitError('このメールアドレスは既に登録されています。')
-          break
-        case 'weak_password':
-          setSubmitError('パスワードは8文字以上で入力してください。')
-          break
-        case 'email_address_invalid':
-          setSubmitError('正しいメールアドレスを入力してください。')
-          break
-        default:
-          setSubmitError('アカウント登録に失敗しました。')
+  // リファクタリング：React Hook Form → 自作useFormフックに変更
+  const signUpForm = useForm<SignUpFormData>({
+    initialValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+      username: ''
+    },
+    validationRules: {
+      email: {
+        custom: (value) => {
+          if (!value.trim()) return 'メールアドレスは必須です'
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return '正しいメールアドレスを入力してください'
+          return undefined
+        }
+      },
+      username: {
+        custom: (value) => {
+          if (!value.trim()) return 'ユーザー名は必須です'
+          if (value.length < 2) return 'ユーザー名は2文字以上で入力してください'
+          if (value.length > 20) return 'ユーザー名は20文字以下で入力してください'
+          return undefined
+        }
+      },
+      password: {
+        custom: (value) => {
+          if (!value.trim()) return 'パスワードは必須です'
+          if (value.length < 8) return 'パスワードは8文字以上で入力してください'
+          return undefined
+        }
+      },
+      confirmPassword: {
+        custom: (value) => {
+          // パスワード確認のカスタムバリデーション
+          if (!value.trim()) return 'パスワードの確認は必須です'
+          if (value !== signUpForm.values.password) {
+            return 'パスワードが一致しません'
+          }
+          return undefined
+        }
       }
+    }
+  })
+
+  // 3. 新規アカウント登録処理ロジック
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // バリデーション実行
+    if (!signUpForm.validateAll()) {
+      return
+    }
+
+    setSubmitError('')
+    signUpForm.setSubmitting(true)
+    
+    try {
+      const { error } = await signUp(
+        signUpForm.values.email, 
+        signUpForm.values.password, 
+        signUpForm.values.username
+      )
+      
+      if (error) {
+        // エラーコードで判定
+        switch (error.code) {
+          case 'user_already_exists':
+            setSubmitError('このメールアドレスは既に登録されています。')
+            break
+          case 'weak_password':
+            setSubmitError('パスワードは8文字以上で入力してください。')
+            break
+          case 'email_address_invalid':
+            setSubmitError('正しいメールアドレスを入力してください。')
+            break
+          default:
+            setSubmitError('アカウント登録に失敗しました。')
+        }
+      }
+    } catch (err) {
+      console.error('SignUp error:', err)
+      setSubmitError('アカウント登録に失敗しました。')
+    } finally {
+      signUpForm.setSubmitting(false)
     }
   }
 
   const handleLoginClick = () => {
-    // loginページに遷移
     navigate('/login')
   }
 
-
-// 4. レンダリング（画面処理）
+  // 4. レンダリング（画面処理）
   return (
     <div className="login-container">
       <div className="login-card">
@@ -88,112 +130,67 @@ export function SignUp() {
         <p className="introduction">アカウントを作成して始めましょう</p>
 
         {/* エラーメッセージ */}
-        {/* &&の左側が truthy なら右側<div xxx /div>を返す */}
-        {/* この場合、エラーメッセージが左側にあれば、divでエラーメッセージを表示する */}
         {submitError && <div className="error-message">{submitError}</div>}
 
-        {/* 新規アカウント登録フォーム */}
-        {/* 送信ボタンをクリックすると、handleSubmit関数が発火し、バリデーションを実行 */}
-        {/* 成功すれば事前に定義したonSubmit関数を実行する */}
-        <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
+        {/* リファクタリング：新規アカウント登録フォーム */}
+        <form onSubmit={handleSubmit} className="auth-form">
+          {/* メールアドレス */}
           <div className="form-group">
-            <label htmlFor="email">メールアドレス</label>
-            <input
+            <FormField
               type="email"
-              id="email"
-              {...register('email', {
-                required: 'メールアドレスは必須です',
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: '正しいメールアドレスを入力してください'
-                }
-              })}
+              label="メールアドレス"
               placeholder="メールアドレスを入力"
-              // ローディング中（loadingがtrue）はボタンを無効化
-              disabled={loading}
+              disabled={loading || signUpForm.isSubmitting}
+              {...signUpForm.getFieldProps('email')}
             />
-
-            {/* React Hook formのformStateを利用し、入力フィールドのバリデーションエラーの場合、メッセージを出力 */}
-            {errors.email && (
-              <span className="field-error">{errors.email.message}</span>
-            )}
           </div>
 
+          {/* ユーザー名 */}
           <div className="form-group">
-            <label htmlFor="username">ユーザー名</label>
-            <input
+            <FormField
               type="text"
-              id="username"
-              {...register('username', {
-                required: 'ユーザー名は必須です',
-                minLength: {
-                  value: 2,
-                  message: 'ユーザー名は2文字以上で入力してください'
-                },
-                maxLength: {
-                  value: 20,
-                  message: 'ユーザー名は20文字以下で入力してください'
-                }
-              })}
+              label="ユーザー名"
               placeholder="ユーザー名を入力"
-              disabled={loading}
+              disabled={loading || signUpForm.isSubmitting}
+              {...signUpForm.getFieldProps('username')}
             />
-            {errors.username && (
-              <span className="field-error">{errors.username.message}</span>
-            )}
           </div>
 
+          {/* パスワード */}
           <div className="form-group">
-            <label htmlFor="password">パスワード</label>
-            <input
+            <FormField
               type="password"
-              id="password"
-              {...register('password', {
-                required: 'パスワードは必須です',
-                minLength: {
-                  value: 8,
-                  message: 'パスワードは8文字以上で入力してください'
-                }
-              })}
+              label="パスワード"
               placeholder="パスワードを入力"
-              disabled={loading}
+              disabled={loading || signUpForm.isSubmitting}
+              {...signUpForm.getFieldProps('password')}
             />
-            {errors.password && (
-              <span className="field-error">{errors.password.message}</span>
-            )}
           </div>
 
+          {/* パスワード確認 */}
           <div className="form-group">
-            <label htmlFor="confirmPassword">パスワード確認</label>
-            <input
+            <FormField
               type="password"
-              id="confirmPassword"
-              {...register('confirmPassword', {
-                required: 'パスワード確認は必須です',
-                validate: (value) =>
-                  value === watchPassword || 'パスワードが一致しません'
-              })}
+              label="パスワード確認"
               placeholder="パスワードを再入力"
-              disabled={loading}
+              disabled={loading || signUpForm.isSubmitting}
+              {...signUpForm.getFieldProps('confirmPassword')}
             />
-            {errors.confirmPassword && (
-              <span className="field-error">{errors.confirmPassword.message}</span>
-            )}
           </div>
 
           <button 
             type="submit" 
             className="btn-primary"
-            disabled={loading}
+            disabled={loading || signUpForm.isSubmitting}
           >
-            {loading ? 'アカウント作成中...' : '新規アカウント登録'}
+            {loading || signUpForm.isSubmitting ? 'アカウント作成中...' : '新規アカウント登録'}
           </button>
 
           {/* Google ログイン（将来実装）
           <button 
             type="button" 
             className="btn-google"
-            disabled={loading}
+            disabled={loading || signUpForm.isSubmitting}
           >
             Googleでアカウント作成
           </button>
