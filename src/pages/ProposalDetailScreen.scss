@@ -201,17 +201,18 @@
   gap: 0.5rem;
   text-align: left;
   min-width: 0;
-  margin-left: $app-padding-mobile;
-  
-  .idea-name,
-  .idea-owner {
-    display: flex;
-    align-items: baseline;
-    gap: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  
+}
+
+// 🚀 攻めたシンプル修正：全ての子要素をリセット
+.page-header .idea-info > * {
+  all: unset;
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+// ラベル・値のスタイル（既存のまま残す）
+.idea-info {
   .label {
     @include app-small-text-style;
     color: $app-gray-medium;
