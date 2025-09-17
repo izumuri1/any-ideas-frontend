@@ -128,13 +128,16 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
       {showActions && (showLikeButton || showProceedButton || showDiscussionButton || showDetailsButton || onDelete) && (
         <div className="idea-actions">
           {/* いいねボタン */}
-          {showLikeButton && onLikeToggle && (
-            <LikeButton 
-              item={idea}
-              currentUser={currentUser}
-              onLikeToggle={onLikeToggle}
-            />
-          )}
+        {showLikeButton && (
+        <LikeButton 
+            item={idea}
+            currentUser={currentUser}
+            onLikeToggle={onLikeToggle}
+            disabled={!onLikeToggle}
+            className="idea-card__like-button"
+            zone={idea.status as 'our_ideas' | 'thinking_about' | 'trying'}
+        />
+        )}
           
           {/* 進めるボタン（Our ideas用・オーナーのみ） */}
           {isOwner && showProceedButton && onProceed && (

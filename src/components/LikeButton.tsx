@@ -26,6 +26,7 @@ interface LikeButtonProps {
   onLikeToggle?: (itemId: string) => void
   disabled?: boolean
   className?: string
+  zone?: 'our_ideas' | 'thinking_about' | 'trying'  // 新規追加
 }
 
 export function LikeButton({ 
@@ -33,7 +34,8 @@ export function LikeButton({
   currentUser, 
   onLikeToggle,
   disabled = false,
-  className = '' 
+  className = '',
+  zone = 'our_ideas'  // デフォルト値を設定
 }: LikeButtonProps) {
   const [liking, setLiking] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
@@ -51,22 +53,27 @@ export function LikeButton({
     }
   }
 
-  // マウスホバー処理
-  const handleMouseEnter = () => {
+    // マウスホバー処理
+    const handleMouseEnter = () => {
     console.log('Mouse entered - like_count:', item.like_count, 'user_has_liked:', item.user_has_liked)
     
-    // いいねが1件以上ある場合は常に上側にユーザー名を表示
+    // いいねが1件以上ある場合は常に上側にユーザー名を表示（全ゾーン共通）
     if (item.like_count && item.like_count > 0) {
-      console.log('Showing tooltip')
-      setShowTooltip(true)
+        console.log('Showing tooltip')
+        setShowTooltip(true)
     }
     
-    // 自分がいいね済みの場合は下側に「取り消し」メッセージを表示
-    if (currentUser && item.user_has_liked) {
-      console.log('Showing cancel message')
-      setShowCancelMessage(true)
+    // Ideas we're tryingゾーンでは下側の「取り消し」メッセージを表示しない
+    if (zone === 'trying') {
+        return
     }
-  }
+    
+    // 自分がいいね済みの場合は下側に「取り消し」メッセージを表示（our_ideas, thinking_aboutのみ）
+    if (currentUser && item.user_has_liked) {
+        console.log('Showing cancel message')
+        setShowCancelMessage(true)
+    }
+    }
 
   const handleMouseLeave = () => {
     setShowTooltip(false)
@@ -110,14 +117,14 @@ export function LikeButton({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <button
-        className={`like-button ${item.user_has_liked ? 'liked' : ''} ${liking ? 'liking' : ''}`}
-        onClick={handleLikeToggle}
-        disabled={liking || disabled || !currentUser}
-        title={item.user_has_liked ? 'いいねを取り消す' : 'いいねする'}
-      >
-        {item.user_has_liked ? '♥' : '♡'} {item.like_count || 0}
-      </button>
+    <button
+    className={`like-button ${item.user_has_liked ? 'liked' : ''} ${liking ? 'liking' : ''}`}
+    onClick={handleLikeToggle}
+    disabled={liking || disabled || !currentUser}
+    title={zone === 'trying' ? undefined : (item.user_has_liked ? 'いいねを取り消す' : 'いいねする')}
+    >
+    {item.user_has_liked ? '♥' : '♡'} {item.like_count || 0}
+    </button>
       {renderLikeTooltip()}
       {renderCancelMessage()}
     </div>
