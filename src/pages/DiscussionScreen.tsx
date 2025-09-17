@@ -7,7 +7,6 @@ import { HamburgerMenu } from '../components/HamburgerMenu'
 import { LikeButton, type LikeableItem } from '../components/LikeButton'
 import { DeleteButton } from '../components/DeleteButton'
 import PageHeader from '../components/PageHeader'
-import IdeaInfo from '../components/IdeaInfo'
 import FormField from '../components/common/FormField'  // 追加
 import { useForm } from '../hooks/useForm'  // 追加
 import './DiscussionScreen.scss'
@@ -572,15 +571,20 @@ export default function DiscussionScreen() {
 
   return (
     <div className="discussion-screen">
-      {/* 元のPageHeaderとIdeaInfo構造を保持 */}
-      <PageHeader className="discussion-header">
-          <HamburgerMenu />
-          
-          <IdeaInfo 
-            ideaName={ideaInfo.idea_name}
-            ownerName={ideaInfo.profiles.username}
-            />
-      </PageHeader>
+    <PageHeader className="discussion-header">
+        <HamburgerMenu />
+        
+        <div className="idea-info">
+        <div className="idea-name">
+            <span className="label">アイデア名：</span>
+            <span className="value">{ideaInfo.idea_name}</span>
+        </div>
+        <div className="idea-owner">
+            <span className="label">アイデアオーナー：</span>
+            <span className="value">{ideaInfo.profiles.username}</span>
+        </div>
+        </div>
+    </PageHeader>
 
       <main className="discussion-main">
         {/* How about? セクション（元の構造を保持） */}
@@ -659,7 +663,7 @@ export default function DiscussionScreen() {
                       className="input-field textarea-field"
                       rows={4}
                       maxLength={500}
-                      showCharacterCount={true}
+                      showCharCount={true}
                       {...todoForm.getFieldProps('text')}
                     />
                   </div>
@@ -687,7 +691,7 @@ export default function DiscussionScreen() {
                       className="input-field textarea-field"
                       rows={4}
                       maxLength={500}
-                      showCharacterCount={true}
+                      showCharCount={true}
                       {...notTodoForm.getFieldProps('text')}
                     />
                   </div>
@@ -715,7 +719,7 @@ export default function DiscussionScreen() {
                       className="input-field textarea-field"
                       rows={4}
                       maxLength={500}
-                      showCharacterCount={true}
+                      showCharCount={true}
                       {...budgetForm.getFieldProps('text')}
                     />
                   </div>

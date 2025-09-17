@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 import { HamburgerMenu } from '../components/HamburgerMenu'
 import { supabase } from '../lib/supabase'
 import PageHeader from '../components/PageHeader'
-import IdeaInfo from '../components/IdeaInfo'
 import './ProposalDetailScreen.scss'
 
 interface Idea {
@@ -172,11 +171,12 @@ export function ProposalDetailScreen() {
         <div className="proposal-detail-screen loading">
         <PageHeader className="proposal-detail-header">
             <HamburgerMenu currentPage="other" />
-            <IdeaInfo 
-            ideaName=""
-            ownerName=""
-            loading={true}
-            />
+            <div className="idea-info">
+            <div className="idea-name">
+                <span className="label">アイデア名：</span>
+                <span className="loading-text">読み込み中...</span>
+            </div>
+            </div>
         </PageHeader>
         </div>
     )
@@ -188,11 +188,12 @@ export function ProposalDetailScreen() {
         <div className="proposal-detail-screen error">
         <PageHeader className="proposal-detail-header">
             <HamburgerMenu currentPage="other" />
-            <IdeaInfo 
-            ideaName=""
-            ownerName=""
-            error={error || 'アイデアが見つかりません'}
-            />
+            <div className="idea-info">
+            <div className="idea-name">
+                <span className="label">アイデア名：</span>
+                <span className="error-text">エラーが発生しました</span>
+            </div>
+            </div>
         </PageHeader>
         </div>
     )
@@ -200,16 +201,20 @@ export function ProposalDetailScreen() {
 
   return (
     <div className="proposal-detail-screen">
-      {/* ヘッダー部分 - Discussion画面と同じ構造 */}
-      <PageHeader className="proposal-detail-header">
-          <HamburgerMenu currentPage="other" />
-          
-          {/* アイデア情報表示 - Discussion画面と同じ構造 */}
-            <IdeaInfo 
-            ideaName={idea.idea_name}
-            ownerName={idea.profiles?.username || 'Unknown User'}
-            />
-      </PageHeader>
+    <PageHeader className="proposal-detail-header">
+        <HamburgerMenu currentPage="other" />
+        
+        <div className="idea-info">
+        <div className="idea-name">
+            <span className="label">アイデア名：</span>
+            <span className="value">{idea.idea_name}</span>
+        </div>
+        <div className="idea-owner">
+            <span className="label">アイデアオーナー：</span>
+            <span className="value">{idea.profiles?.username || 'Unknown User'}</span>
+        </div>
+        </div>
+    </PageHeader>
 
       {/* メインコンテンツ */}
         <main className="proposal-detail-main">

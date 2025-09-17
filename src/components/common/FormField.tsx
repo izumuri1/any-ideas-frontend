@@ -21,12 +21,10 @@ interface FormFieldProps {
   // エラー関連
   error?: string;
   
-  // 表示制御
-  showCharacterCount?: boolean; // 文字数カウント表示制御
-  
   // その他
   className?: string;
   id?: string;
+  showCharCount?: boolean;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -42,24 +40,19 @@ export const FormField: React.FC<FormFieldProps> = ({
   rows = 3,
   options = [],
   error,
-  showCharacterCount = false, // デフォルトは非表示
   className = '',
-  id
+  id,
+  showCharCount = false
 }) => {
   const fieldId = id || `field-${name}`;
   const hasError = !!error;
-  const shouldShowCharacterCount = showCharacterCount && maxLength && (type === 'text' || type === 'textarea');
+  const showCharacterCount = showCharCount && maxLength && (type === 'text' || type === 'textarea');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     onChange(event.target.value);
   };
 
   const renderInput = () => {
-    // 元のコードのクラス名構造を保持
-    const baseClassName = className || 'input-field';
-    const textareaClassName = type === 'textarea' ? `${baseClassName} textarea-field` : baseClassName;
-    const finalClassName = hasError ? `${textareaClassName} error` : textareaClassName;
-
     const commonProps = {
       id: fieldId,
       name,
@@ -68,7 +61,7 @@ export const FormField: React.FC<FormFieldProps> = ({
       placeholder,
       disabled,
       maxLength,
-      className: finalClassName,
+      className: `form-field-input ${hasError ? 'error' : ''} ${className}`,
       'aria-describedby': error ? `${fieldId}-error` : undefined,
       'aria-invalid': hasError
     };
@@ -86,7 +79,9 @@ export const FormField: React.FC<FormFieldProps> = ({
         return (
           <select {...commonProps}>
             {placeholder && (
-              <option value="">{placeholder}</option>
+              <option value="" disabled>
+                {placeholder}
+              </option>
             )}
             {options.map((option) => (
               <option key={option.value} value={option.value}>
@@ -108,7 +103,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   };
 
   return (
-    <div className="form-row">
+    <div className={`form-field-container ${hasError ? 'has-error' : ''}`}>
       {label && (
         <label htmlFor={fieldId} className="form-field-label">
           {label}
@@ -116,9 +111,11 @@ export const FormField: React.FC<FormFieldProps> = ({
         </label>
       )}
       
-      {renderInput()}
+      <div className="form-field-input-wrapper">
+        {renderInput()}
+      </div>
       
-      {shouldShowCharacterCount && (
+      {showCharacterCount && (
         <div className="character-count">
           {value.length}/{maxLength}
         </div>
@@ -127,7 +124,7 @@ export const FormField: React.FC<FormFieldProps> = ({
       {error && (
         <div 
           id={`${fieldId}-error`}
-          className="error-message"
+          className="form-field-error"
           role="alert"
           aria-live="polite"
         >

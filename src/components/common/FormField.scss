@@ -1,11 +1,11 @@
-// src/components/common/FormField.scss - 元のHome.scssスタイル構造に合わせた版
+// src/components/common/FormField.scss
 @use '../../styles/variables' as *;
 
-// 元のform-rowクラスに合わせる
-.form-row {
+.form-field-container {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
   margin-bottom: 1rem;
 
   .form-field-label {
@@ -21,9 +21,11 @@
     }
   }
 
-  // 元のinput-field, textarea-fieldクラス名を保持
-  .input-field,
-  .textarea-field {
+  .form-field-input-wrapper {
+    position: relative;
+  }
+
+  .form-field-input {
     @include app-input-base;
 
     &.error {
@@ -36,19 +38,6 @@
     }
   }
 
-  .textarea-field {
-    resize: vertical;
-    min-height: 80px;
-  }
-
-  // 元のerror-messageクラス名を保持
-  .error-message {
-    @include app-small-text-style;
-    color: $app-error-color;
-    margin: 0.25rem 0 0 0;
-    font-size: 0.8rem;
-  }
-
   .character-count {
     @include app-small-text-style;
     text-align: right;
@@ -56,10 +45,45 @@
     margin-top: 0.25rem;
     font-size: 0.75rem;
   }
+
+  .form-field-error {
+    @include app-small-text-style;
+    color: $app-error-color;
+    margin: 0.25rem 0 0 0;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.25rem;
+
+    &::before {
+      content: '⚠';
+      color: $app-error-color;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+  }
+
+  &.has-error {
+    .form-field-input {
+      border-color: $app-error-color;
+      
+      &:focus {
+        border-color: $app-error-color;
+        box-shadow: 0 0 0 2px rgba($app-error-color, 0.1);
+      }
+    }
+  }
+}
+
+// textareaの特別スタイリング
+.form-field-input[type="textarea"] {
+  resize: vertical;
+  min-height: 80px;
 }
 
 // selectの特別スタイリング  
-.input-field select {
+.form-field-input select {
   cursor: pointer;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -70,20 +94,18 @@
 
 // アクセシビリティ対応
 @media (prefers-reduced-motion: reduce) {
-  .input-field,
-  .textarea-field {
+  .form-field-input {
     transition: none;
   }
 }
 
 // 高コントラストモード対応
 @media (prefers-contrast: high) {
-  .input-field,
-  .textarea-field {
+  .form-field-input {
     border-width: 2px;
   }
   
-  .error-message {
+  .form-field-error {
     font-weight: $app-weight-medium;
   }
 }

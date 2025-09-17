@@ -33,11 +33,16 @@ export interface IdeaCardLoadingStates {
   deletingId?: string | null;
 }
 
-// 表示制御の型定義
+// 表示制御の型定義（拡張版）
 export interface IdeaCardDisplayOptions {
   showProceedButton?: boolean;
   showDetailsButton?: boolean;
   showDiscussionButton?: boolean;
+  // 🆕 新規追加：Discussion画面用のオプション
+  layout?: 'full' | 'simple';           // レイアウトタイプ
+  showFullDetails?: boolean;            // 詳細情報（いつ・誰が・何を）表示
+  showLikeButton?: boolean;             // いいねボタン表示
+  showActions?: boolean;                // アクションエリア全体の表示
 }
 
 // メインのProps型定義
@@ -74,7 +79,12 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
   const {
     showProceedButton = false,
     showDetailsButton = false,
-    showDiscussionButton = false
+    showDiscussionButton = false,
+    // 🆕 新規オプション（デフォルト値）
+    layout = 'full',
+    showFullDetails = true,
+    showLikeButton = true,
+    showActions = true
   } = displayOptions;
 
   // ユーザー権限の確認
@@ -82,84 +92,93 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
   const isProceeding = proceedingId === idea.id;
   const isDeleting = deletingId === idea.id;
 
+  // レイアウトによる表示制御
+  const isSimpleLayout = layout === 'simple';
+  
   return (
-    <div className={`idea-card ${className}`}>
-      {/* アイデアヘッダー（元のEnhancedIdeaCard形式） */}
+    <div className={`idea-card ${isSimpleLayout ? 'idea-card--simple' : ''} ${className}`}>
+      {/* アイデアヘッダー（常に表示） */}
       <div className="idea-header">
         <h3 className="idea-name">{idea.idea_name}</h3>
         <span className="idea-owner">by {idea.profiles.username}</span>
       </div>
 
-      {/* アイデア詳細（元のEnhancedIdeaCard形式 - ラベルなし） */}
-      <div className="idea-details">
-        {idea.when_text && (
+      {/* アイデア詳細（条件付き表示） */}
+      {showFullDetails && (
+        <div className="idea-details">
+          {idea.when_text && (
+            <div className="idea-detail">
+              <span className="detail-value">{idea.when_text}</span>
+            </div>
+          )}
+          
+          {idea.who_text && (
+            <div className="idea-detail">
+              <span className="detail-value">{idea.who_text}</span>
+            </div>
+          )}
+          
           <div className="idea-detail">
-            <span className="detail-value">{idea.when_text}</span>
+            <span className="detail-value">{idea.what_text}</span>
           </div>
-        )}
-        
-        {idea.who_text && (
-          <div className="idea-detail">
-            <span className="detail-value">{idea.who_text}</span>
-          </div>
-        )}
-        
-        <div className="idea-detail">
-          <span className="detail-value">{idea.what_text}</span>
         </div>
-      </div>
+      )}
 
-      {/* アクションボタンエリア（元のEnhancedIdeaCard形式） */}
-      <div className="idea-actions">
-        {/* いいねボタン（常に表示） */}
-        <LikeButton 
-          item={idea}
-          currentUser={currentUser}
-          onLikeToggle={onLikeToggle}
-        />
-        
-        {/* 進めるボタン（Our ideas用・オーナーのみ） */}
-        {isOwner && showProceedButton && onProceed && (
-          <button 
-            className="btn-proceed"
-            onClick={() => onProceed(idea.id)}
-            disabled={isProceeding}
-          >
-            {isProceeding ? '検討を進める中...' : '検討を進める'}
-          </button>
-        )}
+      {/* アクションボタンエリア（条件付き表示） */}
+      {showActions && (showLikeButton || showProceedButton || showDiscussionButton || showDetailsButton || onDelete) && (
+        <div className="idea-actions">
+          {/* いいねボタン */}
+          {showLikeButton && onLikeToggle && (
+            <LikeButton 
+              item={idea}
+              currentUser={currentUser}
+              onLikeToggle={onLikeToggle}
+            />
+          )}
+          
+          {/* 進めるボタン（Our ideas用・オーナーのみ） */}
+          {isOwner && showProceedButton && onProceed && (
+            <button 
+              className="btn-proceed"
+              onClick={() => onProceed(idea.id)}
+              disabled={isProceeding}
+            >
+              {isProceeding ? '検討を進める中...' : '検討を進める'}
+            </button>
+          )}
 
-        {/* 検討ボタン（Ideas we're thinking about用） */}
-        {showDiscussionButton && onDiscussion && (
-          <button 
-            className="btn-proceed"
-            onClick={() => onDiscussion(idea.id)}
-          >
-            具体的に検討する
-          </button>
-        )}
+          {/* 検討ボタン（Ideas we're thinking about用） */}
+          {showDiscussionButton && onDiscussion && (
+            <button 
+              className="btn-proceed"
+              onClick={() => onDiscussion(idea.id)}
+            >
+              具体的に検討する
+            </button>
+          )}
 
-        {/* 詳細ボタン（Ideas we're trying用） */}
-        {showDetailsButton && onViewDetails && (
-          <button 
-            className="btn-proceed"
-            onClick={() => onViewDetails(idea.id)}
-          >
-            詳細
-          </button>
-        )}
+          {/* 詳細ボタン（Ideas we're trying用） */}
+          {showDetailsButton && onViewDetails && (
+            <button 
+              className="btn-proceed"
+              onClick={() => onViewDetails(idea.id)}
+            >
+              詳細
+            </button>
+          )}
 
-        {/* 削除ボタン（オーナーのみ） */}
-        {onDelete && (
-          <DeleteButton
-            item={idea}
-            currentUser={currentUser}
-            creatorId={idea.creator_id}
-            isDeleting={isDeleting}
-            onDelete={onDelete}
-          />
-        )}
-      </div>
+          {/* 削除ボタン（オーナーのみ） */}
+          {onDelete && (
+            <DeleteButton
+              item={idea}
+              currentUser={currentUser}
+              creatorId={idea.creator_id}
+              isDeleting={isDeleting}
+              onDelete={onDelete}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };
