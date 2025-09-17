@@ -79,14 +79,17 @@ export default function Home() {
     validationRules: {
       idea_name: {
         required: true,
-        maxLength: 100
+        maxLength: 100,
+        displayName: 'アイデア名'
       },
       what_text: {
         required: true,
-        maxLength: 500
+        maxLength: 500,
+        displayName: '何をしたい'
       },
       who_text: {
-        maxLength: 500
+        maxLength: 500,
+        displayName: '誰と'
       }
     }
   })

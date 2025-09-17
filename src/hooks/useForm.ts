@@ -1,13 +1,14 @@
 // src/hooks/useForm.ts
 import { useState, useCallback } from 'react';
 
-// バリデーション設定の型定義
+// バリデーション設定の型定義（displayNameを追加）
 export interface ValidationRule {
   required?: boolean;
   minLength?: number;
   maxLength?: number;
   pattern?: RegExp;
   custom?: (value: string) => string | undefined;
+  displayName?: string; // 日本語表示名を追加
 }
 
 export type ValidationRules<T> = {
@@ -100,28 +101,29 @@ export const useForm = <T extends Record<string, any>>({
     if (!rule) return true;
 
     const value = String(values[field] || '');
+    const displayName = rule.displayName || String(field); // 日本語名があれば使用、なければフィールド名
     
     // required チェック
     if (rule.required && !value.trim()) {
-      setError(field, `${String(field)}は必須です`);
+      setError(field, `${displayName}は必須です`);
       return false;
     }
 
     // minLength チェック
     if (rule.minLength && value.length < rule.minLength) {
-      setError(field, `${String(field)}は${rule.minLength}文字以上で入力してください`);
+      setError(field, `${displayName}は${rule.minLength}文字以上で入力してください`);
       return false;
     }
 
     // maxLength チェック
     if (rule.maxLength && value.length > rule.maxLength) {
-      setError(field, `${String(field)}は${rule.maxLength}文字以下で入力してください`);
+      setError(field, `${displayName}は${rule.maxLength}文字以下で入力してください`);
       return false;
     }
 
     // pattern チェック
     if (rule.pattern && !rule.pattern.test(value)) {
-      setError(field, `${String(field)}の形式が正しくありません`);
+      setError(field, `${displayName}の形式が正しくありません`);
       return false;
     }
 

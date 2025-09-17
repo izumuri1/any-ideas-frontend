@@ -158,35 +158,35 @@ export default function DiscussionScreen() {
   // フォームデータの削除（元の手動管理を削除）
   // const [proposalForm, setProposalForm] = useState<ProposalFormData>({...})  削除
   
-  // リファクタリング：各タブ用のuseFormフック
-  const periodForm = useForm<PeriodFormData>({
+    // リファクタリング：各タブ用のuseFormフック
+    const periodForm = useForm<PeriodFormData>({
     initialValues: { startDate: '', endDate: '' },
     validationRules: {
-      startDate: { required: true },
-      endDate: { required: true }
+        startDate: { required: true, displayName: '開始日' },
+        endDate: { required: true, displayName: '終了日' }
     }
-  })
+    })
 
-  const todoForm = useForm<TextFormData>({
+    const todoForm = useForm<TextFormData>({
     initialValues: { text: '' },
     validationRules: {
-      text: { required: true, maxLength: 500 }
+        text: { required: true, maxLength: 500, displayName: 'やりたいこと' }
     }
-  })
+    })
 
-  const notTodoForm = useForm<TextFormData>({
+    const notTodoForm = useForm<TextFormData>({
     initialValues: { text: '' },
     validationRules: {
-      text: { required: true, maxLength: 500 }
+        text: { required: true, maxLength: 500, displayName: 'やらなくても良いこと' }
     }
-  })
+    })
 
-  const budgetForm = useForm<TextFormData>({
+    const budgetForm = useForm<TextFormData>({
     initialValues: { text: '' },
     validationRules: {
-      text: { required: true, maxLength: 500 }
+        text: { required: true, maxLength: 500, displayName: '想定予算' }
     }
-  })
+    })
 
   // アイデア情報の取得（元のまま）
   const fetchIdeaInfo = async () => {
