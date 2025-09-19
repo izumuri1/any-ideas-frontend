@@ -151,13 +151,81 @@ $app-ease-in-out:        ease-in-out;
 }
 
 // リスト用のスクロール可能エリア（ワークスペース選択等）
+// リスト用のスクロール可能エリア（ワークスペース選択等）
 @mixin app-scrollable-list($background-color: $app-bg-color, $max-height: 60vh) {
-  @include app-scrollable-with-gradient($background-color);
+  @include app-scrollable-area;
   max-height: $max-height;
   overflow-y: auto;
   padding: 0.5rem 0;
+  position: relative;
   
-  @media (max-width: 480px) { & { max-height: 50vh; } } // スマホ用の調整
+  // より洗練された上下グラデーション効果
+  &::before {
+    content: '';
+    position: sticky;
+    top: -0.5rem;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: linear-gradient(to bottom, 
+      $background-color 0%, 
+      rgba($background-color, 0.95) 30%,
+      rgba($background-color, 0.8) 60%,
+      transparent 100%);
+    pointer-events: none;
+    z-index: 10;
+    margin-bottom: -24px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &::after {
+    content: '';
+    position: sticky;
+    bottom: -0.5rem;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: linear-gradient(to top,
+      $background-color 0%,
+      rgba($background-color, 0.95) 30%,
+      rgba($background-color, 0.8) 60%,
+      transparent 100%);
+    pointer-events: none;
+    z-index: 10;
+    margin-top: -24px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  // スクロール可能な状態でのみグラデーションを表示
+  &.scrollable-top::before,
+  &.scrollable-bottom::after {
+    opacity: 1;
+  }
+  
+  // スクロールインジケーター
+  &.has-scroll {
+    &::before {
+      box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.05);
+    }
+    &::after {
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    }
+  }
+  
+  @media (max-width: 480px) { 
+    & { 
+      max-height: 50vh;
+      
+      &::before,
+      &::after {
+        height: 16px;
+        margin-bottom: -16px;
+        margin-top: -16px;
+      }
+    } 
+  }
 }
 
 // 横スクロール用のグラデーション効果

@@ -92,6 +92,12 @@
   // mixinは最後に呼び出し（nested ruleを含むため）
   @include app-scrollable-list($app-bg-color, 60vh);
   
+  // スクロール可能性を動的に判定するためのJavaScript連携用クラス
+  &.has-scroll {
+    // スクロールヒントの微細なアニメーション
+    animation: scrollHint 2s ease-in-out infinite;
+  }
+  
   .no-workspaces {
     @include app-text-style;
     text-align: center;
@@ -190,5 +196,15 @@
   
   .workspace-item {
     padding: $app-padding-mobile;
+  }
+}
+
+// スクロール可能エリアのヒントアニメーション
+@keyframes scrollHint {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-2px); 
   }
 }
