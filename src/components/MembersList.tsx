@@ -28,38 +28,28 @@ export function MembersList({ workspaceId }: MembersListProps) {
       setLoading(true)
       setError(null)
 
-      const { data, error: fetchError } = await supabase
-        .from('workspace_members')
-        .select(`
-          id,
-          workspace_id,
-          user_id,
-          role,
-          joined_at,
-          profiles:user_id (
-            username
-          )
-        `)
-        .eq('workspace_id', workspaceId)
-        .order('joined_at', { ascending: true })
+      // RPC関数を使用してワークスペースメンバーを取得（RLS回避）
+      const { data, error: rpcError } = await supabase
+        .rpc('get_workspace_members_safe', { workspace_id_param: workspaceId })
 
-      if (fetchError) {
-        throw fetchError
+      if (rpcError) {
+        throw rpcError
       }
 
-      const formattedMembers: WorkspaceMember[] = (data || []).map((item: any) => ({
-        id: item.id,
-        workspace_id: item.workspace_id,
-        user_id: item.user_id,
-        role: item.role,
-        joined_at: item.joined_at,
-        profiles: {
-          username: Array.isArray(item.profiles) ?
-            item.profiles[0]?.username || 'Unknown' : item.profiles?.username || 'Unknown'
-        }
-      }))
-      
-      setMembers(formattedMembers)
+      if (data) {
+        const formattedMembers: WorkspaceMember[] = data.map((item: any) => ({
+          id: item.id || `${item.user_id}_member`,
+          workspace_id: workspaceId,
+          user_id: item.user_id,
+          role: item.role || 'member',
+          joined_at: item.joined_at || new Date().toISOString(),
+          profiles: {
+            username: item.username || 'Unknown'
+          }
+        }))
+
+        setMembers(formattedMembers)
+      }
     } catch (err: any) {
       console.error('メンバー取得エラー:', err)
       setError(err.message || 'メンバー情報の取得に失敗しました')
@@ -107,16 +97,16 @@ export function MembersList({ workspaceId }: MembersListProps) {
     )
   }
 
-    return (
+  return (
     <section className="members-section">
-        <h2 className="members-title">Members sharing ideas</h2>
-        <div className="members-list">
+      <h2 className="members-title">Members sharing ideas</h2>
+      <div className="members-list">
         {members.map((member, index) => (
-            <div key={member.id} className="member-card">
-                #{index + 1} {member.profiles.username} {member.role === 'owner' ? 'オーナー' : 'メンバー'} {new Date(member.joined_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'numeric', day: 'numeric' })}
-            </div>
+          <div key={member.id} className="member-card">
+            #{index + 1} {member.profiles.username} {member.role === 'owner' ? 'オーナー' : 'メンバー'} {new Date(member.joined_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'numeric', day: 'numeric' })}
+          </div>
         ))}
-        </div>
+      </div>
     </section>
-    )
+  )
 }
