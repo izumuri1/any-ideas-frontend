@@ -33,6 +33,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Login } from './components/Login'
 import { SignUp } from './components/SignUp'
 import { CreateWorkspace } from './components/CreateWorkspace'
+import { InviteHandler } from './components/InviteHandler'
 import Home from './pages/Home'
 import DiscussionScreen from './pages/DiscussionScreen'
 import { ProposalDetailScreen } from './pages/ProposalDetailScreen'
@@ -50,6 +51,9 @@ function App() {
   return (
     <>
       <Routes>
+        {/* 招待URL用ルート - 認証状態に関係なく常にアクセス可能 */}
+        <Route path="/invite/:token" element={<InviteHandler />} />
+        
         {/* 認証が必要なルート */}
         {/* 認証されているユーザー（userが存在）なら、これらのページに移動できる */}
         {user ? (

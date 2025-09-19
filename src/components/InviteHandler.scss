@@ -1,0 +1,105 @@
+// src/components/InviteHandler.scss
+@use '../styles/variables' as *;
+
+//////////////////////////////////////////////////////////////
+// 招待エラー画面
+//////////////////////////////////////////////////////////////
+
+.invite-error-container {
+  @include app-fullscreen-container;
+}
+
+.invite-error-card {
+  @include app-large-card-style($app-bg-color);
+  text-align: center;
+  
+  .logo {
+    @include app-logo-style;
+    margin-bottom: $app-padding-xlarge;
+    animation: logoFadeIn $app-animation-slow $app-ease-out;
+  }
+  
+  .error-content {
+    animation: fadeInUp 0.8s $app-ease-out 0.2s both;
+    
+    .error-title {
+      @include app-title-style;
+      color: $app-error-color;
+      margin-bottom: $app-padding-mobile;
+    }
+    
+    .error-message {
+      @include app-text-style;
+      color: $app-gray-dark;
+      margin-bottom: $app-padding-xlarge;
+      line-height: 1.6;
+    }
+    
+    .btn-back {
+      @include app-button-primary;
+      max-width: 200px;
+      margin: 0 auto;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 招待処理中画面
+//////////////////////////////////////////////////////////////
+
+.invite-processing-container {
+  @include app-fullscreen-container;
+}
+
+.invite-processing-card {
+  @include app-large-card-style($app-bg-color);
+  text-align: center;
+  
+  .logo {
+    @include app-logo-style;
+    margin-bottom: $app-padding-xlarge;
+    animation: logoFadeIn $app-animation-slow $app-ease-out;
+  }
+  
+  .processing-content {
+    animation: fadeInUp 0.8s $app-ease-out 0.2s both;
+    
+    .processing-title {
+      @include app-title-style;
+      color: $app-btn-primary;
+      margin-bottom: $app-padding-mobile;
+    }
+    
+    .processing-message {
+      @include app-text-style;
+      color: $app-gray-dark;
+      line-height: 1.6;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// アニメーション
+//////////////////////////////////////////////////////////////
+
+@keyframes logoFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
