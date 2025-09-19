@@ -127,6 +127,12 @@
 .workspace-item {
   @include app-workspace-item;
   
+  .workspace-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
   .workspace-arrow {
     font-size: $app-font-title;
     color: $app-gray-medium;
@@ -142,6 +148,32 @@
     .workspace-created {
       @include app-small-text-style;
     }
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 招待ボタンスタイル
+//////////////////////////////////////////////////////////////
+
+.btn-invite {
+  padding: 0.5rem $app-padding-large;
+  background-color: $app-btn-primary;
+  color: $app-white;
+  border: none;
+  border-radius: $app-radius-input;
+  font-size: $app-font-small;
+  font-weight: $app-weight-medium;
+  cursor: pointer;
+  transition: all $app-animation-fast $app-ease-out;
+  
+  &:hover:not(:disabled) {
+    background-color: $app-btn-primary-hover;
+    transform: translateY(-1px);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
@@ -177,6 +209,118 @@
   
   &:hover:not(:disabled) {
     background-color: $app-gray-darker;
+  }
+}
+
+//////////////////////////////////////////////////////////////
+// 招待モーダルスタイル
+//////////////////////////////////////////////////////////////
+
+.invite-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $app-padding-mobile;
+  
+  .invite-modal-content {
+    @include app-card-style($app-white);
+    width: 100%;
+    max-width: 400px;
+    padding: $app-padding-xlarge;
+    animation: modalSlideUp 0.3s $app-ease-out;
+    
+    .modal-header {
+      text-align: center;
+      margin-bottom: $app-padding-large;
+      
+      .modal-title {
+        @include app-title-style;
+        margin-bottom: 0.5rem;
+        color: $app-text-color;
+      }
+      
+      .modal-subtitle {
+        @include app-text-style;
+        color: $app-gray-dark;
+        font-size: $app-font-small;
+      }
+    }
+    
+    .invite-url-container {
+      background-color: $app-gray-light;
+      border-radius: $app-radius-input;
+      padding: $app-padding-mobile;
+      margin-bottom: $app-padding-large;
+      border: 1px solid $app-gray-medium;
+      
+      .invite-url {
+        font-family: monospace;
+        font-size: $app-font-small;
+        color: $app-text-color;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: $app-padding-mobile;
+      
+      .btn-copy {
+        flex: 1;
+        padding: $app-padding-mobile;
+        background-color: $app-btn-primary;
+        color: $app-white;
+        border: none;
+        border-radius: $app-radius-input;
+        cursor: pointer;
+        font-weight: $app-weight-medium;
+        transition: all $app-animation-fast $app-ease-out;
+        font-size: $app-font-body;
+        
+        &:hover {
+          background-color: $app-btn-primary-hover;
+          transform: translateY(-1px);
+        }
+        
+        &.copied {
+          background-color: $app-btn-secondary;
+        }
+      }
+      
+    .btn-close {
+        @include app-button-base;
+        flex: 1;
+        background-color: $app-gray-medium;
+        color: $app-white;
+        padding: $app-padding-mobile;
+        font-size: $app-font-body;
+        min-height: auto;
+        
+        &:hover:not(:disabled) {
+          background-color: $app-gray-darker;
+        }
+      }
+    }
+  }
+}
+
+// モーダルアニメーション
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

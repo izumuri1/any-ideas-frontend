@@ -36,6 +36,10 @@ export function CreateWorkspace() {
   const [isLoading, setIsLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [currentInviteWorkspace, setCurrentInviteWorkspace] = useState<Workspace | null>(null);
+  const [inviteUrl, setInviteUrl] = useState("");
+  const [copyButtonText, setCopyButtonText] = useState("リンクをコピー");
 
   // React Hook Formの初期化
   const {
@@ -241,6 +245,76 @@ export function CreateWorkspace() {
     reset();
   };
 
+  // 招待リンク生成処理
+  const generateInviteLink = async (workspace: Workspace) => {
+    if (!user) return;
+
+    try {
+      setIsLoading(true);
+      
+      // ランダムトークンを生成 (64文字)
+      const token = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+
+      // 招待トークンをDBに保存
+      const { error } = await supabase
+        .from('invitation_tokens')
+        .insert({
+          token,
+          workspace_id: workspace.id,
+          created_by: user.id,
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24時間後
+          max_uses: 1,
+          used_count: 0,
+          is_active: true
+        });
+
+      if (error) throw error;
+
+      // 招待URLを生成
+      const inviteUrl = `${window.location.origin}/invite/${token}`;
+      
+      setCurrentInviteWorkspace(workspace);
+      setInviteUrl(inviteUrl);
+      setShowInviteModal(true);
+      setCopyButtonText("リンクをコピー");
+      
+    } catch (error: any) {
+      console.error('招待リンク生成エラー:', error);
+      setSubmitError('招待リンクの生成に失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 招待リンクをコピー
+  const copyInviteLink = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      setCopyButtonText("コピーしました！");
+      setTimeout(() => setCopyButtonText("リンクをコピー"), 2000);
+    } catch (error) {
+      // フォールバック処理
+      const textArea = document.createElement('textarea');
+      textArea.value = inviteUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopyButtonText("コピーしました！");
+      setTimeout(() => setCopyButtonText("リンクをコピー"), 2000);
+    }
+  };
+
+  // 招待モーダルを閉じる
+  const closeInviteModal = () => {
+    setShowInviteModal(false);
+    setCurrentInviteWorkspace(null);
+    setInviteUrl("");
+    setCopyButtonText("リンクをコピー");
+  };
+
   const handleWorkspaceSelect = async (workspace: Workspace) => {
     try {
       // プロフィールの最終ワークスペースを更新
@@ -380,7 +454,21 @@ export function CreateWorkspace() {
                         </span>
                       </div>
                     </div>
-                    <div className="workspace-arrow">→</div>
+                    <div className="workspace-actions">
+                      {workspace.owner_id === user?.id && (
+                        <button
+                          className="btn-invite"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            generateInviteLink(workspace);
+                          }}
+                          disabled={isLoading}
+                        >
+                          招待
+                        </button>
+                      )}
+                      <div className="workspace-arrow">→</div>
+                    </div>
                   </div>
                 ))
               )}
@@ -397,6 +485,31 @@ export function CreateWorkspace() {
           </>
         )}
       </div>
+      
+      {/* 招待モーダル */}
+      {showInviteModal && currentInviteWorkspace && (
+        <div className="invite-modal" onClick={closeInviteModal}>
+          <div className="invite-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">{currentInviteWorkspace.name}</h2>
+              <p className="modal-subtitle">招待リンクを共有してメンバーを招待しよう</p>
+            </div>
+            
+            <div className="invite-url-container">
+              <div className="invite-url">{inviteUrl}</div>
+            </div>
+            
+            <div className="modal-actions">
+              <button className="btn-copy" onClick={copyInviteLink}>
+                {copyButtonText}
+              </button>
+              <button className="btn-close" onClick={closeInviteModal}>
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
