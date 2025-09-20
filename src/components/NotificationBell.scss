@@ -1,0 +1,189 @@
+// src/components/NotificationBell.scss
+// 通知ベルコンポーネントのスタイル
+@use '../styles/variables' as *;
+
+.notification-bell {
+  position: relative;
+  display: inline-block;
+
+  .notification-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: $app-padding-small;
+    border-radius: 50%;
+    transition: background-color $app-animation-fast ease;
+    color: $app-white;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .bell-icon {
+      font-size: $app-font-subtitle;
+      display: block;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: $app-error-color;
+      color: $app-white;
+      border-radius: 50%;
+      font-size: $app-font-small;
+      min-width: 1.2rem;
+      height: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: $app-weight-bold;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  .notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    max-height: 400px;
+    background: $app-white;
+    border-radius: $app-radius-card;
+    box-shadow: $app-shadow-card;
+    z-index: 1000;
+    overflow: hidden;
+    margin-top: $app-padding-small;
+
+    // 矢印を追加
+    &::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid $app-white;
+    }
+
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $app-padding-mobile;
+      border-bottom: 1px solid $app-gray-light;
+      background-color: $app-gray-light;
+
+      h3 {
+        @include app-title-style;
+        margin: 0;
+        font-size: $app-font-body;
+      }
+
+      .mark-all-read {
+        @include app-button-base;
+        background: none;
+        border: none;
+        color: $app-btn-primary;
+        font-size: $app-font-small;
+        padding: $app-padding-small;
+        border-radius: $app-radius-button;
+        min-height: auto;
+
+        &:hover {
+          background-color: rgba($app-btn-primary, 0.1);
+        }
+      }
+    }
+
+    .notification-list {
+      max-height: 300px;
+      overflow-y: auto;
+
+      // スクロールバーのスタイル
+      @include app-scrollable-area;
+
+      .notification-loading,
+      .no-notifications {
+        padding: $app-padding-xlarge;
+        text-align: center;
+        color: $app-gray-medium;
+        font-size: $app-font-body;
+      }
+
+      .notification-item {
+        padding: $app-padding-mobile;
+        border-bottom: 1px solid $app-gray-light;
+        cursor: pointer;
+        position: relative;
+        transition: background-color $app-animation-fast ease;
+        color: $app-text-color;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background-color: $app-gray-light;
+        }
+
+        &.unread {
+          background-color: rgba($app-btn-primary, 0.05);
+          border-left: 3px solid $app-btn-primary;
+          
+          .unread-indicator {
+            position: absolute;
+            left: $app-padding-small;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background-color: $app-btn-primary;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+          }
+        }
+
+        .notification-message {
+          @include app-text-style;
+          font-size: $app-font-body;
+          line-height: 1.4;
+          margin-bottom: $app-padding-small;
+          padding-left: $app-padding-mobile;
+        }
+
+        .notification-time {
+          font-size: $app-font-small;
+          color: $app-gray-medium;
+          padding-left: $app-padding-mobile;
+        }
+      }
+    }
+  }
+}
+
+// アニメーション
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+// レスポンシブ対応
+@media (max-width: 768px) {
+  .notification-bell {
+    .notification-dropdown {
+      width: 280px;
+      right: -($app-padding-large); // 画面端に合わせて調整
+    }
+  }
+}

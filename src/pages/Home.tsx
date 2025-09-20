@@ -10,6 +10,7 @@ import { MembersList } from '../components/MembersList'
 import FormField from '../components/common/FormField'  // ← 既存import
 import { useForm } from '../hooks/useForm'  // ← 既存import
 import IdeaCard from '../components/IdeaCard/IdeaCard' // ← 新規import（IdeaCard化のみの追加）
+import { NotificationBell } from '../components/NotificationBell' // ← 追加
 import './Home.scss'
 
 // 型定義（元のまま完全維持）
@@ -511,6 +512,8 @@ export default function Home() {
             </>
           )}
         </div>
+        
+        <NotificationBell workspaceId={workspaceId!} />
       </PageHeader>
 
       <main className="home-main">
