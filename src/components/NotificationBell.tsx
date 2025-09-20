@@ -18,7 +18,7 @@ interface Notification {
 
 interface NotificationWithProfile extends Notification {
   actor_profile: {
-    display_name: string;
+    username: string;
   };
 }
 
@@ -42,10 +42,10 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ workspaceId 
       const { data, error } = await supabase
         .from('notifications')
         .select(`
-          *,
-          actor_profile:profiles!actor_user_id (
-            display_name
-          )
+            *,
+            actor_profile:profiles!actor_user_id (
+            username
+            )
         `)
         .eq('workspace_id', workspaceId)
         .eq('user_id', user.id)
@@ -56,7 +56,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ workspaceId 
 
       const notificationsWithProfile = data.map(notification => ({
         ...notification,
-        actor_profile: notification.actor_profile || { display_name: '不明なユーザー' }
+        actor_profile: notification.actor_profile || { username: '不明なユーザー' }
       }));
 
       setNotifications(notificationsWithProfile);
