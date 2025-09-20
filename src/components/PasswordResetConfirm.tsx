@@ -45,32 +45,50 @@ export function PasswordResetConfirm() {
   })
 
     useEffect(() => {
-        // Supabaseのパスワードリセット処理
-        const handlePasswordReset = async () => {
-          // URLハッシュ全体を取得
-          const hash = window.location.hash
-          
-          if (hash) {
-            try {
-              // Supabaseのauth状態変更を監視してトークンを自動処理
-              const { data, error } = await supabase.auth.getSession()
-              if (data.session) {
-                console.log('パスワードリセットセッションが確立されました')
-              } else if (error) {
-                console.error('セッション取得エラー:', error)
+            // パスワードリセット用のセッション処理
+            const handlePasswordReset = async () => {
+            const hash = window.location.hash.substring(1)
+            
+            if (hash) {
+                try {
+                // URLハッシュから直接トークンを取得してセッション設定
+                if (hash.includes('access_token')) {
+                    // 古い形式の処理
+                    const params = new URLSearchParams(hash)
+                    const accessToken = params.get('access_token')
+                    const refreshToken = params.get('refresh_token')
+                    
+                    if (accessToken && refreshToken) {
+                    await supabase.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken
+                    })
+                    }
+                } else {
+                // 新しい形式：ハッシュがトークンそのもの
+                const { error } = await supabase.auth.verifyOtp({
+                  token_hash: hash,
+                  type: 'recovery'
+                })
+                
+                if (error) {
+                  console.error('トークン検証エラー:', error)
+                  setSubmitError('無効なリセットリンクです。再度パスワードリセットを行ってください。')
+                } else {
+                  console.log('パスワードリセットトークンが検証されました')
+                }
+                }
+                } catch (error) {
+                console.error('パスワードリセット処理エラー:', error)
+                setSubmitError('パスワードリセット処理中にエラーが発生しました。')
+                }
+            } else {
                 setSubmitError('無効なリセットリンクです。再度パスワードリセットを行ってください。')
-              }
-            } catch (error) {
-              console.error('パスワードリセット処理エラー:', error)
-              setSubmitError('パスワードリセット処理中にエラーが発生しました。')
             }
-          } else {
-            setSubmitError('無効なリセットリンクです。再度パスワードリセットを行ってください。')
-          }
-        }
-        
-        handlePasswordReset()
-    }, [])
+            }
+            
+            handlePasswordReset()
+        }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
