@@ -228,7 +228,15 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 
   const handleLoginClick = () => {
-    navigate('/login')
+    // 現在のクエリパラメータを保持してログイン画面に遷移
+    const inviteToken = searchParams.get('inviteToken')
+    const workspaceName = searchParams.get('workspaceName')
+    
+    if (inviteToken) {
+      navigate(`/login?inviteToken=${inviteToken}&workspaceName=${workspaceName || ''}`)
+    } else {
+      navigate('/login')
+    }
   }
 
   // 4. レンダリング（画面処理）

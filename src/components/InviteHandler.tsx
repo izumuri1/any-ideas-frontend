@@ -101,6 +101,7 @@ export function InviteHandler() {
         await joinWorkspace(processedData);
       } else {
         // 未ログインの場合は新規登録画面にトークンを渡して遷移
+        // ただし、既存ユーザーがログインしてくる可能性も考慮
         navigate(`/signup?inviteToken=${token}&workspaceName=${encodeURIComponent(processedData.workspaces?.name || 'ワークスペース')}`);
       }
 

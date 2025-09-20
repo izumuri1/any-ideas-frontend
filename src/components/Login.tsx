@@ -1,7 +1,7 @@
 // src/components/Login.tsx - useForm + FormFieldリファクタリング版
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import FormField from './common/FormField'  // 追加
 import { useForm } from '../hooks/useForm'   // 追加（React Hook Form → 自作useFormに変更）
 import './Login.scss'
@@ -26,6 +26,7 @@ interface LoginFormData {
 export function Login() {
   const { signIn, loading } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [submitError, setSubmitError] = useState('')
 
   // リファクタリング：React Hook Form → 自作useFormフックに変更
@@ -92,6 +93,16 @@ export function Login() {
           default:
             setSubmitError('ログインに失敗しました。メールアドレスとパスワードを確認してください。')
         }
+      } else {
+        // ログイン成功時の処理を追加
+        const searchParams = new URLSearchParams(location.search)
+        const inviteToken = searchParams.get('inviteToken')
+        
+        if (inviteToken) {
+          // 招待トークンがある場合は InviteHandler に処理を委譲
+          navigate(`/invite/${inviteToken}`)
+        }
+        // 招待トークンがない場合の処理は AuthContext と App.tsx のルーティングに任せる
       }
     } catch (err) {
       console.error('Login error:', err)
