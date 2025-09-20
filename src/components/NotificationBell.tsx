@@ -17,7 +17,7 @@ interface Notification {
 }
 
 interface NotificationWithProfile extends Notification {
-  profiles: {
+  actor_profile: {
     username: string;
   };
 }
@@ -34,39 +34,47 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ workspaceId 
   const [loading, setLoading] = useState(false);
 
   // 通知データを取得
-  const fetchNotifications = async () => {
+    const fetchNotifications = async () => {
     if (!user) return;
 
     try {
-      setLoading(true);
-      const { data, error } = await supabase
+        setLoading(true);
+        
+        // 1. 通知データを取得
+        const { data: notificationsData, error: notificationsError } = await supabase
         .from('notifications')
-        .select(`
-            *,
-            profiles!notifications_actor_user_id_fkey (
-            username
-            )
-        `)
+        .select('*')
         .eq('workspace_id', workspaceId)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+        if (notificationsError) throw notificationsError;
 
-      const notificationsWithProfile = data.map(notification => ({
-        ...notification,
-        actor_profile: notification.profiles || { username: '不明なユーザー' }
-        }));
+        // 2. 各通知のactor_user_idからプロフィール情報を取得
+        const notificationsWithProfile = await Promise.all(
+        notificationsData.map(async (notification) => {
+            const { data: profileData } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', notification.actor_user_id)
+            .single();
 
-      setNotifications(notificationsWithProfile);
-      setUnreadCount(data.filter(n => !n.is_read).length);
+            return {
+            ...notification,
+            actor_profile: profileData || { username: '不明なユーザー' }
+            };
+        })
+        );
+
+        setNotifications(notificationsWithProfile);
+        setUnreadCount(notificationsData.filter(n => !n.is_read).length);
     } catch (error) {
-      console.error('通知取得エラー:', error);
+        console.error('通知取得エラー:', error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+    };
 
   // 通知を既読にする
   const markAsRead = async (notificationId: string) => {
