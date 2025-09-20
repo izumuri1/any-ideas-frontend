@@ -6,42 +6,51 @@
   position: relative;
   display: inline-block;
 
-  .notification-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    padding: $app-padding-small;
-    border-radius: 50%;
-    transition: background-color $app-animation-fast ease;
+.notification-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: $app-padding-small;
+  border-radius: 50%;
+  transition: background-color $app-animation-fast ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .notification-badge-with-count {
+    background-color: $app-error-color;
     color: $app-white;
+    border-radius: 50%;
+    font-size: $app-font-small;
+    font-weight: $app-weight-bold;
+    min-width: 1.4rem;
+    height: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+  }
 
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .bell-icon {
-      font-size: $app-font-subtitle;
-      display: block;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: $app-error-color;
-      color: $app-white;
+  .notification-dot {
+    background-color: $app-gray-medium;
+    border-radius: 50%;
+    width: 1.4rem;
+    height: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background-color: $app-text-color;
       border-radius: 50%;
-      font-size: $app-font-small;
-      min-width: 1.2rem;
-      height: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: $app-weight-bold;
-      animation: pulse 2s infinite;
     }
   }
+}
 
   .notification-dropdown {
     position: absolute;

@@ -152,16 +152,17 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ workspaceId 
 
   return (
     <div className="notification-bell">
-      <button 
+        <button 
         className="notification-button"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="通知"
-      >
-        <span className="bell-icon">🔔</span>
-        {unreadCount > 0 && (
-          <span className="notification-badge">{unreadCount}</span>
+        >
+        {unreadCount > 0 ? (
+            <span className="notification-badge-with-count">{unreadCount}</span>
+        ) : (
+            <span className="notification-dot"></span>
         )}
-      </button>
+        </button>
 
       {isOpen && (
         <div className="notification-dropdown">
