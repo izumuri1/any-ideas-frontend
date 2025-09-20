@@ -45,18 +45,31 @@ export function PasswordResetConfirm() {
   })
 
     useEffect(() => {
-        // URLのハッシュフラグメントからトークンを取得
-        const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        const accessToken = hashParams.get('access_token')
-        const refreshToken = hashParams.get('refresh_token')
-        
-        if (accessToken && refreshToken) {
-        // Supabaseセッションを設定
-        supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
-        })
+        // Supabaseのパスワードリセット処理
+        const handlePasswordReset = async () => {
+          // URLハッシュ全体を取得
+          const hash = window.location.hash
+          
+          if (hash) {
+            try {
+              // Supabaseのauth状態変更を監視してトークンを自動処理
+              const { data, error } = await supabase.auth.getSession()
+              if (data.session) {
+                console.log('パスワードリセットセッションが確立されました')
+              } else if (error) {
+                console.error('セッション取得エラー:', error)
+                setSubmitError('無効なリセットリンクです。再度パスワードリセットを行ってください。')
+              }
+            } catch (error) {
+              console.error('パスワードリセット処理エラー:', error)
+              setSubmitError('パスワードリセット処理中にエラーが発生しました。')
+            }
+          } else {
+            setSubmitError('無効なリセットリンクです。再度パスワードリセットを行ってください。')
+          }
         }
+        
+        handlePasswordReset()
     }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
