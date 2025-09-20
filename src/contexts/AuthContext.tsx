@@ -129,9 +129,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // 3. ページを閉じる時
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
         // asyncはなくても良いが、将来の拡張性確保のため記載
-      async (_: AuthChangeEvent, session: Session | null) => {
+      async (event: AuthChangeEvent, session: Session | null) => {
         setSession(session)
         setUser(session?.user ?? null)
+        
+        // ログイン成功時に保留中の招待があるかチェック
+        if (event === 'SIGNED_IN' && session?.user) {
+          const pendingInvite = sessionStorage.getItem('pendingInvite');
+          if (pendingInvite) {
+            try {
+              const inviteData = JSON.parse(pendingInvite);
+              sessionStorage.removeItem('pendingInvite');
+              
+              // 少し遅延を入れてからリダイレクト（認証状態が確実に設定されるまで）
+              setTimeout(() => {
+                window.location.href = `/invite/${inviteData.token}`;
+              }, 100);
+            } catch (error) {
+              console.error('保留中の招待処理エラー:', error);
+              sessionStorage.removeItem('pendingInvite');
+            }
+          }
+        }
+        
         setLoading(false)
       }
     )

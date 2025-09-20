@@ -99,11 +99,17 @@ export function InviteHandler() {
       // 既にログインしているユーザーの場合
       if (user) {
         await joinWorkspace(processedData);
-      } else {
-        // 未ログインの場合は新規登録画面にトークンを渡して遷移
-        // ただし、既存ユーザーがログインしてくる可能性も考慮
+        } else {
+        // 未ログインの場合：招待データをセッションストレージに保存してから遷移
+        sessionStorage.setItem('pendingInvite', JSON.stringify({
+            token: token,
+            workspaceId: processedData.workspace_id,
+            workspaceName: processedData.workspaces?.name || 'ワークスペース'
+        }));
+        
+        // 新規登録画面にトークンを渡して遷移
         navigate(`/signup?inviteToken=${token}&workspaceName=${encodeURIComponent(processedData.workspaces?.name || 'ワークスペース')}`);
-      }
+        }
 
     } catch (error: any) {
       console.error('招待トークン検証エラー:', error);
