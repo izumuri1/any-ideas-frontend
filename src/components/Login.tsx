@@ -116,6 +116,11 @@ export function Login() {
     navigate('/signup')
   }
 
+  // パスワードリセット画面への遷移
+  const handlePasswordResetClick = () => {
+    navigate('/password-reset')
+  }
+
   // 4. レンダリング（画面処理）
   return (
     <div className="login-container">
@@ -177,6 +182,16 @@ export function Login() {
               className="link-button"
             >
               新規アカウント登録
+            </button>
+          </p>
+
+          <p className="auth-switch">
+            <button 
+              type="button"
+              onClick={handlePasswordResetClick}
+              className="link-button"
+            >
+              パスワードを忘れた方はこちら
             </button>
           </p>
         </form>

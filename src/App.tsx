@@ -32,6 +32,8 @@ import { useAuth } from './contexts/AuthContext'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Login } from './components/Login'
 import { SignUp } from './components/SignUp'
+import { PasswordReset } from './components/PasswordReset'
+import { PasswordResetConfirm } from './components/PasswordResetConfirm'
 import { CreateWorkspace } from './components/CreateWorkspace'
 import { InviteHandler } from './components/InviteHandler'
 import Home from './pages/Home'
@@ -83,6 +85,8 @@ function App() {
             {/* 認証が不要なルート */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/password-reset" element={<PasswordReset />} />
+            <Route path="/password-reset-confirm" element={<PasswordResetConfirm />} />
             {/* ログイン画面以外にアクセスしたらログインにリダイレクト */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </>
