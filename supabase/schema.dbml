@@ -1,0 +1,398 @@
+// Any ideas? データベース設計 (Supabase対応版)
+// アイデア共有・検討プラットフォーム
+
+Project "Any_Ideas" {
+  database_type: 'PostgreSQL (Supabase)'
+  Note: 'Supabase Authを活用したアイデア共有・検討・実行管理システム'
+}
+
+// ===========================
+// Supabase管理テーブル
+// ===========================
+// auth.users テーブル（Supabaseが自動管理）
+// - id: UUID (プライマリキー)
+// - email: メールアドレス
+// - encrypted_password: 暗号化されたパスワード
+// 認証済みか管理。メール確認フローに必須。
+// - email_confirmed_at: メール確認日時
+// アプリ固有のユーザー属性などをJSONで保存。
+// - raw_app_meta_data: アプリケーションメタデータ
+// ユーザー属性やカスタム情報を保存する領域。JSON形式。
+// - raw_user_meta_data: ユーザーメタデータ
+// - created_at: 作成日時
+// - updated_at: 更新日時
+
+// ===========================
+// アプリケーション管理テーブル
+// ===========================
+
+// プロフィールテーブル（auth.usersを拡張）
+Table profiles {
+  id uuid [pk, note: 'auth.users.idと1対1で対応（★★★外部キー制約はDBで設定★★★）']
+  username varchar(100) [not null, note: 'アプリに表示するユーザー名（ユニーク）']
+  last_workspace_id uuid [ref: > workspaces.id, null, note: '最後に使用したワークスペースID']
+  default_workspace_id uuid [ref: > workspaces.id, null, note: 'デフォルトワークスペースID（ユーザー設定）']
+  last_workspace_accessed_at timestamp [null, note: '最後にワークスペースにアクセスした日時']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    username
+    last_workspace_id
+    default_workspace_id
+  }
+  
+  Note: '''
+    Supabase推奨パターン：
+    - auth.usersの作成時にトリガーで自動作成
+    - RLSでユーザー自身のプロフィールのみ更新可能に設定
+    - ワークスペース遷移のためのユーザー設定を管理
+    - last_workspace_id: ログイン時の自動遷移に使用
+    - default_workspace_id: ユーザーが手動設定したデフォルト
+    - ★★★実際のDBではALTER TABLE profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE;
+  '''
+}
+
+// ワークスペーステーブル
+Table workspaces {
+  // デフォルト値として UUID を自動生成する関数(default: `gen_random_uuid()`)
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(255) [not null]
+  // ref: > profiles.id は、DBML における 外部キー（Foreign Key）制約の定義
+  // このカラムは profiles テーブルの id カラムを参照する外部キー
+  // owner_id に入る値は、必ず profiles テーブルの id に存在する UUID でなければならない
+  // SQL:owner_id UUID NOT NULL REFERENCES profiles(id)
+  // これにより次のメリットを得られる
+    // - データの整合性が保たれる（孤立した owner_id を防ぐ）
+    // - JOIN クエリで profiles の情報を簡単に取得できる
+    // - 削除時の挙動（CASCADE など）も設定可能
+  owner_id uuid [not null, ref: > profiles.id]
+  is_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+  
+  // データベースが 検索・絞り込み・ソート を高速に行うための「目次」のようなもの
+  // インデックスがないと、データベースは全件スキャンして探す必要がある
+  indexes {
+    owner_id
+    is_active
+  }
+
+    Note: '''
+        - ワークスペースの所有者はprofilesテーブルのユーザー
+        - 招待トークンはユニークで、ワークスペースごとに生成
+        - RLSポリシーでワークスペースメンバーのみアクセス可能に設定
+    '''
+}
+
+// ワークスペースメンバーテーブル（多対多の中間テーブル）
+Table workspace_members {
+  id uuid [pk, default: `gen_random_uuid()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  user_id uuid [not null, ref: > profiles.id]
+  role varchar(50) [not null, default: 'member', note: 'owner | admin | member']
+  joined_at timestamp [not null, default: `now()`]
+  invited_by uuid [ref: > profiles.id, null]
+  
+  indexes {
+    (workspace_id, user_id) [unique]
+    user_id
+    workspace_id
+  }
+    Note: '''
+        - ワークスペースごとのメンバーシップを管理
+        - ユーザーは複数のワークスペースに参加可能
+        - RLSポリシーでワークスペースメンバーのみアクセス可能に設定
+        - invited_byは招待したユーザーを参照
+    '''
+}
+
+// アイデアテーブル
+Table ideas {
+  id uuid [pk, default: `gen_random_uuid()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  creator_id uuid [not null, ref: > profiles.id]
+  idea_name varchar(100) [not null, note: 'アイデア名']  // ← 新規追加
+  when_text varchar(500) [note: 'いつ頃？']
+  who_text varchar(500) [note: '誰と？']
+  what_text varchar(500) [not null, note: '何をしたい？']
+  status varchar(50) [not null, default: 'our_ideas', note: 'our_ideas | thinking_about | trying']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+  moved_to_thinking_at timestamp [null]
+  moved_to_trying_at timestamp [null]
+  deleted_at timestamp [null, note: '論理削除用']
+  
+  indexes {
+    workspace_id
+    creator_id
+    status
+    deleted_at
+    idea_name  // ← 新規追加（検索・絞り込み用）
+  }
+    Note: '''
+        設計：
+        - アイデアはワークスペースに紐づく
+        - ステータス管理（our_ideas, thinking_about, trying）
+        権限管理：
+        - 作成: ワークスペースメンバー全員
+        - 閲覧: ワークスペースメンバー全員
+        - ステータス変更（進める）: creator_idのユーザーのみ
+        - 削除（論理削除）: creator_idのユーザーのみ
+        - いいね: ワークスペースメンバー全員
+    '''
+}
+
+// アイデアの「いいね」テーブル
+Table idea_likes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  idea_id uuid [not null, ref: > ideas.id]
+  user_id uuid [not null, ref: > profiles.id]
+  created_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    (idea_id, user_id) [unique]
+    idea_id
+    user_id
+  }
+    Note: '''
+        - アイデアに対する「いいね」を管理
+        - ユーザーは1つのアイデアに対して1回のみ「いいね」可能
+        - RLSポリシーでワークスペースメンバーのみアクセス可能に設定
+    '''
+}
+
+// 提案テーブル
+Table proposals {
+  id uuid [pk, default: `gen_random_uuid()`]
+  idea_id uuid [not null, ref: > ideas.id]
+  proposer_id uuid [not null, ref: > profiles.id]
+  proposal_type varchar(50) [not null, note: 'period | todo | not_todo | budget']
+  content text [not null]
+  start_date date [null, note: '実施期間開始日（periodタイプの場合）']
+  end_date date [null, note: '実施期間終了日（periodタイプの場合）']
+  todo_text varchar(500) [null, note: 'TODO内容（todoタイプの場合）']
+  not_todo_text varchar(500) [null, note: 'やらないこと（not_todoタイプの場合）']   
+  budget_text varchar(500) [null, note: '想定予算額・予算項目(budgetタイプの場合)']
+  is_adopted boolean [not null, default: false, note: '採用されたかどうか']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+  adopted_at timestamp [null]
+  adopted_by uuid [ref: > profiles.id, null]
+  deleted_at timestamp [null, note: '論理削除用']
+  
+  indexes {
+    idea_id
+    proposer_id
+    proposal_type
+    is_adopted
+    deleted_at
+  }
+    Note: '''
+        権限管理：
+        - 作成: ワークスペースメンバー全員（1人が各タイプごとに複数提案可能）
+        - 閲覧: ワークスペースメンバー全員
+        - 削除（論理削除）: proposer_idのユーザーのみ（自分の提案のみ）
+        - 採用（is_adopted変更）: アイデアのcreator_idのユーザーのみ（誰の提案でも採用可能）
+        - 採用取り消し（戻す）: アイデアのcreator_idのユーザーのみ（誰の提案でも戻すことが可能）
+        - いいね: ワークスペースメンバー全員
+        ビジネスルール：
+        - 1つのアイデアに対して、1人のユーザーは各proposal_typeごとに複数提案可能
+        - 採用された提案は、adopted_byとadopted_atを記録
+        - Lets go with thatへの移動はis_adopted=trueで管理
+        - 同一ユーザーが同じタイプで複数の提案を作成できる（例：複数の期間提案）
+        実装時の注意：
+        - ユニーク制約は不要（1人が複数提案可能なため）
+        - UNIQUE (idea_id, proposer_id, proposal_type)の制約は設定しない
+        -- RLSポリシーはそのまま使用可能
+        -- 提案者のみ自分の提案を削除可能
+            CREATE POLICY "Proposers can delete own proposals" ON proposals
+            FOR UPDATE USING (
+            proposer_id = auth.uid() 
+            AND deleted_at IS NULL
+            );
+    '''
+}
+
+// 提案の「いいね」テーブル
+Table proposal_likes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  proposal_id uuid [not null, ref: > proposals.id]
+  user_id uuid [not null, ref: > profiles.id]
+  created_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    (proposal_id, user_id) [unique]
+    proposal_id
+    user_id
+  }
+    Note: '''
+            - 提案に対する「いいね」を管理
+            - ユーザーは1つの提案に対して1回のみ「いいね」可能
+            - RLSポリシーでワークスペースメンバーのみアクセス可能に設定
+        '''
+}
+
+// ワンタイム招待トークンテーブル
+Table invitation_tokens {
+  id uuid [pk, default: `gen_random_uuid()`]
+  token varchar(64) [not null, unique, note: '64文字のランダムトークン']
+  workspace_id uuid [not null, ref: > workspaces.id, note: '招待先ワークスペース']
+  created_by uuid [not null, ref: > profiles.id, note: '招待者']
+  expires_at timestamp [not null, note: '有効期限（24時間）']
+  max_uses int [not null, default: 1, note: 'ワンタイム用に1固定']
+  used_count int [not null, default: 0, note: '使用回数']
+  used_by uuid [ref: > profiles.id, null, note: '使用したユーザー']
+  used_at timestamp [null, note: '使用日時']
+  is_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    token
+    workspace_id
+    created_by
+    expires_at
+    is_active
+  }
+  
+  Note: '''
+    ワンタイム招待トークン管理:
+    - token: URLパスで使用する64文字ランダム文字列
+    - 1回使用で自動無効化（used_count >= max_uses）
+    - 24時間で自動期限切れ
+    - 使用履歴を記録（used_by, used_at）
+    - RLSでワークスペースメンバーのみアクセス可能
+  '''
+}
+
+// 通知テーブル（修正版）
+Table notifications {
+  id uuid [pk, default: `gen_random_uuid()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  user_id uuid [not null, ref: > profiles.id, note: '通知を受け取るユーザー']
+  actor_user_id uuid [not null, ref: > profiles.id, note: '行動を起こしたユーザー']
+  type varchar(50) [not null, note: 'idea_created | idea_moved | proposal_added | proposal_adopted | member_joined']
+  message text [not null, note: '通知メッセージ']
+  related_id uuid [null, note: '関連するアイデアやプロポーザルのID']
+  is_read boolean [not null, default: false]
+  created_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    (user_id, workspace_id)
+    (user_id, is_read)
+    workspace_id
+    created_at
+  }
+  
+  Note: '''
+    ワークスペース内の通知管理:
+    - user_id: 通知を受け取るユーザー
+    - actor_user_id: 行動を起こしたユーザー
+    - type: 通知の種類を分類
+    - message: 表示用のメッセージ
+    - related_id: 関連するコンテンツのID（アイデアやプロポーザル）
+    - RLSでワークスペースメンバーのみアクセス可能
+    - リアルタイム配信対象テーブル
+    
+    通知ルール（2025年9月20日更新）:
+    - 自分の行動は自分に通知しない（actor_user_id != user_id）
+    - 他人の行動は全ワークスペースメンバーに通知する
+    - 役割による通知制御は行わない（アイデアオーナー、ワークスペースオーナー等の区別なし）
+    - 行動者以外の全ワークスペースメンバーが通知対象
+    
+    通知の種類:
+    - idea_created: 新しいアイデアが投稿された → 投稿者以外の全メンバーに通知
+    - idea_moved: アイデアのステータスが変更された → ステータス変更者以外の全メンバーに通知
+      - thinking_about: 検討開始時の通知
+      - trying: 実行決定時の通知
+    - proposal_added: 新しい提案が追加された → 提案者以外の全メンバーに通知
+    - proposal_adopted: 提案が採用された → 採用者以外の全メンバーに通知
+    - member_joined: 新しいメンバーがワークスペースに参加した → 参加者以外の全メンバーに通知
+    
+    実装における通知対象者の決定ロジック:
+    ```sql
+    -- 通知対象者：行動者以外の全ワークスペースメンバー
+    SELECT user_id 
+    FROM workspace_members 
+    WHERE workspace_id = [対象ワークスペースID]
+    AND user_id != [行動者のuser_id]
+    ```
+
+    実装完了済み機能（2025年9月20日時点）:
+    - アイデア投稿時の通知（trigger_create_idea_notification）
+    - アイデア移動時の通知（trigger_create_idea_move_notification）
+      - thinking_aboutステータス変更時
+      - tryingステータス変更時
+    - 提案追加時の通知（trigger_create_proposal_notification）
+    - 提案採用時の通知（trigger_create_proposal_adopted_notification）
+
+    フロントエンド実装済み:
+    - NotificationBellコンポーネント
+    - リアルタイム通知更新
+    - 未読数表示
+    - 既読・未読管理
+
+    データベーストリガー:
+    - PostgreSQL関数による自動通知生成
+    - Supabase Realtimeによるリアルタイム配信
+      '''
+}
+
+// ★★★MVPには採用しないが、あると便利なテーブル
+// アクティビティログテーブル
+Table activity_logs {
+  id uuid [pk, default: `gen_random_uuid()`]
+  workspace_id uuid [not null, ref: > workspaces.id]
+  user_id uuid [not null, ref: > profiles.id]
+  action_type varchar(100) [not null, note: 'idea_created | idea_moved | proposal_created | proposal_adopted等']
+  target_type varchar(50) [not null, note: 'idea | proposal | workspace']
+  target_id uuid [not null]
+  metadata jsonb [null, note: '追加情報をJSON形式で保存']
+  created_at timestamp [not null, default: `now()`]
+  
+  indexes {
+    workspace_id
+    user_id
+    created_at
+    action_type
+  }
+    Note: '''
+            - ワークスペース内のアクティビティを記録
+            - ユーザーの行動を追跡し、分析に利用可能
+            - RLSポリシーでワークスペースメンバーのみアクセス可能に設定
+            使用例：
+            ワークスペースのホーム画面に「最近の活動」として表示
+            - 山田さんが「温泉旅行」のアイデアを登録しました（5分前）
+            - 田中さんが「3月実施」を提案しました（1時間前）
+            - 佐藤さんが「箱根」の提案を採用しました（昨日）
+        '''
+}
+
+// ===========================
+// Supabase用の追加設定メモ
+// ===========================
+
+// 1. トリガー設定
+// - auth.usersに新規ユーザー作成時、profilesテーブルに自動でレコード作成
+// CREATE OR REPLACE FUNCTION public.handle_new_user()
+// RETURNS trigger AS $$
+// BEGIN
+//   INSERT INTO public.profiles (id, username)
+//   VALUES (new.id, new.raw_user_meta_data->>'username');
+//   RETURN new;
+// END;
+// $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+// 2. RLS (Row Level Security) ポリシー例
+// - profiles: ユーザーは自分のプロフィールのみ更新可能
+// - workspaces: メンバーのみ閲覧可能
+// - ideas: ワークスペースメンバーのみCRUD可能
+// - proposals: ワークスペースメンバーのみ作成、提案者のみ削除可能
+
+// 3. Realtime設定
+// - ideas, proposals テーブルの変更をリアルタイムで配信
+// - workspace_members の追加/削除をリアルタイムで配信
+
+// 4. Storage Bucket設定（将来の拡張用）
+// - avatars: プロフィール画像
+// - idea-attachments: アイデアの添付ファイル
