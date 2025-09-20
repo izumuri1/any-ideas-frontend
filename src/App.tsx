@@ -56,6 +56,10 @@ function App() {
         {/* 招待URL用ルート - 認証状態に関係なく常にアクセス可能 */}
         <Route path="/invite/:token" element={<InviteHandler />} />
         
+        {/* パスワードリセット関連 - 認証状態に関係なく常にアクセス可能 */}
+        <Route path="/password-reset" element={<PasswordReset />} />
+        <Route path="/password-reset-confirm" element={<PasswordResetConfirm />} />
+        
         {/* 認証が必要なルート */}
         {/* 認証されているユーザー（userが存在）なら、これらのページに移動できる */}
         {user ? (
@@ -85,8 +89,6 @@ function App() {
             {/* 認証が不要なルート */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/password-reset" element={<PasswordReset />} />
-            <Route path="/password-reset-confirm" element={<PasswordResetConfirm />} />
             {/* ログイン画面以外にアクセスしたらログインにリダイレクト */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </>
