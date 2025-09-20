@@ -17,7 +17,7 @@ interface Notification {
 }
 
 interface NotificationWithProfile extends Notification {
-  actor_profile: {
+  profiles: {
     username: string;
   };
 }
@@ -43,7 +43,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ workspaceId 
         .from('notifications')
         .select(`
             *,
-            actor_profile:profiles!actor_user_id (
+            profiles!notifications_actor_user_id_fkey (
             username
             )
         `)
@@ -56,8 +56,8 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ workspaceId 
 
       const notificationsWithProfile = data.map(notification => ({
         ...notification,
-        actor_profile: notification.actor_profile || { username: '不明なユーザー' }
-      }));
+        actor_profile: notification.profiles || { username: '不明なユーザー' }
+        }));
 
       setNotifications(notificationsWithProfile);
       setUnreadCount(data.filter(n => !n.is_read).length);
