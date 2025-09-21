@@ -166,17 +166,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
 // supabase.auth.signUpでemail、password、username（オプション）を取得、errorに格納、戻り値としてerrorを返す
 // サインアップ成功時のdataは返さない。onAuthStateChangeでユーザー情報を取得するため
   const signUp = async (email: string, password: string, username: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          username: username
-        }
+  console.log('=== AuthContext signUp 関数開始 ===')
+  console.log('パラメータ:', { email, passwordLength: password.length, username })
+  
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        username: username
       }
-    })
-    return { error }
-  }
+    }
+  })
+  
+  console.log('=== Supabase signUp 結果 ===')
+  console.log('エラー:', error)
+  
+  return { error }
+}
 
   // サインイン
   const signIn = async (email: string, password: string) => {
