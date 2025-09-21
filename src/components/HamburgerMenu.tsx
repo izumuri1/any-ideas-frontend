@@ -45,17 +45,17 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
         navigate('/create-workspace')
         break
       case 'workspace-select':
-        navigate('/workspace-select')
+        navigate('/workspace')
         break
       case 'logout':
         try {
           await signOut()
-          // ログアウト成功後、明示的にログイン画面にリダイレクト
-          window.location.href = '/login'
+          // ログアウト成功後、React Routerを使用してログイン画面にリダイレクト
+          navigate('/login')
         } catch (error) {
           console.error('ログアウトエラー:', error)
-          // エラー時も強制的にログイン画面に遷移
-          window.location.href = '/login'
+          // エラー時もReact Routerを使用してログイン画面に遷移
+          navigate('/login')
         }
         break
       default:
