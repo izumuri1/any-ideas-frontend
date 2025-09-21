@@ -181,6 +181,26 @@ const { data } = await supabase
     proposal_type: 'todo',
     content: '提案内容'
   })
+
+// 提案採用
+const { data } = await supabase
+  .from('proposals')
+  .update({ 
+    is_adopted: true,
+    adopted_at: new Date().toISOString(),
+    adopted_by: userId
+  })
+  .eq('id', proposalId)
+
+// 提案を戻す（採用を取り消し）
+const { data } = await supabase
+  .from('proposals')
+  .update({ 
+    is_adopted: false,
+    adopted_at: null,
+    adopted_by: null
+  })
+  .eq('id', proposalId)
 ```
 
 #### notifications
