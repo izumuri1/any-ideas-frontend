@@ -169,21 +169,57 @@ export function AuthProvider({ children }: AuthProviderProps) {
   console.log('=== AuthContext signUp 関数開始 ===')
   console.log('パラメータ:', { email, passwordLength: password.length, username })
   
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        username: username
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username: username
+        }
+      }
+    })
+    
+    console.log('=== Supabase signUp 結果 ===')
+    console.log('データ:', data)
+    console.log('エラー:', error)
+    
+    // メール確認が有効な場合の重複ユーザーチェック
+    if (!error && data.user) {
+      // ユーザーが作成されたが、identitiesが空の場合は既存ユーザー
+      if (data.user.identities && data.user.identities.length === 0) {
+        console.log('=== 既存ユーザー検出（identitiesが空） ===')
+        return { 
+          error: {
+            code: 'user_already_exists',
+            message: 'このメールアドレスは既に使用されています。',
+            status: 400
+          } as AuthError
+        }
+      }
+      
+      // または、email_confirmed_atがnullで、created_atが現在時刻でない場合
+      if (!data.user.email_confirmed_at && data.user.created_at) {
+        const createdTime = new Date(data.user.created_at).getTime()
+        const nowTime = Date.now()
+        const timeDiff = Math.abs(nowTime - createdTime)
+        
+        // 作成時刻が5秒以上前の場合は既存ユーザーの可能性
+        if (timeDiff > 5000) {
+          console.log('=== 既存ユーザー検出（作成時刻チェック） ===')
+          console.log('作成時刻:', data.user.created_at, '現在時刻差:', timeDiff)
+          return { 
+            error: {
+              code: 'user_already_exists',
+              message: 'このメールアドレスは既に使用されています。',
+              status: 400
+            } as AuthError
+          }
+        }
       }
     }
-  })
-  
-  console.log('=== Supabase signUp 結果 ===')
-  console.log('エラー:', error)
-  
-  return { error }
-}
+    
+    return { error }
+  }
 
   // サインイン
   const signIn = async (email: string, password: string) => {

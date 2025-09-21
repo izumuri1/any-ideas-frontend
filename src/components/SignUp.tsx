@@ -92,84 +92,64 @@ export function SignUp() {
   })
 
   // 3. 新規アカウント登録処理ロジック
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  
-  console.log('=== SignUp handleSubmit 開始 ===')
-  console.log('フォーム値:', signUpForm.values)
-  
-  // バリデーション実行
-  if (!signUpForm.validateAll()) {
-    console.log('バリデーションエラー:', signUpForm.errors)
-    return
-  }
-
-  console.log('バリデーション通過')
-  setSubmitError('')
-  signUpForm.setSubmitting(true)
-  
-  try {
-    console.log('signUp関数呼び出し開始')
-    const { error } = await signUp(
-      signUpForm.values.email, 
-      signUpForm.values.password, 
-      signUpForm.values.username
-    )
-    console.log('signUp関数呼び出し完了:', { error })
-      
-      if (error) {
-  console.error('=== SignUp エラー詳細 ===')
-  console.error('エラーオブジェクト:', error)
-  console.error('エラーコード:', error.code)
-  console.error('エラーメッセージ:', error.message)
-  console.error('エラーステータス:', error.status)
-  
-  // エラーコードとメッセージで判定を強化
-  switch (error.code) {
-    case 'user_already_exists':
-    case 'email_already_exists':
-    case 'signup_disabled':
-      setSubmitError('このメールアドレスは既に使用されています。')
-      break
-    case 'weak_password':
-      setSubmitError('パスワードは8文字以上で入力してください。')
-      break
-    case 'email_address_invalid':
-    case 'invalid_email':
-      setSubmitError('正しいメールアドレスを入力してください。')
-      break
-    default:
-      // エラーメッセージからも判定
-      const errorMsg = error.message?.toLowerCase() || ''
-      if (errorMsg.includes('already') || errorMsg.includes('exists') || errorMsg.includes('duplicate')) {
-        setSubmitError('このメールアドレスは既に使用されています。')
-      } else if (errorMsg.includes('email')) {
-        setSubmitError('メールアドレスに問題があります。')
-      } else {
-        setSubmitError(`アカウント登録に失敗しました。エラー: ${error.message || error.code || '不明なエラー'}`)
-      }
-  }
-  console.log('設定したエラーメッセージ:', submitError)
-  return
-} else {
-  console.log('=== SignUp 成功 ===')
-  // 招待トークンがある場合の処理
-  if (isInviteMode && inviteToken) {
-    console.log('招待トークン処理開始')
-    await handleInviteTokenProcessing()
-  } else {
-    console.log('通常の登録完了')
-  }
-}
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     
-} catch (err) {
-  console.error('=== SignUp catch エラー ===')
-  console.error('キャッチされたエラー:', err)
-  setSubmitError('アカウント登録中に予期しないエラーが発生しました。')
-} finally {
-  console.log('=== SignUp finally ===')
-  signUpForm.setSubmitting(false)
-}
+    // バリデーション実行
+    if (!signUpForm.validateAll()) {
+      return
+    }
+
+    setSubmitError('')
+    signUpForm.setSubmitting(true)
+    
+    try {
+      const { error } = await signUp(
+        signUpForm.values.email, 
+        signUpForm.values.password, 
+        signUpForm.values.username
+      )
+        
+      if (error) {
+        // エラーコードとメッセージで判定
+        switch (error.code) {
+          case 'user_already_exists':
+          case 'email_already_exists':
+          case 'signup_disabled':
+            setSubmitError('このメールアドレスは既に使用されています。')
+            break
+          case 'weak_password':
+            setSubmitError('パスワードは8文字以上で入力してください。')
+            break
+          case 'email_address_invalid':
+          case 'invalid_email':
+            setSubmitError('正しいメールアドレスを入力してください。')
+            break
+          default:
+            // エラーメッセージからも判定
+            const errorMsg = error.message?.toLowerCase() || ''
+            if (errorMsg.includes('already') || errorMsg.includes('exists') || errorMsg.includes('duplicate')) {
+              setSubmitError('このメールアドレスは既に使用されています。')
+            } else if (errorMsg.includes('email')) {
+              setSubmitError('メールアドレスに問題があります。')
+            } else {
+              setSubmitError(`アカウント登録に失敗しました。エラー: ${error.message || error.code || '不明なエラー'}`)
+            }
+        }
+        return
+      } else {
+        // 招待トークンがある場合の処理
+        if (isInviteMode && inviteToken) {
+          await handleInviteTokenProcessing()
+        }
+      }
+          
+    } catch (err) {
+      console.error('SignUp error:', err)
+      setSubmitError('アカウント登録中に予期しないエラーが発生しました。')
+    } finally {
+      signUpForm.setSubmitting(false)
+    }
   }
 
   // 招待トークン処理関数
