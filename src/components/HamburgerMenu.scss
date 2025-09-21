@@ -410,7 +410,7 @@
   color: $app-btn-primary;
   margin-bottom: $app-padding-mobile;
   font-size: $app-font-small;
-  text-align: center;
+  text-align: left;
 }
 
 .tutorial-step {
@@ -423,18 +423,7 @@
   }
   
   .tutorial-step-number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background-color: $app-btn-primary;
-    color: white;
-    border-radius: 50%;
-    font-weight: $app-weight-bold;
-    font-size: $app-font-small;
-    margin-right: $app-padding-mobile;
-    flex-shrink: 0;
+    // ... 既存のスタイル
   }
   
   .tutorial-step-text {
@@ -442,6 +431,8 @@
     line-height: 1.6;
     margin: 0;
     padding-top: 4px;
+    text-align: left;
+    word-break: break-word;
   }
 }
 
