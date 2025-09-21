@@ -8,10 +8,11 @@ CREATE POLICY "Idea creators can delete their ideas" ON "public"."ideas" FOR DEL
 
 
 
-CREATE POLICY "Idea owners can adopt any proposal" ON "public"."proposals" FOR UPDATE USING (((EXISTS ( SELECT 1
-   FROM "public"."ideas"
-  WHERE (("ideas"."id" = "proposals"."idea_id") AND ("ideas"."creator_id" = "auth"."uid"())))) OR (("proposer_id" = "auth"."uid"()) AND ("deleted_at" IS NULL))));
+CREATE POLICY "Idea owners can adopt proposals" ON "public"."proposals" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM ideas
+  WHERE ((ideas.id = proposals.idea_id) AND (ideas.creator_id = auth.uid())))));
 
+CREATE POLICY "Proposers can delete own proposals" ON "public"."proposals" FOR UPDATE USING ((proposer_id = auth.uid()));
 
 
 CREATE POLICY "Public read for invited workspaces" ON "public"."workspaces" FOR SELECT USING (true);
