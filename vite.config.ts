@@ -71,5 +71,18 @@ export default defineConfig({
     alias: {
       '@': '/src'
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          supabase: ['@supabase/supabase-js', '@supabase/auth-js']
+        }
+      }
+    },
+    target: 'es2015',
+    minify: 'terser'
   }
 })
