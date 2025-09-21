@@ -31,11 +31,19 @@ import { AuthProvider } from './contexts/AuthContext.tsx'
 import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  import.meta.env.DEV ? (
+    <StrictMode>
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </BrowserRouter>
+    </StrictMode>
+  ) : (
     <BrowserRouter>
       <AuthProvider>
         <App />
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>,
+  )
 )
