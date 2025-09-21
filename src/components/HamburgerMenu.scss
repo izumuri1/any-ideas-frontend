@@ -326,3 +326,132 @@
     animation: none;
   }
 }
+
+//////////////////////////////////////////////////////////////
+// Tutorial 通知デザイン
+//////////////////////////////////////////////////////////////
+
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  animation: fadeIn $app-animation-fast $app-ease-out;
+}
+
+.tutorial-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  background-color: $app-bg-color;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 2001;
+  animation: slideInUp $app-animation-normal $app-ease-out;
+  border-left: 4px solid $app-btn-primary;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.tutorial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $app-padding-large;
+  border-bottom: 1px solid $app-gray-light;
+  
+  .tutorial-title {
+    @include app-title-style;
+    font-size: $app-font-subtitle;
+    margin: 0;
+    color: $app-text-color;
+    font-weight: $app-weight-bold;
+  }
+  
+  .tutorial-close-button {
+    @include app-button-base;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background-color: transparent;
+    color: $app-gray-dark;
+    font-size: 18px;
+    min-height: auto;
+    border-radius: 50%;
+    
+    &:hover {
+      background-color: $app-gray-light;
+      color: $app-text-color;
+    }
+  }
+}
+
+.tutorial-content {
+  padding: $app-padding-large;
+}
+
+.tutorial-section {
+  margin-bottom: $app-padding-large;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.tutorial-section-title {
+  @include app-text-style;
+  font-weight: $app-weight-bold;
+  color: $app-btn-primary;
+  margin-bottom: $app-padding-mobile;
+  font-size: $app-font-small;
+  text-align: center;
+}
+
+.tutorial-step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $app-padding-mobile;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .tutorial-step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: $app-btn-primary;
+    color: white;
+    border-radius: 50%;
+    font-weight: $app-weight-bold;
+    font-size: $app-font-small;
+    margin-right: $app-padding-mobile;
+    flex-shrink: 0;
+  }
+  
+  .tutorial-step-text {
+    @include app-text-style;
+    line-height: 1.6;
+    margin: 0;
+    padding-top: 4px;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
