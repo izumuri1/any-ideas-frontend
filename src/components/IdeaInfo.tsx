@@ -9,7 +9,7 @@ interface IdeaInfoProps {
   error?: string | null
 }
 
-const IdeaInfo: React.FC<IdeaInfoProps> = ({ 
+const IdeaInfo: React.FC<IdeaInfoProps> = React.memo(({ 
   ideaName, 
   ownerName, 
   loading = false, 
@@ -49,6 +49,6 @@ const IdeaInfo: React.FC<IdeaInfoProps> = ({
       </div>
     </div>
   )
-}
+})
 
 export default IdeaInfo
