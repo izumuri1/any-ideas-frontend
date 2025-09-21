@@ -140,7 +140,7 @@ export default function Home() {
       .eq('workspace_id', workspaceId)
       .eq('status', status)
       .is('deleted_at', null)
-      .order('when_text', { ascending: true })
+      .order('when_text', { ascending: true, nullsFirst: false })
 
     if (error) {
       console.error(`${status}アイデア取得エラー:`, error)
@@ -193,7 +193,14 @@ export default function Home() {
       ])
 
       setIdeas(ourIdeasData)
-      setThinkingIdeas(thinkingIdeasData)
+      setThinkingIdeas(thinkingIdeasData.sort((a, b) => {
+        // nullや空文字の場合は最後に配置
+        if (!a.when_text && !b.when_text) return 0
+        if (!a.when_text) return 1
+        if (!b.when_text) return -1
+        // when_textの文字列比較（昇順）
+        return a.when_text.localeCompare(b.when_text)
+      }))
       setTryingIdeas(tryingIdeasData)
 
     } catch (error) {
