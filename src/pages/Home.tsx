@@ -192,16 +192,37 @@ export default function Home() {
         fetchIdeasByStatus('trying')
       ])
 
-      setIdeas(ourIdeasData)
-      setThinkingIdeas(thinkingIdeasData.sort((a, b) => {
-        // nullや空文字の場合は最後に配置
-        if (!a.when_text && !b.when_text) return 0
-        if (!a.when_text) return 1
-        if (!b.when_text) return -1
-        // when_textの文字列比較（昇順）
-        return a.when_text.localeCompare(b.when_text)
-      }))
-      setTryingIdeas(tryingIdeasData)
+      // 日本語の年月を数値に変換してソートする関数
+      const sortByWhenText = (ideas: Idea[]) => {
+        return ideas.sort((a, b) => {
+          // nullや空文字の場合は最後に配置
+          if (!a.when_text && !b.when_text) return 0
+          if (!a.when_text) return 1
+          if (!b.when_text) return -1
+          
+          // 日本語の年月を数値に変換してソート
+          const parseDate = (dateStr: string) => {
+            const match = dateStr.match(/(\d{4})年(\d{1,2})月/)
+            if (!match) return { year: 0, month: 0 }
+            return { year: parseInt(match[1]), month: parseInt(match[2]) }
+          }
+          
+          const dateA = parseDate(a.when_text)
+          const dateB = parseDate(b.when_text)
+          
+          // 年で比較
+          if (dateA.year !== dateB.year) {
+            return dateA.year - dateB.year
+          }
+          
+          // 年が同じ場合は月で比較
+          return dateA.month - dateB.month
+        })
+      }
+
+      setIdeas(sortByWhenText(ourIdeasData))
+      setThinkingIdeas(sortByWhenText(thinkingIdeasData))
+      setTryingIdeas(sortByWhenText(tryingIdeasData))
 
     } catch (error) {
       handleError(error, 'アイデア一覧の取得に失敗しました')
