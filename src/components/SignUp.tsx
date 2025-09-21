@@ -111,22 +111,32 @@ const handleSubmit = async (e: React.FormEvent) => {
       )
       
       if (error) {
-        // エラーコードで判定
-        switch (error.code) {
-          case 'user_already_exists':
-            setSubmitError('このメールアドレスは既に登録されています。')
-            break
-          case 'weak_password':
-            setSubmitError('パスワードは8文字以上で入力してください。')
-            break
-          case 'email_address_invalid':
-            setSubmitError('正しいメールアドレスを入力してください。')
-            break
-          default:
-            setSubmitError('アカウント登録に失敗しました。')
-        }
-        return
+      console.error('SignUp error details:', error); // デバッグ用ログ追加
+      
+      // エラーコードとメッセージで判定を強化
+      switch (error.code) {
+        case 'user_already_exists':
+        case 'email_already_exists':  // 追加：別のエラーコードパターン
+          setSubmitError('このメールアドレスは既に使用されています。')
+          break
+        case 'weak_password':
+          setSubmitError('パスワードは8文字以上で入力してください。')
+          break
+        case 'email_address_invalid':
+        case 'invalid_email':  // 追加：別のエラーコードパターン
+          setSubmitError('正しいメールアドレスを入力してください。')
+          break
+        default:
+          // エラーメッセージも確認して適切なメッセージを表示
+          if (error.message?.toLowerCase().includes('already') || 
+              error.message?.toLowerCase().includes('exists')) {
+            setSubmitError('このメールアドレスは既に使用されています。')
+          } else {
+            setSubmitError(`アカウント登録に失敗しました。${error.message ? ': ' + error.message : ''}`)
+          }
       }
+      return
+    }
 
       // 招待トークンがある場合の処理
       if (isInviteMode && inviteToken) {
