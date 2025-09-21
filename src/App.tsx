@@ -40,10 +40,25 @@ import Home from './pages/Home'
 import DiscussionScreen from './pages/DiscussionScreen'
 import { ProposalDetailScreen } from './pages/ProposalDetailScreen'
 import { LoadingSpinner } from './components/LoadingSpinner'
+import { cleanupOldNotifications } from './utils/notificationCleanup'
+import { useEffect } from 'react'
 import './App.scss'
 
 function App() {
   const { user, loading } = useAuth()
+
+  // 通知クリーンアップの定期実行
+  useEffect(() => {
+    // 起動時に1回実行
+    cleanupOldNotifications()
+    
+    // 24時間ごとに定期実行
+    const cleanupInterval = setInterval(() => {
+      cleanupOldNotifications()
+    }, 24 * 60 * 60 * 1000)
+    
+    return () => clearInterval(cleanupInterval)
+  }, [])
 
   // ローディング中の表示
   if (loading) {
