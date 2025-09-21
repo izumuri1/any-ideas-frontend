@@ -67,8 +67,8 @@ function App() {
             {/* ログイン後は直接ワークスペース選択画面へ */}
             <Route path="/" element={<CreateWorkspace />} />
             <Route path="/workspace" element={<CreateWorkspace />} />
-            <Route path="/create-workspace" element={<CreateWorkspace />} />
-            <Route path="/workspace-select" element={<CreateWorkspace />} />
+            <Route path="/create-workspace" element={<Navigate to="/workspace" replace />} />
+            <Route path="/workspace-select" element={<Navigate to="/workspace" replace />} />
             
             {/* 個別のワークスペース（Home画面） */}
             <Route path="/workspace/:workspaceId" element={<Home />} />
