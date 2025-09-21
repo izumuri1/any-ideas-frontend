@@ -140,7 +140,7 @@ export default function Home() {
       .eq('workspace_id', workspaceId)
       .eq('status', status)
       .is('deleted_at', null)
-      .order('created_at', { ascending: false })
+      .order('when_text', { ascending: true })
 
     if (error) {
       console.error(`${status}アイデア取得エラー:`, error)
