@@ -168,58 +168,82 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
             </div>
             <div className="tutorial-content">
               <div className="tutorial-section">
-                <div className="tutorial-section-title">ーーーAny ideas？ーーー</div>
+                <div className="tutorial-section-title">💡 Any ideas？</div>
                 <div className="tutorial-step">
-                  <span className="tutorial-step-number">①</span>
-                  <span className="tutorial-step-text">アイデアを登録しましょう。</span>
+                  <span className="tutorial-step-number">1</span>
+                  <div className="tutorial-step-content">
+                    <span className="tutorial-step-text">みんなで思いついたアイデアを投稿しよう！</span>
+                    <span className="tutorial-step-tip">アイデア登録をクリック</span>
+                  </div>
                 </div>
               </div>
               
               <div className="tutorial-section">
-                <div className="tutorial-section-title">ーーーOur ideasーーー</div>
+                <div className="tutorial-section-title">👥 Our ideas</div>
                 <div className="tutorial-step">
-                  <span className="tutorial-step-number">②</span>
-                  <span className="tutorial-step-text">登録されたアイデアを確認して、共感したアイデアにいいねしましょう。</span>
+                  <span className="tutorial-step-number">2</span>
+                  <div className="tutorial-step-content">
+                    <span className="tutorial-step-text">みんなで気になるアイデアに「いいね」しよう！</span>
+                    <span className="tutorial-step-tip">♡をクリック</span>
+                  </div>
                 </div>
                 <div className="tutorial-step">
-                  <span className="tutorial-step-number">③</span>
-                  <span className="tutorial-step-text">アイデアオーナーは、共感が得られたアイデアの検討を進めましょう。</span>
-                </div>
-              </div>
-              
-              <div className="tutorial-section">
-                <div className="tutorial-section-title">ーーーIdeas we're thinking aboutーーー</div>
-                <div className="tutorial-step">
-                  <span className="tutorial-step-number">④</span>
-                  <span className="tutorial-step-text">アイデアに対して提案のある人は、具体的に検討しましょう。</span>
+                  <span className="tutorial-step-number">3</span>
+                  <div className="tutorial-step-content">
+                    <span className="tutorial-step-text">反響があったアイデアの実現に向けて検討しよう！</span>
+                    <span className="tutorial-step-tip">アイデアオーナーは検討を進めるをクリック</span>
+                  </div>
                 </div>
               </div>
               
               <div className="tutorial-section">
-                <div className="tutorial-section-title">ーーーHow about？ーーー</div>
+                <div className="tutorial-section-title">🤔 Ideas we're thinking about</div>
                 <div className="tutorial-step">
-                  <span className="tutorial-step-number">⑤</span>
-                  <span className="tutorial-step-text">やりたいことなどを提案しましょう。</span>
+                  <span className="tutorial-step-number">4</span>
+                  <div className="tutorial-step-content">
+                    <span className="tutorial-step-text">みんなで実現方法を提案しよう！</span>
+                    <span className="tutorial-step-tip">具体的に検討するをクリック</span>
+                  </div>
                 </div>
               </div>
               
               <div className="tutorial-section">
-                <div className="tutorial-section-title">ーーーGo for itーーー</div>
+                <div className="tutorial-section-title">💭 How about？</div>
                 <div className="tutorial-step">
-                  <span className="tutorial-step-number">⑥</span>
-                  <span className="tutorial-step-text">登録された提案を確認して、共感した提案にいいねしましょう。</span>
-                </div>
-                <div className="tutorial-step">
-                  <span className="tutorial-step-number">⑦</span>
-                  <span className="tutorial-step-text">アイデアオーナーは、共感が得られた提案を採用しましょう。</span>
+                  <span className="tutorial-step-number">5</span>
+                  <div className="tutorial-step-content">
+                    <span className="tutorial-step-text">みんなで実施時期や、やりたいことなどを提案しよう！</span>
+                    <span className="tutorial-step-tip">提案をクリック。複数の案があってもOK</span>
+                  </div>
                 </div>
               </div>
               
               <div className="tutorial-section">
-                <div className="tutorial-section-title">ーーーLet's go with that!ーーー</div>
+                <div className="tutorial-section-title">🎯 Go for it</div>
                 <div className="tutorial-step">
-                  <span className="tutorial-step-number">⑧</span>
-                  <span className="tutorial-step-text">アイデアオーナーは、採用した提案を決定して実行しましょう。</span>
+                  <span className="tutorial-step-number">6</span>
+                  <div className="tutorial-step-content">
+                    <span className="tutorial-step-text">みんなでベストな提案に「いいね」しよう！</span>
+                    <span className="tutorial-step-tip">♡をクリック。みんなで最適解を選ぼう</span>
+                  </div>
+                </div>
+                <div className="tutorial-step">
+                  <span className="tutorial-step-number">7</span>
+                  <div className="tutorial-step-content">
+                    <span className="tutorial-step-text">アイデアオーナーが提案を採用しよう！</span>
+                    <span className="tutorial-step-tip">提案を採用するをクリック</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="tutorial-section">
+                <div className="tutorial-section-title">🚀 Let's go with that!</div>
+                <div className="tutorial-step">
+                  <span className="tutorial-step-number">8</span>
+                  <div className="tutorial-step-content">
+                    <span className="tutorial-step-text">アイデアオーナーが採用した提案を決定して実行しよう！</span>
+                    <span className="tutorial-step-tip">決定して実行するをクリック</span>
+                  </div>
                 </div>
               </div>
             </div>
