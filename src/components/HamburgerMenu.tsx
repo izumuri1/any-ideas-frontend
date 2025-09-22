@@ -158,7 +158,7 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
           <div className="tutorial-notification">
             <div className="tutorial-header">
               <div className="tutorial-title-section">
-                <img src="/icon-48x48.png" alt="App Icon" className="tutorial-app-icon" />
+                <img src="./icon-48x48.png" alt="App Icon" className="tutorial-app-icon" />
                 <h3 className="tutorial-title">このアプリの使い方</h3>
               </div>
               <button 
