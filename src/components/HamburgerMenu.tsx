@@ -157,7 +157,10 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
           />
           <div className="tutorial-notification">
             <div className="tutorial-header">
-              <h3 className="tutorial-title">このアプリの使い方</h3>
+              <div className="tutorial-title-section">
+                <img src="/icon-48x48.png" alt="App Icon" className="tutorial-app-icon" />
+                <h3 className="tutorial-title">このアプリの使い方</h3>
+              </div>
               <button 
                 className="tutorial-close-button"
                 onClick={() => setIsTutorialOpen(false)}
@@ -191,7 +194,7 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
                   <span className="tutorial-step-number">3</span>
                   <div className="tutorial-step-content">
                     <span className="tutorial-step-text">反響があったアイデアの実現に向けて検討しよう！</span>
-                    <span className="tutorial-step-tip">アイデアオーナーは検討を進めるをクリック</span>
+                    <span className="tutorial-step-tip"><span style={{ fontWeight: 'bold', textDecoration: 'underline' }}>アイデアオーナーは</span>検討を進めるをクリック</span>
                   </div>
                 </div>
               </div>
@@ -230,8 +233,8 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
                 <div className="tutorial-step">
                   <span className="tutorial-step-number">7</span>
                   <div className="tutorial-step-content">
-                    <span className="tutorial-step-text">アイデアオーナーが提案を採用しよう！</span>
-                    <span className="tutorial-step-tip">提案を採用するをクリック</span>
+                    <span className="tutorial-step-text">提案を採用しよう！</span>
+                    <span className="tutorial-step-tip"><span style={{ fontWeight: 'bold', textDecoration: 'underline' }}>アイデアオーナーは</span>提案を採用するをクリック</span>
                   </div>
                 </div>
               </div>
@@ -241,8 +244,8 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
                 <div className="tutorial-step">
                   <span className="tutorial-step-number">8</span>
                   <div className="tutorial-step-content">
-                    <span className="tutorial-step-text">アイデアオーナーが採用した提案を決定して実行しよう！</span>
-                    <span className="tutorial-step-tip">決定して実行するをクリック</span>
+                    <span className="tutorial-step-text">採用した提案を決定して実行しよう！</span>
+                    <span className="tutorial-step-tip"><span style={{ fontWeight: 'bold', textDecoration: 'underline' }}>アイデアオーナーは</span>決定して実行するをクリック</span>
                   </div>
                 </div>
               </div>
