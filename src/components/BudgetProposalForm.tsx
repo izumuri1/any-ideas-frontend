@@ -102,9 +102,22 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
 
   // AI提案を予算テキストにコピー
   const useAISuggestion = () => {
-    budgetForm.setFieldValue('text', aiSuggestion);
+    // 直接valuesを更新
+    budgetForm.values.text = aiSuggestion;
+    
+    // onChangeイベントも手動で呼び出す（getFieldPropsが提供している場合）
+    const fieldProps = budgetForm.getFieldProps('text');
+    if (fieldProps.onChange) {
+        fieldProps.onChange({
+        target: {
+            name: 'text',
+            value: aiSuggestion
+        }
+        });
+    }
+    
     setAiSuggestion(''); // 提案を使用したら非表示
-  };
+    };
 
   return (
     <div className="proposal-registration-form">
