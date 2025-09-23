@@ -29,7 +29,7 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState('');
   const [error, setError] = useState('');
-  const [remainingUsage, setRemainingUsage] = useState<number | null>(null);
+  const [remainingUsage] = useState<number | null>(null);
 
   const [aiFormData, setAiFormData] = useState<AIFormData>({
     planType: '',
@@ -73,16 +73,21 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          formData: aiFormData,
-          userId: user.id
-        })
+            planType: aiFormData.planType,
+            participants: aiFormData.participants, 
+            duration: aiFormData.duration,
+            location: aiFormData.location,
+            budget_range: aiFormData.budget_range,
+            preferences: aiFormData.preferences,
+            userId: user.id
+            })
       });
 
       const data = await response.json();
 
       if (data.success) {
         setAiSuggestion(data.suggestion);
-        setRemainingUsage(data.remaining);
+        // setRemainingUsage(data.remaining);
         setShowAIForm(false); // フォームを閉じる
       } else {
         setError(data.error || 'AI提案の生成に失敗しました');
