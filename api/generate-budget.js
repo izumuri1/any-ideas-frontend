@@ -24,15 +24,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { formData, userId } = req.body;
+    const { planType, participants, duration, location, budget_range, preferences, userId } = req.body;
     
     // 基本的な入力チェック
-    if (!formData || !userId) {
-      return res.status(400).json({ 
+    if (!planType || !participants || !duration || !location || !userId) {
+    return res.status(400).json({ 
         success: false, 
         error: '必要なデータが不足しています',
-        received: { formData: !!formData, userId: !!userId }
-      });
+        received: { planType: !!planType, participants: !!participants, duration: !!duration, location: !!location, userId: !!userId }
+    });
     }
 
     // APIキーの存在確認
@@ -52,12 +52,12 @@ export default async function handler(req, res) {
     必ず各項目に実際の物価を考慮してください。土日や祝日割増も計算に入れてください。
 
     【条件】
-    プラン内容: ${formData.planType}
-    参加者人数: ${formData.participants}
-    期間（日数）: ${formData.duration}
-    場所: ${formData.location}
-    ${formData.budget_range ? `希望予算: ${formData.budget_range}` : ''}
-    ${formData.preferences ? `特記事項: ${formData.preferences}` : ''}
+    プラン内容: ${planType}
+    参加者人数: ${participants}
+    期間（日数）: ${duration}
+    場所: ${location}
+    ${budget_range ? `希望予算: ${budget_range}` : ''}
+    ${preferences ? `特記事項: ${preferences}` : ''}
 
     【出力フォーマット】
     総額予算: XX万円〜YY万円
@@ -117,9 +117,9 @@ export default async function handler(req, res) {
       suggestion,
       debug: {
         hasApiKey: !!apiKey,
-        formData,
+        requestData: { planType, participants, duration, location, budget_range, preferences },
         userId
-      }
+        }
     });
 
   } catch (error) {
