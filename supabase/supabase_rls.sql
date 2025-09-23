@@ -1,14 +1,175 @@
--- Supabase RLS (Row Level Security) ポリシー設定
--- Any Ideas アプリケーション用セキュリティ設定
--- 書き出し日時: 2025-09-21
+-- Supabase Schema Export
+-- Date: 2025-09-23
+-- Description: Any Ideas アプリケーション完全スキーマ（AI使用制限機能・セキュリティ修正後）
+-- Export Source: Supabase SQL Editor
 
--- ===========================
+-- ============================
+-- テーブル定義
+-- ============================
+
+CREATE TABLE public.activity_logs (
+    id uuid NOT NULL,
+    workspace_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    action_type character varying NOT NULL,
+    target_type character varying NOT NULL,
+    target_id uuid NOT NULL,
+    metadata jsonb,
+    created_at timestamp without time zone NOT NULL
+);
+
+CREATE TABLE public.admin_idea_likes_summary (
+    idea_name character varying,
+    workspace_id uuid,
+    workspace_name character varying,
+    total_likes bigint,
+    liked_by_users ARRAY,
+    idea_created_at timestamp without time zone
+);
+
+CREATE TABLE public.ai_usage_quotas (
+    id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    usage_date date NOT NULL,
+    daily_count integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+CREATE TABLE public.idea_likes (
+    id uuid NOT NULL,
+    idea_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+CREATE TABLE public.ideas (
+    id uuid NOT NULL,
+    workspace_id uuid NOT NULL,
+    creator_id uuid NOT NULL,
+    when_text character varying,
+    who_text character varying,
+    what_text character varying NOT NULL,
+    status character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    moved_to_thinking_at timestamp without time zone,
+    moved_to_trying_at timestamp without time zone,
+    deleted_at timestamp without time zone,
+    idea_name character varying NOT NULL
+);
+
+CREATE TABLE public.ideas_with_like_counts (
+    id uuid,
+    workspace_id uuid,
+    creator_id uuid,
+    when_text character varying,
+    who_text character varying,
+    what_text character varying,
+    status character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    moved_to_thinking_at timestamp without time zone,
+    moved_to_trying_at timestamp without time zone,
+    deleted_at timestamp without time zone,
+    idea_name character varying,
+    like_count bigint,
+    creator_username character varying
+);
+
+CREATE TABLE public.invitation_tokens (
+    id uuid NOT NULL,
+    token character varying NOT NULL,
+    workspace_id uuid NOT NULL,
+    created_by uuid NOT NULL,
+    expires_at timestamp without time zone NOT NULL,
+    max_uses integer NOT NULL,
+    used_count integer NOT NULL,
+    used_by uuid,
+    used_at timestamp without time zone,
+    is_active boolean NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+CREATE TABLE public.notifications (
+    id uuid NOT NULL,
+    workspace_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    actor_user_id uuid NOT NULL,
+    type text NOT NULL,
+    message text NOT NULL,
+    related_id uuid,
+    is_read boolean NOT NULL,
+    created_at timestamp with time zone NOT NULL
+);
+
+CREATE TABLE public.profiles (
+    id uuid NOT NULL,
+    username character varying NOT NULL,
+    last_workspace_id uuid,
+    default_workspace_id uuid,
+    last_workspace_accessed_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+CREATE TABLE public.proposal_likes (
+    id uuid NOT NULL,
+    proposal_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+CREATE TABLE public.proposals (
+    id uuid NOT NULL,
+    idea_id uuid NOT NULL,
+    proposer_id uuid NOT NULL,
+    proposal_type character varying NOT NULL,
+    content text NOT NULL,
+    start_date date,
+    end_date date,
+    todo_text character varying,
+    not_todo_text character varying,
+    budget_text character varying,
+    is_adopted boolean NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    adopted_at timestamp without time zone,
+    adopted_by uuid,
+    deleted_at timestamp without time zone
+);
+
+CREATE TABLE public.workspace_members (
+    id uuid NOT NULL,
+    workspace_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    role character varying NOT NULL,
+    joined_at timestamp without time zone NOT NULL,
+    invited_by uuid
+);
+
+CREATE TABLE public.workspaces (
+    id uuid NOT NULL,
+    name character varying NOT NULL,
+    owner_id uuid NOT NULL,
+    is_active boolean NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+-- ============================
 -- RLS ポリシー定義
--- ===========================
+-- ============================
 
 CREATE POLICY "Workspace members can view activity logs" ON "public"."activity_logs" FOR SELECT USING ((workspace_id IN ( SELECT workspace_members.workspace_id
    FROM workspace_members
   WHERE (workspace_members.user_id = auth.uid()))));
+
+CREATE POLICY "Users can insert own usage" ON "public"."ai_usage_quotas" FOR INSERT WITH CHECK ((auth.uid() = user_id));
+
+CREATE POLICY "Users can update own usage" ON "public"."ai_usage_quotas" FOR UPDATE USING ((auth.uid() = user_id));
+
+CREATE POLICY "Users can view own usage" ON "public"."ai_usage_quotas" FOR SELECT USING ((auth.uid() = user_id));
 
 CREATE POLICY "Users can delete own likes" ON "public"."idea_likes" FOR DELETE USING ((auth.uid() = user_id));
 
@@ -105,13 +266,17 @@ CREATE POLICY "Public read for invited workspaces" ON "public"."workspaces" FOR 
 
 CREATE POLICY "workspaces_owner_full_access" ON "public"."workspaces" FOR ALL USING ((owner_id = ( SELECT auth.uid() AS uid))) WITH CHECK ((owner_id = ( SELECT auth.uid() AS uid)));
 
--- ===========================
+-- ============================
 -- RLS 有効化
--- ===========================
+-- ============================
 
 ALTER TABLE "public"."activity_logs" ENABLE ROW LEVEL SECURITY;
 
+ALTER TABLE "public"."ai_usage_quotas" ENABLE ROW LEVEL SECURITY;
+
 ALTER TABLE "public"."idea_likes" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."ideas" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."invitation_tokens" ENABLE ROW LEVEL SECURITY;
 
@@ -127,9 +292,9 @@ ALTER TABLE "public"."workspace_members" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."workspaces" ENABLE ROW LEVEL SECURITY;
 
--- ===========================
+-- ============================
 -- スキーマ権限設定
--- ===========================
+-- ============================
 
 GRANT USAGE ON SCHEMA "public" TO "postgres";
 
@@ -138,3 +303,22 @@ GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 
 GRANT USAGE ON SCHEMA "public" TO "service_role";
+
+-- ============================
+-- 注記
+-- ============================
+
+-- このスキーマは以下の機能を含みます：
+-- 1. ワークスペース管理 (workspaces, workspace_members)
+-- 2. アイデア管理 (ideas, idea_likes) 
+-- 3. 提案管理 (proposals, proposal_likes)
+-- 4. 招待システム (invitation_tokens)
+-- 5. 通知システム (notifications)
+-- 6. ユーザープロファイル (profiles)
+-- 7. アクティビティログ (activity_logs)
+-- 8. AI使用制限管理 (ai_usage_quotas) - 新規追加
+-- 9. 管理者向け集計ビュー (admin_idea_likes_summary, ideas_with_like_counts)
+-- 
+-- 全テーブルにRow Level Security (RLS) が有効化されており、
+-- ユーザーはワークスペースメンバーとしてのみデータにアクセス可能。
+-- Function Search Path セキュリティ警告対応済み。

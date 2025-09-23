@@ -1,23 +1,23 @@
--- ===========================
--- 関数定義
--- ===========================
+-- ============================
+-- 関数定義（セキュリティ修正済み）
+-- ============================
 
 CREATE OR REPLACE FUNCTION public.cleanup_old_notifications()
  RETURNS integer
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 DECLARE
   deleted_count INTEGER;
 BEGIN
-  DELETE FROM notifications 
+  DELETE FROM public.notifications 
   WHERE created_at < NOW() - INTERVAL '30 days';
   
   GET DIAGNOSTICS deleted_count = ROW_COUNT;
   RETURN deleted_count;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."cleanup_old_notifications"() OWNER TO "postgres";
 
@@ -26,6 +26,7 @@ CREATE OR REPLACE FUNCTION public.create_idea_move_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
@@ -38,17 +39,14 @@ BEGIN
         RETURN NEW;
     END IF;
     
-    -- 【修正前】thinking_aboutへの移動のみを対象
-    -- IF NEW.status != 'thinking_about' THEN
-    
-    -- 【修正後】thinking_aboutまたはtryingへの移動を対象
+    -- thinking_aboutまたはtryingへの移動を対象
     IF NEW.status NOT IN ('thinking_about', 'trying') THEN
         RETURN NEW;
     END IF;
     
     -- 投稿者の表示名を取得
     SELECT COALESCE(username, 'Unknown User') INTO actor_name
-    FROM profiles 
+    FROM public.profiles 
     WHERE id = NEW.creator_id;
     
     -- ステータスに応じたメッセージを生成
@@ -56,7 +54,7 @@ BEGIN
         WHEN 'thinking_about' THEN
             status_text := 'の検討を開始しました';
         WHEN 'trying' THEN
-            status_text := 'の実行を決定しました';  -- 【追加】tryingケースのメッセージ
+            status_text := 'の実行を決定しました';
         ELSE
             status_text := 'のステータスを変更しました';
     END CASE;
@@ -67,11 +65,11 @@ BEGIN
     -- ワークスペースの全メンバー（投稿者以外）に通知を作成
     FOR member_record IN 
         SELECT user_id 
-        FROM workspace_members 
+        FROM public.workspace_members 
         WHERE workspace_id = NEW.workspace_id 
-        AND user_id != NEW.creator_id  -- 投稿者自身は除外
+        AND user_id != NEW.creator_id
     LOOP
-        INSERT INTO notifications (
+        INSERT INTO public.notifications (
             workspace_id,
             user_id,
             actor_user_id,
@@ -94,8 +92,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."create_idea_move_notification"() OWNER TO "postgres";
 
@@ -104,6 +101,7 @@ CREATE OR REPLACE FUNCTION public.create_idea_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
@@ -112,7 +110,7 @@ DECLARE
 BEGIN
     -- 投稿者の表示名を取得
     SELECT COALESCE(username, 'Unknown User') INTO actor_name
-    FROM profiles 
+    FROM public.profiles 
     WHERE id = NEW.creator_id;
     
     -- 通知メッセージを生成
@@ -121,11 +119,11 @@ BEGIN
     -- ワークスペースの全メンバー（投稿者以外）に通知を作成
     FOR member_record IN 
         SELECT user_id 
-        FROM workspace_members 
+        FROM public.workspace_members 
         WHERE workspace_id = NEW.workspace_id 
-        AND user_id != NEW.creator_id  -- 投稿者自身は除外
+        AND user_id != NEW.creator_id
     LOOP
-        INSERT INTO notifications (
+        INSERT INTO public.notifications (
             workspace_id,
             user_id,
             actor_user_id,
@@ -148,8 +146,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."create_idea_notification"() OWNER TO "postgres";
 
@@ -158,6 +155,7 @@ CREATE OR REPLACE FUNCTION public.create_notification(p_workspace_id uuid, p_use
  RETURNS uuid
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 DECLARE
   notification_id UUID;
@@ -167,7 +165,7 @@ BEGIN
     RETURN NULL;
   END IF;
   
-  INSERT INTO notifications (
+  INSERT INTO public.notifications (
     workspace_id,
     user_id,
     actor_user_id,
@@ -185,8 +183,7 @@ BEGIN
   
   RETURN notification_id;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."create_notification"(p_workspace_id uuid, p_user_id uuid, p_actor_user_id uuid, p_type text, p_message text, p_related_id uuid DEFAULT NULL::uuid) OWNER TO "postgres";
 
@@ -195,6 +192,7 @@ CREATE OR REPLACE FUNCTION public.create_proposal_adopted_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
@@ -216,12 +214,12 @@ BEGIN
     
     -- 採用者の表示名を取得
     SELECT COALESCE(username, 'Unknown User') INTO adopter_name
-    FROM profiles 
+    FROM public.profiles 
     WHERE id = NEW.adopted_by;
     
     -- 提案者の表示名を取得
     SELECT COALESCE(username, 'Unknown User') INTO proposer_name
-    FROM profiles 
+    FROM public.profiles 
     WHERE id = NEW.proposer_id;
     
     -- 関連するアイデア情報を取得
@@ -230,7 +228,7 @@ BEGIN
         creator_id,
         workspace_id
     INTO idea_info
-    FROM ideas 
+    FROM public.ideas 
     WHERE id = NEW.idea_id;
     
     -- 提案タイプに応じたテキストを生成
@@ -253,11 +251,11 @@ BEGIN
     -- 採用者以外の全ワークスペースメンバーに通知
     FOR member_record IN 
         SELECT user_id 
-        FROM workspace_members 
+        FROM public.workspace_members 
         WHERE workspace_id = idea_info.workspace_id
-        AND user_id != NEW.adopted_by  -- 採用者本人は除外
+        AND user_id != NEW.adopted_by
     LOOP
-        INSERT INTO notifications (
+        INSERT INTO public.notifications (
             workspace_id,
             user_id,
             actor_user_id,
@@ -280,8 +278,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."create_proposal_adopted_notification"() OWNER TO "postgres";
 
@@ -290,6 +287,7 @@ CREATE OR REPLACE FUNCTION public.create_proposal_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
@@ -300,7 +298,7 @@ DECLARE
 BEGIN
     -- 提案者の表示名を取得
     SELECT COALESCE(username, 'Unknown User') INTO actor_name
-    FROM profiles 
+    FROM public.profiles 
     WHERE id = NEW.proposer_id;
     
     -- 関連するアイデア情報を取得
@@ -309,7 +307,7 @@ BEGIN
         creator_id,
         workspace_id
     INTO idea_info
-    FROM ideas 
+    FROM public.ideas 
     WHERE id = NEW.idea_id;
     
     -- 提案タイプに応じたテキストを生成
@@ -329,14 +327,14 @@ BEGIN
     -- 通知メッセージを生成
     notification_message := actor_name || 'さんが「' || idea_info.idea_name || '」に' || proposal_type_text || 'を追加しました';
     
-    -- 【修正箇所】提案者以外の全ワークスペースメンバーに通知
+    -- 提案者以外の全ワークスペースメンバーに通知
     FOR member_record IN 
         SELECT user_id 
-        FROM workspace_members 
+        FROM public.workspace_members 
         WHERE workspace_id = idea_info.workspace_id
-        AND user_id != NEW.proposer_id  -- 提案者本人は除外
+        AND user_id != NEW.proposer_id
     LOOP
-        INSERT INTO notifications (
+        INSERT INTO public.notifications (
             workspace_id,
             user_id,
             actor_user_id,
@@ -359,8 +357,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."create_proposal_notification"() OWNER TO "postgres";
 
@@ -369,6 +366,7 @@ CREATE OR REPLACE FUNCTION public.generate_notification_message(p_type character
  RETURNS text
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 BEGIN
   CASE p_type
@@ -386,8 +384,7 @@ BEGIN
       RETURN p_actor_name || 'さんが活動しました';
   END CASE;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."generate_notification_message"(p_type character varying, p_actor_name text, p_target_name text) OWNER TO "postgres";
 
@@ -395,6 +392,7 @@ ALTER FUNCTION "public"."generate_notification_message"(p_type character varying
 CREATE OR REPLACE FUNCTION public.generate_notification_message(p_actor_name text, p_type text, p_target_name text DEFAULT NULL::text)
  RETURNS text
  LANGUAGE plpgsql
+ SET search_path TO ''
 AS $function$
 BEGIN
   CASE p_type
@@ -410,8 +408,7 @@ BEGIN
       RETURN p_actor_name || 'さんが活動しました';
   END CASE;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."generate_notification_message"(p_actor_name text, p_type text, p_target_name text DEFAULT NULL::text) OWNER TO "postgres";
 
@@ -420,16 +417,16 @@ CREATE OR REPLACE FUNCTION public.get_idea_like_count(idea_uuid uuid)
  RETURNS integer
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 BEGIN
     RETURN (
         SELECT COUNT(*)::INTEGER
-        FROM idea_likes
+        FROM public.idea_likes
         WHERE idea_id = idea_uuid
     );
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."get_idea_like_count"(idea_uuid uuid) OWNER TO "postgres";
 
@@ -494,8 +491,7 @@ BEGIN
     CASE WHEN am.role = 'owner' THEN 1 ELSE 2 END,
     am.joined_at ASC;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."get_workspace_members"(workspace_id_param uuid) OWNER TO "postgres";
 
@@ -560,8 +556,7 @@ BEGIN
     CASE WHEN am.role = 'owner' THEN 1 ELSE 2 END,
     am.joined_at ASC;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."get_workspace_members_safe"(workspace_id_param uuid) OWNER TO "postgres";
 
@@ -570,6 +565,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 BEGIN
   INSERT INTO public.profiles (id, username)
@@ -580,8 +576,7 @@ EXCEPTION
     -- ユーザーが既に存在する場合はスキップ
     RETURN new;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 
@@ -589,13 +584,13 @@ ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
  RETURNS trigger
  LANGUAGE plpgsql
+ SET search_path TO ''
 AS $function$
 BEGIN
-  NEW.updated_at = now();
+  NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."handle_updated_at"() OWNER TO "postgres";
 
@@ -604,22 +599,22 @@ CREATE OR REPLACE FUNCTION public.user_has_liked_idea(idea_uuid uuid, user_uuid 
  RETURNS boolean
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO ''
 AS $function$
 BEGIN
     RETURN EXISTS (
-        SELECT 1 FROM idea_likes
+        SELECT 1 FROM public.idea_likes
         WHERE idea_id = idea_uuid AND user_id = user_uuid
     );
 END;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."user_has_liked_idea"(idea_uuid uuid, user_uuid uuid) OWNER TO "postgres";
 
 
--- ===========================
+-- ============================
 -- トリガー定義
--- ===========================
+-- ============================
 
 CREATE TRIGGER set_ideas_updated_at BEFORE UPDATE ON public.ideas FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
 
@@ -638,15 +633,18 @@ CREATE TRIGGER trigger_create_proposal_notification AFTER INSERT ON public.propo
 CREATE TRIGGER set_workspaces_updated_at BEFORE UPDATE ON public.workspaces FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
 
 
--- ===========================
+-- ============================
 -- 外部キー制約
--- ===========================
+-- ============================
 
 ALTER TABLE ONLY "public"."activity_logs"
     ADD CONSTRAINT "activity_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id");
 
 ALTER TABLE ONLY "public"."activity_logs"
     ADD CONSTRAINT "activity_logs_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE CASCADE;
+
+ALTER TABLE ONLY "public"."ai_usage_quotas"
+    ADD CONSTRAINT "ai_usage_quotas_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
 ALTER TABLE ONLY "public"."idea_likes"
     ADD CONSTRAINT "idea_likes_idea_id_fkey" FOREIGN KEY ("idea_id") REFERENCES "public"."ideas"("id") ON DELETE CASCADE;
