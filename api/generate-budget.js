@@ -129,13 +129,18 @@ const suggestion = data.candidates[0].content.parts[0].text;
 
     // 成功レスポンス
     return res.status(200).json({
-      success: true,
-      suggestion,
-      debug: {
+    success: true,
+    suggestion,
+    usage: {
+        daily: {
+        remaining: 14 // フロントエンドで実際の値に更新される
+        }
+    },
+    debug: {
         hasApiKey: !!apiKey,
         requestData: { planType, participants, duration, location, budget_range, preferences },
         userId
-        }
+    }
     });
 
   } catch (error) {

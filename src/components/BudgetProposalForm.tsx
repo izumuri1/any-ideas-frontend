@@ -113,7 +113,7 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
     setError('');
 
     try {
-      const response = await fetch('/api/generate-budget-safe', {
+      const response = await fetch('/api/generate-budget', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
