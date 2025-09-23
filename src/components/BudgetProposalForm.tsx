@@ -39,7 +39,7 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
   const { user } = useAuth();
   const [showAIForm, setShowAIForm] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [aiSuggestion, setAiSuggestion] = useState('');
+  const [aiSuggestion, setAiSuggestion] = useState<any>('');
   const [error, setError] = useState('');
   const [quotaStatus, setQuotaStatus] = useState<QuotaStatus>({
     canRequest: true,
@@ -189,21 +189,41 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
   // AI提案を予算テキストにコピー
     const useAISuggestion = () => {
         try {
-            // aiSuggestionを確実に文字列に変換してから設定
             let suggestionText = '';
+            
+            console.log('AI提案の型とデータ:', typeof aiSuggestion, aiSuggestion); // デバッグ用
+            
             if (typeof aiSuggestion === 'string') {
                 suggestionText = aiSuggestion;
             } else if (aiSuggestion && typeof aiSuggestion === 'object') {
-                // オブジェクトの場合はJSONとして整形するか、適切なプロパティを取得
-                suggestionText = JSON.stringify(aiSuggestion, null, 2);
-            } else {
+                const suggestion = aiSuggestion as any; // 型アサーション
+                // オブジェクトの場合、よく使われるプロパティを確認
+                if (suggestion.suggestion) {
+                    suggestionText = suggestion.suggestion;
+                } else if (suggestion.text) {
+                    suggestionText = suggestion.text;
+                } else if (suggestion.content) {
+                    suggestionText = suggestion.content;
+                } else if (suggestion.message) {
+                    suggestionText = suggestion.message;
+                } else {
+                    // 上記のプロパティがない場合はJSON形式で表示
+                    suggestionText = JSON.stringify(suggestion, null, 2);
+                }
+            } else if (aiSuggestion !== null && aiSuggestion !== undefined) {
                 suggestionText = String(aiSuggestion);
+            } else {
+                suggestionText = '';
             }
             
-            console.log('AI提案をセット:', suggestionText); // デバッグ用
+            console.log('変換後のテキスト:', suggestionText); // デバッグ用
             
-            budgetForm.setValue('text', suggestionText);
-            setAiSuggestion(''); // 提案を使用したら非表示
+            if (suggestionText.trim()) {
+                budgetForm.setValue('text', suggestionText);
+                setAiSuggestion(''); // 提案を使用したら非表示
+            } else {
+                setError('有効な提案データがありません');
+            }
         } catch (error) {
             console.error('AI提案の使用に失敗しました:', error);
             setError('提案の使用に失敗しました');
