@@ -101,22 +101,15 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
   };
 
   // AI提案を予算テキストにコピー
-  const useAISuggestion = () => {
-    // 直接valuesを更新
-    budgetForm.values.text = aiSuggestion;
-    
-    // onChangeイベントも手動で呼び出す（getFieldPropsが提供している場合）
-    const fieldProps = budgetForm.getFieldProps('text');
-    if (fieldProps.onChange) {
-        fieldProps.onChange({
-        target: {
-            name: 'text',
-            value: aiSuggestion
-        }
-        });
+    const useAISuggestion = () => {
+    try {
+        // useFormフックの正しいsetValueメソッドを使用
+        budgetForm.setValue('text', aiSuggestion);
+        setAiSuggestion(''); // 提案を使用したら非表示
+    } catch (error) {
+        console.error('AI提案の使用に失敗しました:', error);
+        setError('提案の使用に失敗しました');
     }
-    
-    setAiSuggestion(''); // 提案を使用したら非表示
     };
 
   return (
