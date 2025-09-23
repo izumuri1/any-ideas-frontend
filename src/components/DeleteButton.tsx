@@ -26,13 +26,20 @@ export function DeleteButton({
     return null
   }
 
-  return (
+const handleClick = () => {
+  const confirmed = window.confirm('この項目を削除してもよろしいですか？\n削除すると元に戻すことはできません。')
+  if (confirmed) {
+    onDelete(item.id)
+  }
+}
+
+    return (
     <button 
-      className="btn-delete"
-      onClick={() => onDelete(item.id)}
-      disabled={isDeleting}
+        className="btn-delete"
+        onClick={handleClick}
+        disabled={isDeleting}
     >
-      {isDeleting ? deletingText : deleteText}
+        {isDeleting ? deletingText : deleteText}
     </button>
-  )
+    )
 }
