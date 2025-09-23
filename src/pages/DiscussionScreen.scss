@@ -501,17 +501,60 @@
         border-color: color.adjust($app-btn-secondary, $lightness: -10%);
     }
     
-    .ai-icon {
-      font-size: 16px;
+    // 無効化時のスタイル
+    &:disabled {
+        background-color: $app-gray-medium;
+        border-color: $app-gray-medium;
+        cursor: not-allowed;
+        opacity: 0.6;
+        
+        .disabled-indicator {
+        font-size: 12px;
+        margin-left: 4px;
+        opacity: 0.8;
+        }
     }
-  }
+    
+    .ai-icon {
+        font-size: 16px;
+    }
+    }
   
   .usage-info {
     @include app-small-text-style;
     color: $app-gray-medium;
     margin-top: 0.5rem;
     text-align: center;
-  }
+    }
+
+    // 制限メッセージのスタイル
+    .quota-limit-message {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    color: #dc2626;
+    
+    strong {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+    
+    p {
+        margin: 0 0 8px 0;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    
+    small {
+        font-size: 12px;
+        opacity: 0.8;
+        display: block;
+    }
+    }
 }
 
 .ai-form-container {

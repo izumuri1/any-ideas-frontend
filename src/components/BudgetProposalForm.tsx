@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { geminiQuotaManager } from '../lib/geminiQuotaManager';
 
 interface BudgetProposalFormProps {
   budgetForm: any; // 既存のuseFormフック
@@ -19,6 +20,18 @@ interface AIFormData {
   preferences: string;
 }
 
+interface LimitMessage {
+  title: string;
+  message: string;
+  resetTime: Date | null;
+}
+
+interface QuotaStatus {
+  canRequest: boolean;
+  remaining: { daily: number; minute: number };
+  limitMessage: LimitMessage | null;
+}
+
 const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
   budgetForm,
   onSubmit,
@@ -29,7 +42,12 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState('');
   const [error, setError] = useState('');
-  const [remainingUsage] = useState<number | null>(null);
+  const [quotaStatus, setQuotaStatus] = useState<QuotaStatus>({
+    canRequest: true,
+    remaining: { daily: 15, minute: 15 },
+    limitMessage: null
+    });
+  const [remainingUsage, setRemainingUsage] = useState<number | null>(null);
 
   const [aiFormData, setAiFormData] = useState<AIFormData>({
     planType: '',
@@ -38,10 +56,32 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
     location: '',
     budget_range: '',
     preferences: ''
-  });
+    });
 
-  // AI提案フォームの入力変更処理
-  const handleAIFormChange = (field: keyof AIFormData, value: string) => {
+    // 制限状況を更新する関数
+    const updateQuotaStatus = () => {
+    const quotaCheck = geminiQuotaManager.canMakeRequest();
+    const stats = geminiQuotaManager.getUsageStats();
+    
+    setQuotaStatus({
+        canRequest: quotaCheck.canRequest,
+        remaining: quotaCheck.remaining,
+        limitMessage: quotaCheck.canRequest ? null : 
+        geminiQuotaManager.getLimitExceededMessage(quotaCheck.reason || '')
+    });
+    
+    setRemainingUsage(stats.daily.remaining);
+    };
+
+    // 制限状況の定期更新
+    React.useEffect(() => {
+    updateQuotaStatus();
+    const interval = setInterval(updateQuotaStatus, 5000);
+    return () => clearInterval(interval);
+    }, []);
+
+    // AI提案フォームの入力変更処理
+    const handleAIFormChange = (field: keyof AIFormData, value: string) => {
     setAiFormData(prev => ({
       ...prev,
       [field]: value
@@ -57,20 +97,26 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
   };
 
   // AI予算提案を生成
-  const generateAIBudget = async () => {
+    const generateAIBudget = async () => {
+    // 制限チェック
+    if (!quotaStatus.canRequest) {
+        setError(quotaStatus.limitMessage?.message || '使用制限に達しています');
+        return;
+    }
+
     if (!user) {
-      setError('ログインが必要です');
-      return;
+        setError('ログインが必要です');
+        return;
     }
 
     setIsGenerating(true);
     setError('');
 
     try {
-      const response = await fetch('/api/generate-budget', {
+      const response = await fetch('/api/generate-budget-safe', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             planType: aiFormData.planType,
@@ -85,15 +131,28 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
 
       const data = await response.json();
 
-      if (data.success) {
-    console.log('API レスポンス:', data); // デバッグ用
-    console.log('AI提案データ:', data.suggestion, typeof data.suggestion); // デバッグ用
-    setAiSuggestion(data.suggestion);
-    // setRemainingUsage(data.remaining);
-    setShowAIForm(false); // フォームを閉じる
-      } else {
+        if (!response.ok) {
+        // 制限エラーの場合の特別な処理
+        if (data.error === 'quota_exceeded') {
+            setError(data.message);
+            updateQuotaStatus();
+            return;
+        }
+        }
+
+        if (data.success) {
+        console.log('API レスポンス:', data); // デバッグ用
+        console.log('AI提案データ:', data.suggestion, typeof data.suggestion); // デバッグ用
+        setAiSuggestion(data.suggestion);
+        // 使用状況を更新
+        if (data.usage) {
+            setRemainingUsage(data.usage.daily.remaining);
+        }
+        updateQuotaStatus();
+        setShowAIForm(false); // フォームを閉じる
+        } else {
         setError(data.error || 'AI提案の生成に失敗しました');
-      }
+        }
     } catch (error) {
       console.error('AI提案エラー:', error);
       setError('ネットワークエラーが発生しました');
@@ -122,18 +181,33 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
       {/* AI提案セクション */}
       <div className="ai-suggestion-container">
         <button 
-          type="button"
-          onClick={() => setShowAIForm(!showAIForm)}
-          className="btn-ai-suggestion"
+        type="button"
+        onClick={() => setShowAIForm(!showAIForm)}
+        className="btn-ai-suggestion"
+        disabled={!quotaStatus.canRequest}
         >
-          AI予算提案
+        AI予算提案
+        {!quotaStatus.canRequest && <span className="disabled-indicator">（制限中）</span>}
         </button>
         
+        {/* 制限メッセージの表示 */}
+        {!quotaStatus.canRequest && quotaStatus.limitMessage && (
+        <div className="quota-limit-message">
+            <strong>{quotaStatus.limitMessage.title}</strong>
+            <p>{quotaStatus.limitMessage.message}</p>
+            {quotaStatus.limitMessage.resetTime && (
+            <small>
+                リセット時刻: {quotaStatus.limitMessage.resetTime.toLocaleString()}
+            </small>
+            )}
+        </div>
+        )}
+
         {/* 残り使用回数表示 */}
-        {remainingUsage !== null && (
-          <div className="usage-info">
+        {remainingUsage !== null && quotaStatus.canRequest && (
+        <div className="usage-info">
             今日の残り使用回数: {remainingUsage}回
-          </div>
+        </div>
         )}
 
         {/* AI提案用の情報入力フォーム */}
