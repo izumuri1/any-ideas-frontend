@@ -1,5 +1,9 @@
-// /api/generate-budget.js
-// デバッグ用シンプル版
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 export default async function handler(req, res) {
   console.log('=== API Called ===');
@@ -28,11 +32,49 @@ export default async function handler(req, res) {
     
     // 基本的な入力チェック
     if (!planType || !participants || !duration || !location || !userId) {
-    return res.status(400).json({ 
+      return res.status(400).json({ 
         success: false, 
         error: '必要なデータが不足しています',
         received: { planType: !!planType, participants: !!participants, duration: !!duration, location: !!location, userId: !!userId }
-    });
+      });
+    }
+
+    // 使用回数制限チェック
+    const today = new Date().toISOString().split('T')[0];
+    
+    // 今日の使用回数を取得
+    const { data: usageData, error: fetchError } = await supabase
+      .from('ai_usage_quotas')
+      .select('daily_count')
+      .eq('user_id', userId)
+      .eq('usage_date', today)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('使用回数取得エラー:', fetchError);
+      return res.status(500).json({
+        success: false,
+        error: 'システムエラーが発生しました'
+      });
+    }
+
+    const currentUsage = usageData?.daily_count || 0;
+    const DAILY_LIMIT = 15;
+
+    // 制限チェック
+    if (currentUsage >= DAILY_LIMIT) {
+      return res.status(429).json({
+        success: false,
+        error: 'quota_exceeded',
+        message: `本日のAI使用回数が上限（${DAILY_LIMIT}回）に達しました。明日の0時にリセットされます。`,
+        usage: {
+          daily: {
+            used: currentUsage,
+            limit: DAILY_LIMIT,
+            remaining: 0
+          }
+        }
+      });
     }
 
     // APIキーの存在確認
@@ -78,11 +120,11 @@ export default async function handler(req, res) {
     console.log('Calling Gemini API...');
     
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-    method: 'POST',  // ← この行を追加
-    headers: {
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+      },
+      body: JSON.stringify({
         contents: [{
           parts: [{
             text: prompt
@@ -98,49 +140,65 @@ export default async function handler(req, res) {
     console.log('Gemini API response status:', response.status);
 
     if (!response.ok) {
-    let errorData;
-    try {
+      let errorData;
+      try {
         errorData = await response.json();
-    } catch (e) {
+      } catch (e) {
         errorData = await response.text();
-    }
-    console.error('Gemini API Error Response:', errorData);
-    console.error('Response headers:', [...response.headers.entries()]);
-    throw new Error(`Gemini API Error (${response.status}): ${errorData.error?.message || errorData || 'Unknown error'}`);
+      }
+      console.error('Gemini API Error Response:', errorData);
+      throw new Error(`Gemini API Error (${response.status}): ${errorData.error?.message || errorData || 'Unknown error'}`);
     }
 
     const data = await response.json();
     console.log('Gemini API response:', data);
     
-    // より詳細なデバッグ情報を追加
-console.log('Full Gemini API response:', JSON.stringify(data, null, 2));
+    if (!data.candidates || data.candidates.length === 0) {
+      console.error('No candidates in response:', data);
+      throw new Error('Gemini APIから候補が返されませんでした');
+    }
 
-if (!data.candidates || data.candidates.length === 0) {
-  console.error('No candidates in response:', data);
-  throw new Error('Gemini APIから候補が返されませんでした');
-}
+    if (!data.candidates[0].content || !data.candidates[0].content.parts || data.candidates[0].content.parts.length === 0) {
+      console.error('Invalid content structure:', data.candidates[0]);
+      throw new Error('Gemini APIのレスポンス構造が不正です');
+    }
 
-if (!data.candidates[0].content || !data.candidates[0].content.parts || data.candidates[0].content.parts.length === 0) {
-  console.error('Invalid content structure:', data.candidates[0]);
-  throw new Error('Gemini APIのレスポンス構造が不正です');
-}
+    const suggestion = data.candidates[0].content.parts[0].text;
 
-const suggestion = data.candidates[0].content.parts[0].text;
+    // 使用回数を更新（UPSERT）
+    const newUsageCount = currentUsage + 1;
+    const { error: upsertError } = await supabase
+      .from('ai_usage_quotas')
+      .upsert({
+        user_id: userId,
+        usage_date: today,
+        daily_count: newUsageCount,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,usage_date'
+      });
+
+    if (upsertError) {
+      console.error('使用回数更新エラー:', upsertError);
+      // エラーが発生してもAI提案は返す（課金されたため）
+    }
 
     // 成功レスポンス
     return res.status(200).json({
-    success: true,
-    suggestion,
-    usage: {
+      success: true,
+      suggestion,
+      usage: {
         daily: {
-        remaining: 14 // フロントエンドで実際の値に更新される
+          used: newUsageCount,
+          limit: DAILY_LIMIT,
+          remaining: DAILY_LIMIT - newUsageCount
         }
-    },
-    debug: {
+      },
+      debug: {
         hasApiKey: !!apiKey,
         requestData: { planType, participants, duration, location, budget_range, preferences },
         userId
-    }
+      }
     });
 
   } catch (error) {

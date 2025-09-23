@@ -3,7 +3,6 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { geminiQuotaManager } from '../lib/geminiQuotaManager';
 
 interface BudgetProposalFormProps {
   budgetForm: any; // 既存のuseFormフック
@@ -59,18 +58,38 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
     });
 
     // 制限状況を更新する関数
-    const updateQuotaStatus = () => {
-    const quotaCheck = geminiQuotaManager.canMakeRequest();
-    const stats = geminiQuotaManager.getUsageStats();
+    const updateQuotaStatus = async () => {
+    if (!user) return;
     
-    setQuotaStatus({
-        canRequest: quotaCheck.canRequest,
-        remaining: quotaCheck.remaining,
-        limitMessage: quotaCheck.canRequest ? null : 
-        geminiQuotaManager.getLimitExceededMessage(quotaCheck.reason || '')
-    });
-    
-    setRemainingUsage(stats.daily.remaining);
+    try {
+        const response = await fetch(`/api/get-usage-quota?userId=${user.id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+        const canRequest = data.usage.daily.remaining > 0;
+        setQuotaStatus({
+            canRequest,
+            remaining: { 
+            daily: data.usage.daily.remaining, 
+            minute: 15 // 分制限は簡素化のため削除
+            },
+            limitMessage: canRequest ? null : {
+            title: '本日の利用制限に達しました',
+            message: `本日のAI使用回数が上限（${data.usage.daily.limit}回）に達しました。明日の0時にリセットされます。`,
+            resetTime: (() => {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                return tomorrow;
+            })()
+            }
+        });
+        
+        setRemainingUsage(data.usage.daily.remaining);
+        }
+    } catch (error) {
+        console.error('使用回数取得エラー:', error);
+    }
     };
 
     // 制限状況の定期更新
@@ -141,19 +160,24 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
         }
 
        if (data.success) {
-        console.log('API レスポンス:', data); // デバッグ用
-        console.log('AI提案データ:', data.suggestion, typeof data.suggestion); // デバッグ用
-        setAiSuggestion(data.suggestion);
-        
-        // ★重要: 使用回数をカウントアップ
-        geminiQuotaManager.recordRequest();
-        
-        // 使用状況を更新
-        updateQuotaStatus();
-        setShowAIForm(false);
-    } else {
-        setError(data.error || 'AI提案の生成に失敗しました');
-    }
+            console.log('API レスポンス:', data);
+            console.log('AI提案データ:', data.suggestion, typeof data.suggestion);
+            setAiSuggestion(data.suggestion);
+            
+            // 使用回数の更新（サーバーから返される値を使用）
+            if (data.usage) {
+            setRemainingUsage(data.usage.daily.remaining);
+            setQuotaStatus(prev => ({
+                ...prev,
+                canRequest: data.usage.daily.remaining > 0,
+                remaining: { daily: data.usage.daily.remaining, minute: 15 }
+            }));
+            }
+            
+            setShowAIForm(false);
+        } else {
+            setError(data.error || 'AI提案の生成に失敗しました');
+        }
     } catch (error) {
       console.error('AI提案エラー:', error);
       setError('ネットワークエラーが発生しました');
