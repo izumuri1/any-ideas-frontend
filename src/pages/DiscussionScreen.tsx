@@ -9,6 +9,7 @@ import { DeleteButton } from '../components/DeleteButton'
 import PageHeader from '../components/PageHeader'
 import FormField from '../components/common/FormField'  // 追加
 import { useForm } from '../hooks/useForm'  // 追加
+import BudgetProposalForm from '../components/BudgetProposalForm'
 import './DiscussionScreen.scss'
 
 // 型定義（元のまま）
@@ -709,30 +710,14 @@ export default function DiscussionScreen() {
 
             {/* 想定予算 */}
             {activeTab === 'budget' && (
-              <div className="tab-content active">
+            <div className="tab-content active">
                 <h3 className="tab-title">想定予算</h3>
-                <div className="proposal-registration-form">
-                  <div className="form-row">
-                    <FormField
-                      type="textarea"
-                      placeholder="想定予算を記入"
-                      className="input-field textarea-field"
-                      rows={4}
-                      maxLength={500}
-                      showCharCount={true}
-                      {...budgetForm.getFieldProps('text')}
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => handleProposalSubmit('budget')}
-                    disabled={budgetForm.isSubmitting}
-                    className="btn-primary"
-                  >
-                    {budgetForm.isSubmitting ? '提案中...' : '提案'}
-                  </button>
-                </div>
-              </div>
+                <BudgetProposalForm
+                budgetForm={budgetForm}
+                onSubmit={() => handleProposalSubmit('budget')}
+                isSubmitting={budgetForm.isSubmitting}
+                />
+            </div>
             )}
           </div>
         </section>
