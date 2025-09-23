@@ -426,11 +426,12 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
       {/* 既存の予算入力エリア */}
       <div className="form-row">
         <textarea
-          placeholder="想定予算を記入"
-          className="input-field textarea-field"
-          rows={4}
-          maxLength={500}
-          {...budgetForm.getFieldProps('text')}
+        placeholder="想定予算を記入"
+        className="input-field textarea-field"
+        rows={4}
+        maxLength={500}
+        value={budgetForm.values.text}
+        onChange={(e) => budgetForm.setValue('text', e.target.value)}
         />
         <div className="character-count">
           {budgetForm.values.text.length}/500
