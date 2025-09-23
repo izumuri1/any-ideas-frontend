@@ -447,15 +447,11 @@ export default function Home() {
     try {
       console.log('削除開始:', { ideaId, userId: user.id, creatorId: ideaToDelete.creator_id })
       
-      // 認証状態をチェック
-      const { data: session, error: sessionError } = await supabase.auth.getSession()
-      console.log('セッション情報:', { session: session?.session?.user?.id, error: sessionError })
-      
-      const { error } = await supabase
-        .from('ideas')
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', ideaId)
-        .eq('creator_id', user.id)
+      // カスタム関数を呼び出し（RLSをバイパス）
+      const { data, error } = await supabase.rpc('delete_idea_by_owner', {
+        idea_uuid: ideaId,
+        user_uuid: user.id
+      })
 
       if (error) {
         console.error('Supabaseエラー詳細:', {
@@ -465,6 +461,10 @@ export default function Home() {
           hint: error.hint
         })
         throw error
+      }
+
+      if (!data) {
+        throw new Error('削除権限がありません')
       }
       
       console.log('削除成功')
