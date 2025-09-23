@@ -449,11 +449,13 @@ export default function Home() {
         .from('ideas')
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', ideaId)
+        .eq('creator_id', user.id)  // ← この行を追加
 
       if (error) throw error
       await fetchAllIdeas()
     } catch (error) {
       console.error('アイデア削除でエラーが発生しました:', error)
+      alert('アイデアの削除に失敗しました')  // ← この行を追加
     } finally {
       setDeletingIdeaId(null)
     }
