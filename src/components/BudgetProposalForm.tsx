@@ -188,17 +188,26 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
 
   // AI提案を予算テキストにコピー
     const useAISuggestion = () => {
-    try {
-        // aiSuggestionを確実に文字列に変換してから設定
-        const suggestionText = typeof aiSuggestion === 'string' ? aiSuggestion : String(aiSuggestion);
-        console.log('AI提案をセット:', suggestionText); // デバッグ用
-        
-        budgetForm.setValue('text', suggestionText);
-        setAiSuggestion(''); // 提案を使用したら非表示
-    } catch (error) {
-        console.error('AI提案の使用に失敗しました:', error);
-        setError('提案の使用に失敗しました');
-    }
+        try {
+            // aiSuggestionを確実に文字列に変換してから設定
+            let suggestionText = '';
+            if (typeof aiSuggestion === 'string') {
+                suggestionText = aiSuggestion;
+            } else if (aiSuggestion && typeof aiSuggestion === 'object') {
+                // オブジェクトの場合はJSONとして整形するか、適切なプロパティを取得
+                suggestionText = JSON.stringify(aiSuggestion, null, 2);
+            } else {
+                suggestionText = String(aiSuggestion);
+            }
+            
+            console.log('AI提案をセット:', suggestionText); // デバッグ用
+            
+            budgetForm.setValue('text', suggestionText);
+            setAiSuggestion(''); // 提案を使用したら非表示
+        } catch (error) {
+            console.error('AI提案の使用に失敗しました:', error);
+            setError('提案の使用に失敗しました');
+        }
     };
 
   return (
