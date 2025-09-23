@@ -1,5 +1,5 @@
 // /api/generate-budget.js
-// Gemini API を使用した安全な予算提案生成API
+// Vercel Functions用 - Gemini API を使用した安全な予算提案生成API
 
 // 使用量管理クラス
 class GeminiUsageManager {
@@ -192,7 +192,7 @@ async function callGeminiAPI(prompt) {
   return data.candidates[0].content.parts[0].text;
 }
 
-// メインのAPIハンドラー
+// Vercel Functions のメインハンドラー
 export default async function handler(req, res) {
   // CORS設定
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -277,7 +277,8 @@ export default async function handler(req, res) {
     res.status(500).json({
       success: false,
       error: 'AI提案の生成に失敗しました',
-      suggestion: 'AI提案の生成に失敗しました。手動で入力してください。'
+      suggestion: 'AI提案の生成に失敗しました。手動で入力してください。',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 }
