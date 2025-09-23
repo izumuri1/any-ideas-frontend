@@ -202,7 +202,7 @@
   transition: all $app-animation-fast $app-ease-out;
 
   // Ideas we're tryingゾーンのカード背景色を変更
-  .ideas-zone.ideas-trying & {
+  .ideas-zone.trying & {
     background-color: $app-gray-light;
   }
   
