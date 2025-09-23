@@ -140,19 +140,20 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
         }
         }
 
-        if (data.success) {
+       if (data.success) {
         console.log('API レスポンス:', data); // デバッグ用
         console.log('AI提案データ:', data.suggestion, typeof data.suggestion); // デバッグ用
         setAiSuggestion(data.suggestion);
+        
+        // ★重要: 使用回数をカウントアップ
+        geminiQuotaManager.recordRequest();
+        
         // 使用状況を更新
-        if (data.usage) {
-            setRemainingUsage(data.usage.daily.remaining);
-        }
         updateQuotaStatus();
-        setShowAIForm(false); // フォームを閉じる
-        } else {
+        setShowAIForm(false);
+    } else {
         setError(data.error || 'AI提案の生成に失敗しました');
-        }
+    }
     } catch (error) {
       console.error('AI提案エラー:', error);
       setError('ネットワークエラーが発生しました');
