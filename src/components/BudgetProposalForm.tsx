@@ -126,7 +126,6 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
           onClick={() => setShowAIForm(!showAIForm)}
           className="btn-ai-suggestion"
         >
-          <span className="ai-icon">🤖</span>
           AI予算提案
         </button>
         
