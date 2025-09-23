@@ -86,9 +86,11 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
       const data = await response.json();
 
       if (data.success) {
-        setAiSuggestion(data.suggestion);
-        // setRemainingUsage(data.remaining);
-        setShowAIForm(false); // フォームを閉じる
+    console.log('API レスポンス:', data); // デバッグ用
+    console.log('AI提案データ:', data.suggestion, typeof data.suggestion); // デバッグ用
+    setAiSuggestion(data.suggestion);
+    // setRemainingUsage(data.remaining);
+    setShowAIForm(false); // フォームを閉じる
       } else {
         setError(data.error || 'AI提案の生成に失敗しました');
       }
@@ -103,8 +105,11 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
   // AI提案を予算テキストにコピー
     const useAISuggestion = () => {
     try {
-        // useFormフックの正しいsetValueメソッドを使用
-        budgetForm.setValue('text', aiSuggestion);
+        // aiSuggestionを確実に文字列に変換してから設定
+        const suggestionText = typeof aiSuggestion === 'string' ? aiSuggestion : String(aiSuggestion);
+        console.log('AI提案をセット:', suggestionText); // デバッグ用
+        
+        budgetForm.setValue('text', suggestionText);
         setAiSuggestion(''); // 提案を使用したら非表示
     } catch (error) {
         console.error('AI提案の使用に失敗しました:', error);
