@@ -105,11 +105,20 @@ export default async function handler(req, res) {
     const data = await response.json();
     console.log('Gemini API response:', data);
     
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-      throw new Error('Gemini APIから有効な応答を取得できませんでした');
-    }
+    // より詳細なデバッグ情報を追加
+console.log('Full Gemini API response:', JSON.stringify(data, null, 2));
 
-    const suggestion = data.candidates[0].content.parts[0].text;
+if (!data.candidates || data.candidates.length === 0) {
+  console.error('No candidates in response:', data);
+  throw new Error('Gemini APIから候補が返されませんでした');
+}
+
+if (!data.candidates[0].content || !data.candidates[0].content.parts || data.candidates[0].content.parts.length === 0) {
+  console.error('Invalid content structure:', data.candidates[0]);
+  throw new Error('Gemini APIのレスポンス構造が不正です');
+}
+
+const suggestion = data.candidates[0].content.parts[0].text;
 
     // 成功レスポンス
     return res.status(200).json({
