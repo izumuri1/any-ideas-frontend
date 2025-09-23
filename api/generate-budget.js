@@ -77,10 +77,11 @@ export default async function handler(req, res) {
     console.log('Calling Gemini API...');
     
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-      headers: {
+    method: 'POST',  // ← この行を追加
+    headers: {
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    },
+    body: JSON.stringify({
         contents: [{
           parts: [{
             text: prompt
@@ -96,9 +97,15 @@ export default async function handler(req, res) {
     console.log('Gemini API response status:', response.status);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Gemini API Error:', errorData);
-      throw new Error(`Gemini API Error: ${errorData.error?.message || 'Unknown error'}`);
+    let errorData;
+    try {
+        errorData = await response.json();
+    } catch (e) {
+        errorData = await response.text();
+    }
+    console.error('Gemini API Error Response:', errorData);
+    console.error('Response headers:', [...response.headers.entries()]);
+    throw new Error(`Gemini API Error (${response.status}): ${errorData.error?.message || errorData || 'Unknown error'}`);
     }
 
     const data = await response.json();
