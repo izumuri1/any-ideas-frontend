@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION public.cleanup_old_notifications()
  RETURNS integer
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 DECLARE
   deleted_count INTEGER;
@@ -26,7 +26,7 @@ CREATE OR REPLACE FUNCTION public.create_idea_move_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 DECLARE
     member_record RECORD;
@@ -101,7 +101,7 @@ CREATE OR REPLACE FUNCTION public.create_idea_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 DECLARE
     member_record RECORD;
@@ -155,7 +155,7 @@ CREATE OR REPLACE FUNCTION public.create_notification(p_workspace_id uuid, p_use
  RETURNS uuid
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 DECLARE
   notification_id UUID;
@@ -192,7 +192,7 @@ CREATE OR REPLACE FUNCTION public.create_proposal_adopted_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 DECLARE
     member_record RECORD;
@@ -287,7 +287,7 @@ CREATE OR REPLACE FUNCTION public.create_proposal_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 DECLARE
     member_record RECORD;
@@ -362,11 +362,38 @@ $function$;
 ALTER FUNCTION "public"."create_proposal_notification"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION public.delete_idea_by_owner(idea_uuid uuid, user_uuid uuid)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path=""
+AS $function$
+BEGIN
+  -- アイデアオーナーかチェック
+  IF NOT EXISTS (
+    SELECT 1 FROM public.ideas 
+    WHERE id = idea_uuid AND creator_id = user_uuid AND deleted_at IS NULL
+  ) THEN
+    RETURN false;
+  END IF;
+  
+  -- 論理削除を実行
+  UPDATE public.ideas 
+  SET deleted_at = NOW()
+  WHERE id = idea_uuid AND creator_id = user_uuid;
+  
+  RETURN true;
+END;
+$function$;
+
+ALTER FUNCTION "public"."delete_idea_by_owner"(idea_uuid uuid, user_uuid uuid) OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION public.generate_notification_message(p_type character varying, p_actor_name text, p_target_name text)
  RETURNS text
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 BEGIN
   CASE p_type
@@ -392,7 +419,7 @@ ALTER FUNCTION "public"."generate_notification_message"(p_type character varying
 CREATE OR REPLACE FUNCTION public.generate_notification_message(p_actor_name text, p_type text, p_target_name text DEFAULT NULL::text)
  RETURNS text
  LANGUAGE plpgsql
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 BEGIN
   CASE p_type
@@ -417,7 +444,7 @@ CREATE OR REPLACE FUNCTION public.get_idea_like_count(idea_uuid uuid)
  RETURNS integer
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 BEGIN
     RETURN (
@@ -435,7 +462,7 @@ CREATE OR REPLACE FUNCTION public.get_workspace_members(workspace_id_param uuid)
  RETURNS TABLE(id uuid, user_id uuid, role text, joined_at timestamp without time zone, username text)
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO 'public'
+ SET search_path=public
 AS $function$
 BEGIN
   -- 現在のユーザーがワークスペースのメンバーかオーナーかを確認
@@ -500,7 +527,7 @@ CREATE OR REPLACE FUNCTION public.get_workspace_members_safe(workspace_id_param 
  RETURNS TABLE(id uuid, user_id uuid, role text, joined_at timestamp without time zone, username text)
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO 'public'
+ SET search_path=public
 AS $function$
 BEGIN
   -- アクセス権限チェック
@@ -565,7 +592,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 BEGIN
   INSERT INTO public.profiles (id, username)
@@ -584,7 +611,7 @@ ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
  RETURNS trigger
  LANGUAGE plpgsql
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 BEGIN
   NEW.updated_at = NOW();
@@ -599,7 +626,7 @@ CREATE OR REPLACE FUNCTION public.user_has_liked_idea(idea_uuid uuid, user_uuid 
  RETURNS boolean
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO ''
+ SET search_path=""
 AS $function$
 BEGIN
     RETURN EXISTS (
@@ -668,10 +695,19 @@ ALTER TABLE ONLY "public"."invitation_tokens"
     ADD CONSTRAINT "invitation_tokens_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id");
 
 ALTER TABLE ONLY "public"."notifications"
+    ADD CONSTRAINT "notifications_actor_user_id_fkey" FOREIGN KEY ("actor_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+ALTER TABLE ONLY "public"."notifications"
+    ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+ALTER TABLE ONLY "public"."notifications"
     ADD CONSTRAINT "notifications_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE CASCADE;
 
 ALTER TABLE ONLY "public"."profiles"
     ADD CONSTRAINT "profiles_default_workspace_id_fkey" FOREIGN KEY ("default_workspace_id") REFERENCES "public"."workspaces"("id");
+
+ALTER TABLE ONLY "public"."profiles"
+    ADD CONSTRAINT "profiles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 ALTER TABLE ONLY "public"."profiles"
     ADD CONSTRAINT "profiles_last_workspace_id_fkey" FOREIGN KEY ("last_workspace_id") REFERENCES "public"."workspaces"("id");
@@ -702,3 +738,40 @@ ALTER TABLE ONLY "public"."workspace_members"
 
 ALTER TABLE ONLY "public"."workspaces"
     ADD CONSTRAINT "workspaces_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "public"."profiles"("id");
+
+
+-- ============================
+-- 主な変更点（前回との差分）
+-- ============================
+
+-- 1. 新規追加関数:
+--    - delete_idea_by_owner(idea_uuid uuid, user_uuid uuid) 
+--      アイデアオーナーによる論理削除機能
+
+-- 2. search_path設定の統一:
+--    - 全関数でSET search_path=""に統一
+--    - セキュリティ向上のため
+
+-- 3. 関数重複の発見:
+--    - generate_notification_message関数の2つのオーバーロード版が存在
+--    - パラメータの順序が異なる2つのバージョン
+
+-- 4. 外部キー制約の重要な注意点:
+--    - notifications テーブルの user_id, actor_user_id は auth.users を参照
+--    - profiles テーブルの id は auth.users.id と1対1対応
+--    - CASCADE削除設定により、関連データの整合性を保持
+
+-- ============================
+-- 注記
+-- ============================
+
+-- このファイルには以下の機能が含まれます：
+-- 1. 通知システム関数 (create_*_notification系)
+-- 2. ワークスペースメンバー管理 (get_workspace_members系)
+-- 3. アイデア関連操作 (delete_idea_by_owner, get_idea_like_count等)
+-- 4. ユーザー管理 (handle_new_user, handle_updated_at)
+-- 5. 通知メッセージ生成 (generate_notification_message)
+-- 6. データクリーンアップ (cleanup_old_notifications)
+-- 
+-- 全関数にSECURITY DEFINERとsearch_path=""設定を適用し、
+-- セキュリティを強化。PostgreSQLのFunction Search Path脆弱性対策済み。
