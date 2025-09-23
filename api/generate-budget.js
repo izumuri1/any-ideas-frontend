@@ -44,18 +44,39 @@ export default async function handler(req, res) {
       });
     }
 
-    // 簡単なGemini APIテスト
-    const prompt = `以下の条件で簡潔な予算を提案してください：
-プラン: ${formData.planType}
-参加者: ${formData.participants}
-期間: ${formData.duration}
-場所: ${formData.location}
+    // Gemini APIへのリクエスト作成
+    const prompt = `
+    あなたは2024年の日本における予算見積り専門のアドバイザーです。
+    【依頼内容】
+    下記条件に基づき、現実的な予算を詳細に見積もってください。
+    必ず各項目に実際の物価を考慮してください。土日や祝日割増も計算に入れてください。
 
-100文字以内で回答してください。`;
+    【条件】
+    プラン内容: ${formData.planType}
+    参加者人数: ${formData.participants}
+    期間（日数）: ${formData.duration}
+    場所: ${formData.location}
+    ${formData.budget_range ? `希望予算: ${formData.budget_range}` : ''}
+    ${formData.preferences ? `特記事項: ${formData.preferences}` : ''}
+
+    【出力フォーマット】
+    総額予算: XX万円〜YY万円
+    内訳:
+    - 宿泊費: XX万円
+    - 交通費: XX万円
+    - 食事代: XX万円
+    - その他: XX万円
+
+    【注意事項】
+    - 2024年の日本における最新の市場価格や相場を前提とする
+    - 希望条件（例:高級旅館、特定エリア等）があれば必ず加味した現実的な価格設定にする
+    - 自信の無い項目は「推定」と明記し、可能な範囲で根拠を添える
+    - 曖昧な場合も必ず金額レンジ（例：15〜20万円）の形で回答する
+    `;
 
     console.log('Calling Gemini API...');
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,8 +88,8 @@ export default async function handler(req, res) {
           }]
         }],
         generationConfig: {
-          maxOutputTokens: 150,
-          temperature: 0.7
+          maxOutputTokens: 800,
+          temperature: 0.3
         }
       })
     });
