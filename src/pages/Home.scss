@@ -200,6 +200,11 @@
   padding: $app-padding-large;
   box-shadow: $app-shadow-card;
   transition: all $app-animation-fast $app-ease-out;
+
+  // Ideas we're tryingゾーンのカード背景色を変更
+  .ideas-zone.ideas-trying & {
+    background-color: $app-gray-light;
+  }
   
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
