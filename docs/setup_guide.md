@@ -71,6 +71,11 @@ Redirect URLs:
 ```
 ※ [PORT] は開発サーバーのポート番号
 
+### 6. AI予算提案機能設定
+```env
+# .env.local に追加
+GEMINI_API_KEY=your-gemini-api-key
+
 ---
 
 ## 起動・動作確認

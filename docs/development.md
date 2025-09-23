@@ -353,6 +353,15 @@ npm run lint --watch
 # デバッグ用ビルド
 npm run build
 npm run preview
+
+# AI機能のテスト
+# 1. Gemini APIキーを設定
+echo "GEMINI_API_KEY=your-key" >> .env.local
+
+# 2. 使用制限のリセット（開発用）
+# ブラウザの開発者ツールで実行:
+# localStorage.removeItem('gemini_api_usage')
+
 ```
 
 ### VS Code 拡張推奨
@@ -370,6 +379,7 @@ npm run preview
 - **データベース**: `supabase/schema.dbml`
 - [Vercel Documentation](https://vercel.com/docs)
 - [Vite Documentation](https://vitejs.dev/guide/)
+- [Gemini API](https://developers.generativeai.google/)
 
 ---
 

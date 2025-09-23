@@ -342,6 +342,30 @@ interface Idea {
 
 ---
 
+## AI予算提案機能
+
+### 概要
+Gemini APIを使用した予算見積もり機能。想定予算タブで利用可能。
+
+### 使用方法
+```typescript
+// AI予算提案の実行
+const response = await fetch('/api/generate-budget', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    planType: '旅行', // 必須
+    participants: '4人', // 必須  
+    duration: '2泊3日', // 必須
+    location: '沖縄', // 必須
+    budget_range: '10-20万円', // 任意
+    preferences: '高級ホテル希望', // 任意
+    userId: user.id // 必須
+  })
+});
+
+---
+
 ## 開発Tips
 
 ### デバッグ用コード
@@ -376,6 +400,7 @@ console.log('Channel subscribed:', channel)
 - **関数・トリガー**: `supabase/supabase_functions.sql`
 - **セットアップ**: `setup_guide.md`
 - [Supabase JavaScript SDK](https://supabase.com/docs/reference/javascript/introduction)
+- [Gemini API Documentation](https://developers.generativeai.google/)
 
 ---
 
