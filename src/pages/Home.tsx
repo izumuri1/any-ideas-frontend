@@ -445,17 +445,33 @@ export default function Home() {
 
     setDeletingIdeaId(ideaId)
     try {
+      console.log('削除開始:', { ideaId, userId: user.id, creatorId: ideaToDelete.creator_id })
+      
+      // 認証状態をチェック
+      const { data: session, error: sessionError } = await supabase.auth.getSession()
+      console.log('セッション情報:', { session: session?.session?.user?.id, error: sessionError })
+      
       const { error } = await supabase
         .from('ideas')
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', ideaId)
-        .eq('creator_id', user.id)  // ← この行を追加
+        .eq('creator_id', user.id)
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabaseエラー詳細:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        })
+        throw error
+      }
+      
+      console.log('削除成功')
       await fetchAllIdeas()
     } catch (error) {
       console.error('アイデア削除でエラーが発生しました:', error)
-      alert('アイデアの削除に失敗しました')  // ← この行を追加
+      alert('アイデアの削除に失敗しました。詳細はコンソールを確認してください。')
     } finally {
       setDeletingIdeaId(null)
     }
