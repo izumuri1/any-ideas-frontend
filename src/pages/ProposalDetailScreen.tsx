@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { HamburgerMenu } from '../components/HamburgerMenu'
 import { supabase } from '../lib/supabase'
 import PageHeader from '../components/PageHeader'
+import { formatPeriodWithDayOfWeek } from '../utils/dateUtils';
 import './ProposalDetailScreen.scss'
 
 interface Idea {
@@ -235,7 +236,7 @@ export function ProposalDetailScreen() {
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
                             <p>{proposal.start_date && proposal.end_date ? 
-                                `${new Date(proposal.start_date).toLocaleDateString('ja-JP')} 〜 ${new Date(proposal.end_date).toLocaleDateString('ja-JP')}` : 
+                                formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date)) : 
                                 proposal.content}
                             </p>
                             </div>
@@ -334,8 +335,8 @@ export function ProposalDetailScreen() {
                     <div key={proposal.id} className="proposal-card adopted-card non-adopted-card">
                       <div className="proposal-content">
                         <p>{proposal.start_date && proposal.end_date ?
-                          `${new Date(proposal.start_date).toLocaleDateString('ja-JP')} 〜 ${new Date(proposal.end_date).toLocaleDateString('ja-JP')}` :
-                          proposal.content}
+                        formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date)) :
+                        proposal.content}
                         </p>
                       </div>
                       <div className="proposal-header">

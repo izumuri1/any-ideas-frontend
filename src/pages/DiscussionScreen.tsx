@@ -10,6 +10,7 @@ import PageHeader from '../components/PageHeader'
 import FormField from '../components/common/FormField'  // 追加
 import { useForm } from '../hooks/useForm'  // 追加
 import BudgetProposalForm from '../components/BudgetProposalForm'
+import { formatPeriodWithDayOfWeek } from '../utils/dateUtils';
 import './DiscussionScreen.scss'
 
 // 型定義（元のまま）
@@ -846,8 +847,8 @@ export default function DiscussionScreen() {
                     <div key={proposal.id} className="proposal-card adopted-card">
                       <div className="proposal-content">
                         <p>{proposal.start_date && proposal.end_date ? 
-                          `${new Date(proposal.start_date).toLocaleDateString('ja-JP')} 〜 ${new Date(proposal.end_date).toLocaleDateString('ja-JP')}` : 
-                          proposal.content}
+                        formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date)) :
+                        proposal.content}
                         </p>
                       </div>
                       <div className="proposal-header">
