@@ -349,7 +349,8 @@ export function CreateWorkspace() {
           <>
             <p className="subtitle">ワークスペース作成</p>
             <p className="introduction">
-              アイデアを共有するワークスペースを作成しましよう
+              アイデアを共有するワークスペースを作成しよう<br />
+              作成したらアイデアを共有したいメンバーをワークスペースへ招待しよう
             </p>
 
             {/* エラーメッセージ */}
