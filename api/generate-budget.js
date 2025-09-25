@@ -115,6 +115,14 @@ export default async function handler(req, res) {
     - 希望条件（例:高級旅館、特定エリア等）があれば必ず加味した現実的な価格設定にする
     - 自信の無い項目は「推定」と明記し、可能な範囲で根拠を添える
     - 曖昧な場合も必ず金額レンジ（例：15〜20万円）の形で回答する
+    - 必ず計算を二重チェックし、各内訳の合計が総額予算と一致するようにしてください
+    - 人数と単価の計算は特に慎重に行い、明確な根拠を示してください
+
+    【計算チェック必須】
+    回答前に以下を確認してください：
+    1. 人数 × 単価の計算が正しいか
+    2. 各項目（宿泊費+交通費+食事代+その他）の合計が総額予算の範囲内か
+    3. 単価が現実的な相場に合っているか
     `;
 
     console.log('Calling Gemini API...');
@@ -132,7 +140,7 @@ export default async function handler(req, res) {
         }],
         generationConfig: {
           maxOutputTokens: 800,
-          temperature: 0.3
+          temperature: 0.1
         }
       })
     });
