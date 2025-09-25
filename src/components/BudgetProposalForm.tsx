@@ -92,6 +92,45 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
     }
     };
 
+    // AI提案のフォーマット処理関数を追加
+    const formatAISuggestion = (suggestion: string) => {
+        if (!suggestion) return '';
+        
+        return suggestion
+        .split('\n')
+        .map((line, index) => {
+            // 空行の処理
+            if (line.trim() === '') {
+            return <br key={index} />;
+            }
+            
+            // 「総額予算:」「内訳:」などの見出し行
+            if (line.includes('総額予算:') || line.includes('内訳:')) {
+            return (
+                <div key={index} className="budget-header">
+                {line}
+                </div>
+            );
+            }
+            
+            // 「- 宿泊費:」などのリスト項目
+            if (line.trim().startsWith('- ')) {
+            return (
+                <div key={index} className="budget-item">
+                {line}
+                </div>
+            );
+            }
+            
+            // その他の通常行
+            return (
+            <div key={index} className="budget-line">
+                {line}
+            </div>
+            );
+        });
+    };
+
     // 制限状況の定期更新
     React.useEffect(() => {
     updateQuotaStatus();
@@ -393,7 +432,9 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
               </button>
             </div>
             <div className="ai-suggestion-content">
-              <pre>{aiSuggestion}</pre>
+              <div className="formatted-suggestion">
+                {formatAISuggestion(aiSuggestion)}
+              </div>
             </div>
             <div className="ai-suggestion-actions">
               <button 
