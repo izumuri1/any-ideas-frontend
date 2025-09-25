@@ -76,14 +76,12 @@ function ProposalCard({
 
   // 提案内容の表示を取得
   const getProposalContent = () => {
-    switch (proposal.proposal_type) {
-      case 'period':
-        if (proposal.start_date && proposal.end_date) {
-          const startDate = new Date(proposal.start_date).toLocaleDateString('ja-JP')
-          const endDate = new Date(proposal.end_date).toLocaleDateString('ja-JP')
-          return `${startDate}～${endDate}`
-        }
-        return proposal.content
+  switch (proposal.proposal_type) {
+    case 'period':
+      if (proposal.start_date && proposal.end_date) {
+        return formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date))
+      }
+      return proposal.content
       case 'todo':
         return proposal.todo_text || proposal.content
       case 'not_todo':
