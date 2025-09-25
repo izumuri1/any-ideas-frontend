@@ -12,6 +12,7 @@ import { useForm } from '../hooks/useForm'  // ← 既存import
 import IdeaCard from '../components/IdeaCard/IdeaCard' // ← 新規import（IdeaCard化のみの追加）
 import { NotificationBell } from '../components/NotificationBell' // ← 追加
 import { sortByWhenText } from '../utils/dateUtils'
+import { handleError } from '../utils/errorUtils'
 import './Home.scss'
 
 // 型定義（元のまま完全維持）
@@ -172,12 +173,6 @@ export default function Home() {
       like_count: item.idea_likes?.length || 0,
       user_has_liked: user ? item.idea_likes?.some((like: any) => like.user_id === user.id) || false : false
     }))
-  }
-
-  // handleError（元のまま）
-  const handleError = (error: any, message: string) => {
-    console.error(message, error)
-    alert(message)
   }
 
   // fetchAllIdeas（元のまま）
