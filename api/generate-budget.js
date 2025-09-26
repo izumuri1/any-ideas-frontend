@@ -162,12 +162,22 @@ export default async function handler(req, res) {
       throw new Error('Gemini APIから候補が返されませんでした');
     }
 
-    if (!data.candidates[0].content || !data.candidates[0].content.parts || data.candidates[0].content.parts.length === 0) {
-      console.error('Invalid content structure:', data.candidates[0]);
-      throw new Error('Gemini APIのレスポンス構造が不正です');
+    const candidate = data.candidates[0];
+    if (!candidate.content) {
+    console.error('Invalid content structure:', candidate);
+    throw new Error('Gemini APIのレスポンス構造が不正です');
     }
 
-    const suggestion = data.candidates[0].content.parts[0].text;
+    // content.partsが配列の場合と、contentが直接textを持つ場合の両方に対応
+    let suggestion;
+    if (candidate.content.parts && candidate.content.parts.length > 0) {
+    suggestion = candidate.content.parts[0].text;
+    } else if (candidate.content.text) {
+    suggestion = candidate.content.text;
+    } else {
+    console.error('No text found in response:', candidate.content);
+    throw new Error('レスポンスにテキストが含まれていません');
+    }
 
     // 使用回数を更新（UPSERT）
     const newUsageCount = currentUsage + 1;
