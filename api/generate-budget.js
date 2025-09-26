@@ -99,8 +99,8 @@ export default async function handler(req, res) {
     - 参加者人数: ${participants}
     - 期間（日数）: ${duration}
     - 場所: ${location}
-    - ${budget_range ? `希望予算: ${budget_range}` : ''}
-    - ${preferences ? `特記事項: ${preferences}` : ''}
+    ${budget_range ? `- 希望予算: ${budget_range}` : ''}
+    ${preferences ? `- 特記事項: ${preferences}` : ''}
 
     # 思考ステップ
     1.  まず、プラン内容、場所、期間、人数の基本情報から、予算の全体像を把握します。
