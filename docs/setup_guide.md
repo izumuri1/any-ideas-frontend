@@ -74,7 +74,7 @@ Redirect URLs:
 ### 6. AI予算提案機能設定
 ```env
 # .env.local に追加
-GEMINI_API_KEY=your-gemini-api-key
+OPENAI_API_KEY=your-openai-api-key
 
 ---
 

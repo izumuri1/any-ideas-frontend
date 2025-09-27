@@ -345,7 +345,7 @@ interface Idea {
 ## AI予算提案機能
 
 ### 概要
-Gemini APIを使用した予算見積もり機能。想定予算タブで利用可能。
+OpenAI API (gpt-4o-mini)を使用した予算見積もり機能。想定予算タブで利用可能。
 
 ### 使用方法
 ```typescript
@@ -400,7 +400,7 @@ console.log('Channel subscribed:', channel)
 - **関数・トリガー**: `supabase/supabase_functions.sql`
 - **セットアップ**: `setup_guide.md`
 - [Supabase JavaScript SDK](https://supabase.com/docs/reference/javascript/introduction)
-- [Gemini API Documentation](https://developers.generativeai.google/)
+- [OpenAI API Documentation](https://platform.openai.com/docs)
 
 ---
 

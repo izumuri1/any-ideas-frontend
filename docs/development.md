@@ -355,12 +355,12 @@ npm run build
 npm run preview
 
 # AI機能のテスト
-# 1. Gemini APIキーを設定
-echo "GEMINI_API_KEY=your-key" >> .env.local
+# 1. OpenAI APIキーを設定
+echo "OPENAI_API_KEY=your-key" >> .env.local
 
 # 2. 使用制限のリセット（開発用）
-# ブラウザの開発者ツールで実行:
-# localStorage.removeItem('gemini_api_usage')
+# データベースの ai_usage_quotas テーブルで管理
+# 開発時にリセットが必要な場合はSupabaseから直接削除
 
 ```
 
@@ -379,7 +379,7 @@ echo "GEMINI_API_KEY=your-key" >> .env.local
 - **データベース**: `supabase/schema.dbml`
 - [Vercel Documentation](https://vercel.com/docs)
 - [Vite Documentation](https://vitejs.dev/guide/)
-- [Gemini API](https://developers.generativeai.google/)
+- [OpenAI API](https://platform.openai.com/docs)
 
 ---
 
