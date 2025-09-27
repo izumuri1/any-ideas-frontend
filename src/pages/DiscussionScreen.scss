@@ -30,21 +30,20 @@
   @include app-section-style;
   margin-bottom: $app-padding-large;
   
-  .section-title {
+    .section-title {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    @include app-title-style;
+    justify-content: center;
+    gap: 0.75rem;
+    @include app-logo-style;
     margin-bottom: 0.5rem;
-    text-align: left;  // 中央揃えから左揃えに変更
     
-    // アイコン画像のスタイル
     img {
-      width: 32px;
-      height: 32px;
-      flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
     }
-  }
+    }
   
   .section-description {
     @include app-text-style;
