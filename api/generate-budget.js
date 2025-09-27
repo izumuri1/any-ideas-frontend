@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   console.log('=== API Called ===');
   console.log('Method:', req.method);
   console.log('Body:', req.body);
-  console.log('Env GEMINI_API_KEY exists:', !!process.env.GEMINI_API_KEY);
+  console.log('Env OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
   
   // CORS設定
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -78,70 +78,61 @@ export default async function handler(req, res) {
     }
 
     // APIキーの存在確認
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return res.status(500).json({
         success: false,
-        error: 'Gemini APIキーが設定されていません'
+        error: 'OpenAI APIキーが設定されていません'
       });
     }
 
-    // Gemini APIへのリクエスト作成
-    const prompt = `
-    あなたは2024年の日本における予算見積り専門のアドバイザーです。
-    【依頼内容】
-    下記条件に基づき、現実的な予算を詳細に見積もってください。
-    必ず各項目に実際の物価を考慮してください。土日や祝日割増も計算に入れてください。
-    【条件】
-    プラン内容: ${planType}
-    参加者人数: ${participants}
-    期間（日数）: ${duration}
-    場所: ${location}
-    ${budget_range ? `希望予算: ${budget_range}` : ''}
-    ${preferences ? `特記事項: ${preferences}` : ''}
-    【出力フォーマット】
-    総額予算: XX万円〜YY万円
-    内訳:
-    - 宿泊費: XX万円
-    - 交通費: XX万円
-    - 食事代: XX万円
-    - その他: XX万円
-    【注意事項】
-    - 回答は480文字以内で簡潔にまとめてください
-    - 質問が行われた時点の日本における最新の市場価格や相場を前提とする
-    - 希望条件（例:高級旅館、特定エリア等）があれば必ず加味した現実的な価格設定にする
-    - 自信の無い項目は「推定」と明記し、可能な範囲で根拠を添える
-    - 曖昧な場合も必ず金額レンジ（例：15〜20万円）の形で回答する
-    - 必ず計算を二重チェックし、各内訳の合計が総額予算と一致するようにしてください
-    - 人数と単価の計算は特に慎重に行い、明確な根拠を示してください
-    【計算チェック必須】
-    回答前に以下を確認してください：
-    1. 人数 × 単価の計算が正しいか
-    2. 各項目（宿泊費+交通費+食事代+その他）の合計が総額予算の範囲内か
-    3. 単価が現実的な相場に合っているか
-    `;
+    // AI APIへのリクエスト作成
+    const prompt = `あなたは日本の予算見積り専門アドバイザーです。
 
-    console.log('Calling Gemini API...');
+    【条件】
+    - プラン内容: ${planType}
+    - 参加者人数: ${participants}
+    - 期間: ${duration}日
+    - 場所: ${location}
+    ${budget_range ? `- 希望予算: ${budget_range}` : ''}
+    ${preferences ? `- 特記事項: ${preferences}` : ''}
+
+    【タスク】
+    現実的な予算を詳細に見積もってください。2024年の日本の物価、土日祝日の割増を考慮してください。
+
+    【出力フォーマット】
+    総額予算: XX万円〜YY万円
+    内訳:
+    - 宿泊費: XX万円（根拠を簡潔に）
+    - 交通費: XX万円（根拠を簡潔に）
+    - 食事代: XX万円（根拠を簡潔に）
+    - その他: XX万円（根拠を簡潔に）
+
+    【注意】
+    - 480文字以内で簡潔に
+    - 計算を二重チェックし、内訳の合計が総額と一致すること
+    - 不明確な項目は「推定」と明記`;
+
+    console.log('Calling OpenAI API...');
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`, {
-      method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          maxOutputTokens: 800,
-          temperature: 0.1
-        }
-      })
-    });
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [{
+            role: 'user',
+            content: prompt
+            }],
+            max_tokens: 800,
+            temperature: 0.1
+        })
+        });
 
-    console.log('Gemini API response status:', response.status);
+    console.log('OpenAI API response status:', response.status);
 
     if (!response.ok) {
       let errorData;
@@ -150,32 +141,22 @@ export default async function handler(req, res) {
       } catch (e) {
         errorData = await response.text();
       }
-      console.error('Gemini API Error Response:', errorData);
-      throw new Error(`Gemini API Error (${response.status}): ${errorData.error?.message || errorData || 'Unknown error'}`);
+      console.error('OpenAI API Error Response:', errorData);
+      throw new Error(`OpenAI API Error (${response.status}): ${errorData.error?.message || errorData || 'Unknown error'}`);
     }
 
     const data = await response.json();
-    console.log('Gemini API response:', data);
+    console.log('OpenAI API response:', data);
     
-    if (!data.candidates || data.candidates.length === 0) {
-      console.error('No candidates in response:', data);
-      throw new Error('Gemini APIから候補が返されませんでした');
+    if (!data.choices || data.choices.length === 0) {
+    console.error('No choices in response:', data);
+    throw new Error('OpenAI APIから応答が返されませんでした');
     }
 
-    const candidate = data.candidates[0];
-    if (!candidate.content) {
-    console.error('Invalid content structure:', candidate);
-    throw new Error('Gemini APIのレスポンス構造が不正です');
-    }
+    const suggestion = data.choices[0].message.content;
 
-    // content.partsが配列の場合と、contentが直接textを持つ場合の両方に対応
-    let suggestion;
-    if (candidate.content.parts && candidate.content.parts.length > 0) {
-    suggestion = candidate.content.parts[0].text;
-    } else if (candidate.content.text) {
-    suggestion = candidate.content.text;
-    } else {
-    console.error('No text found in response:', candidate.content);
+    if (!suggestion) {
+    console.error('No content in response:', data.choices[0]);
     throw new Error('レスポンスにテキストが含まれていません');
     }
 
@@ -225,7 +206,7 @@ export default async function handler(req, res) {
       error: 'AI提案の生成に失敗しました',
       details: error.message,
       debug: {
-        hasApiKey: !!process.env.GEMINI_API_KEY,
+        hasApiKey: !!process.env.OPENAI_API_KEY,
         timestamp: new Date().toISOString()
       }
     });
