@@ -142,6 +142,11 @@ export default function DiscussionScreen() {
   const { user } = useAuth()
   const navigate = useNavigate()
   
+  // 画面遷移時に最上部へスクロール
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+  
   // 状態管理（元のまま）
   const [ideaInfo, setIdeaInfo] = useState<IdeaInfo | null>(null)
   const [proposals, setProposals] = useState<Proposal[]>([])
