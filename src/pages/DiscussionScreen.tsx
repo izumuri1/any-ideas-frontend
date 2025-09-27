@@ -728,7 +728,7 @@ export default function DiscussionScreen() {
 
     {/* 提案一覧セクション（元のまま） */}
     <section className="proposals-section">
-    <h3 className="proposals-title">Go for it</h3>
+    <h3 className="proposals-title">Which one should we pick?</h3>
     <p className="proposals-description">提案を採用しよう</p>
     
     {/* タブ別提案表示 */}

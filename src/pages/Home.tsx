@@ -658,7 +658,7 @@ export default function Home() {
         </section>
 
         <section className="ideas-zone trying">
-          <h2 className="zone-title">Ideas we're trying</h2>
+          <h2 className="zone-title">Ideas in action</h2>
           <p className="zone-description">これまでに検討したアイデアを確認しよう</p>
           <div className="ideas-cards">
             {tryingIdeas.length === 0 ? (
