@@ -594,8 +594,11 @@ export default function DiscussionScreen() {
       <main className="discussion-main">
         {/* How about? セクション（元の構造を保持） */}
         <section className="how-about-section">
-          <h2 className="section-title">How about?</h2>
-          <p className="section-description">提案してアイデアを具体化しよう</p>
+        <h2 className="section-title">
+            <img src="/icons/icon-48x48.png" alt="" />
+            How about？
+        </h2>
+        <p className="section-description">具体的な提案を登録しよう</p>
           
           {/* タブメニュー（元のまま） */}
           <div className="tab-menu">

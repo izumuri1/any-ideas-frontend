@@ -31,9 +31,19 @@
   margin-bottom: $app-padding-large;
   
   .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     @include app-title-style;
     margin-bottom: 0.5rem;
-    text-align: center;
+    text-align: left;  // 中央揃えから左揃えに変更
+    
+    // アイコン画像のスタイル
+    img {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+    }
   }
   
   .section-description {
