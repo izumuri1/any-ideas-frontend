@@ -46,6 +46,11 @@ export function ProposalDetailScreen() {
 
   const [proposals, setProposals] = useState<Proposal[]>([])
 
+  // 画面遷移時に最上部へスクロール
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   // アイデア情報を取得
   useEffect(() => {
     if (!ideaId || !workspaceId) {
