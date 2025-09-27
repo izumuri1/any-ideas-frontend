@@ -478,6 +478,29 @@
   }
 }
 
+// 追加：特定のstepの下に横線を引く
+.tutorial-step.with-divider {
+  position: relative;
+  padding-bottom: 20px;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -$app-padding-large;
+    right: -$app-padding-large;
+    height: 1px;
+    background-color: $app-text-color;
+  }
+}
+
+// アイコンサイズ調整（新規追加）
+.tutorial-section-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 @keyframes slideInUp {
   from {
     opacity: 0;

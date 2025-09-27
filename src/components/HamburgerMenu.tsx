@@ -158,7 +158,6 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
           <div className="tutorial-notification">
             <div className="tutorial-header">
               <div className="tutorial-title-section">
-                <img src="/icons/icon-48x48.png" alt="App Icon" className="tutorial-app-icon" />
                 <h3 className="tutorial-title">このアプリの使い方</h3>
               </div>
               <button 
@@ -171,7 +170,10 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
             </div>
             <div className="tutorial-content">
               <div className="tutorial-section">
-                <div className="tutorial-section-title">💡 Any ideas？</div>
+                <div className="tutorial-section-title">
+                  <img src="/icons/icon-48x48.png" alt="App Icon" className="tutorial-section-icon" />
+                  Any ideas？
+                </div>
                 <div className="tutorial-step">
                   <span className="tutorial-step-number">1</span>
                   <div className="tutorial-step-content">
@@ -201,7 +203,7 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
               
               <div className="tutorial-section">
                 <div className="tutorial-section-title">🤔 Ideas we're thinking about</div>
-                <div className="tutorial-step">
+                <div className="tutorial-step with-divider">
                   <span className="tutorial-step-number">3</span>
                   <div className="tutorial-step-content">
                     <span className="tutorial-step-text">みんなで実現方法を提案しよう！</span>
@@ -211,7 +213,10 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
               </div>
               
               <div className="tutorial-section">
-                <div className="tutorial-section-title">💭 How about？</div>
+                <div className="tutorial-section-title">
+                  <img src="/icons/icon-48x48.png" alt="App Icon" className="tutorial-section-icon" />
+                  How about？
+                </div>
                 <div className="tutorial-step">
                   <span className="tutorial-step-number">4</span>
                   <div className="tutorial-step-content">
