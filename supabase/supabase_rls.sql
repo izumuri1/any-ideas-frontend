@@ -182,8 +182,8 @@ CREATE INDEX idx_idea_likes_idea_id ON public.idea_likes USING btree (idea_id);
 CREATE INDEX idx_idea_likes_user_id ON public.idea_likes USING btree (user_id);
 CREATE INDEX idx_ideas_creator_id ON public.ideas USING btree (creator_id);
 CREATE INDEX idx_ideas_deleted_at ON public.ideas USING btree (deleted_at);
-CREATE INDEX idx_ideas_idea_name ON public.ideas USING btree (idea_name);
-CREATE INDEX idx_ideas_status ON public.ideas USING btree (status);
+-- idx_ideas_idea_name は削除済み（使用回数0のため）
+-- idx_ideas_status は削除済み（使用回数0のため）
 CREATE INDEX idx_ideas_workspace_id ON public.ideas USING btree (workspace_id);
 CREATE INDEX idx_ideas_workspace_status_deleted ON public.ideas USING btree (workspace_id, status) WHERE (deleted_at IS NULL);
 CREATE INDEX idx_invitation_tokens_created_by ON public.invitation_tokens USING btree (created_by);
@@ -192,7 +192,7 @@ CREATE INDEX idx_invitation_tokens_is_active ON public.invitation_tokens USING b
 CREATE INDEX idx_invitation_tokens_token ON public.invitation_tokens USING btree (token);
 CREATE INDEX idx_invitation_tokens_workspace_id ON public.invitation_tokens USING btree (workspace_id);
 CREATE INDEX idx_notifications_created_at ON public.notifications USING btree (created_at);
-CREATE INDEX idx_notifications_unread ON public.notifications USING btree (user_id, is_read);
+-- idx_notifications_unread は削除済み（idx_notifications_user_readと重複のため）
 CREATE INDEX idx_notifications_user_read ON public.notifications USING btree (user_id, is_read);
 CREATE INDEX idx_notifications_user_workspace ON public.notifications USING btree (user_id, workspace_id);
 CREATE INDEX idx_notifications_user_workspace_created ON public.notifications USING btree (user_id, workspace_id, created_at DESC);
@@ -206,8 +206,8 @@ CREATE INDEX idx_proposals_deleted_at ON public.proposals USING btree (deleted_a
 CREATE INDEX idx_proposals_idea_adopted_deleted ON public.proposals USING btree (idea_id, is_adopted) WHERE (deleted_at IS NULL);
 CREATE INDEX idx_proposals_idea_deleted ON public.proposals USING btree (idea_id) WHERE (deleted_at IS NULL);
 CREATE INDEX idx_proposals_idea_id ON public.proposals USING btree (idea_id);
-CREATE INDEX idx_proposals_is_adopted ON public.proposals USING btree (is_adopted);
-CREATE INDEX idx_proposals_proposal_type ON public.proposals USING btree (proposal_type);
+-- idx_proposals_is_adopted は削除済み（使用回数0のため）
+-- idx_proposals_proposal_type は削除済み（使用回数0のため）
 CREATE INDEX idx_proposals_proposer_id ON public.proposals USING btree (proposer_id);
 CREATE INDEX idx_workspace_members_user_id ON public.workspace_members USING btree (user_id);
 CREATE INDEX idx_workspace_members_workspace_id ON public.workspace_members USING btree (workspace_id);
