@@ -1,12 +1,18 @@
 -- ============================
--- 関数定義（セキュリティ修正済み）
+-- Supabase Schema Export (Part 2: Functions, Triggers, Foreign Keys)
+-- Date: 2025-09-28
+-- Description: Any Ideas アプリケーション - 関数、トリガー、外部キー制約
+-- ============================
+
+-- ============================
+-- 関数定義
 -- ============================
 
 CREATE OR REPLACE FUNCTION public.cleanup_old_notifications()
  RETURNS integer
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 DECLARE
   deleted_count INTEGER;
@@ -19,14 +25,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."cleanup_old_notifications"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.create_idea_move_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
@@ -94,14 +97,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."create_idea_move_notification"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.create_idea_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
@@ -148,14 +148,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."create_idea_notification"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.create_notification(p_workspace_id uuid, p_user_id uuid, p_actor_user_id uuid, p_type text, p_message text, p_related_id uuid DEFAULT NULL::uuid)
  RETURNS uuid
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 DECLARE
   notification_id UUID;
@@ -185,14 +182,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."create_notification"(p_workspace_id uuid, p_user_id uuid, p_actor_user_id uuid, p_type text, p_message text, p_related_id uuid DEFAULT NULL::uuid) OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.create_proposal_adopted_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
@@ -280,14 +274,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."create_proposal_adopted_notification"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.create_proposal_notification()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
@@ -359,14 +350,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."create_proposal_notification"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.delete_idea_by_owner(idea_uuid uuid, user_uuid uuid)
  RETURNS boolean
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 BEGIN
   -- アイデアオーナーかチェック
@@ -386,14 +374,12 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."delete_idea_by_owner"(idea_uuid uuid, user_uuid uuid) OWNER TO "postgres";
-
-
+-- generate_notification_message (オーバーロード版1)
 CREATE OR REPLACE FUNCTION public.generate_notification_message(p_type character varying, p_actor_name text, p_target_name text)
  RETURNS text
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 BEGIN
   CASE p_type
@@ -413,13 +399,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."generate_notification_message"(p_type character varying, p_actor_name text, p_target_name text) OWNER TO "postgres";
-
-
+-- generate_notification_message (オーバーロード版2)
 CREATE OR REPLACE FUNCTION public.generate_notification_message(p_actor_name text, p_type text, p_target_name text DEFAULT NULL::text)
  RETURNS text
  LANGUAGE plpgsql
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 BEGIN
   CASE p_type
@@ -437,14 +421,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."generate_notification_message"(p_actor_name text, p_type text, p_target_name text DEFAULT NULL::text) OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.get_idea_like_count(idea_uuid uuid)
  RETURNS integer
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 BEGIN
     RETURN (
@@ -455,14 +436,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."get_idea_like_count"(idea_uuid uuid) OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.get_workspace_members(workspace_id_param uuid)
  RETURNS TABLE(id uuid, user_id uuid, role text, joined_at timestamp without time zone, username text)
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=public
+ SET search_path TO 'public'
 AS $function$
 BEGIN
   -- 現在のユーザーがワークスペースのメンバーかオーナーかを確認
@@ -520,14 +498,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."get_workspace_members"(workspace_id_param uuid) OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.get_workspace_members_safe(workspace_id_param uuid)
  RETURNS TABLE(id uuid, user_id uuid, role text, joined_at timestamp without time zone, username text)
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=public
+ SET search_path TO 'public'
 AS $function$
 BEGIN
   -- アクセス権限チェック
@@ -585,14 +560,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."get_workspace_members_safe"(workspace_id_param uuid) OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.handle_new_user()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 BEGIN
   INSERT INTO public.profiles (id, username)
@@ -605,13 +577,10 @@ EXCEPTION
 END;
 $function$;
 
-ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
  RETURNS trigger
  LANGUAGE plpgsql
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 BEGIN
   NEW.updated_at = NOW();
@@ -619,14 +588,11 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."handle_updated_at"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION public.user_has_liked_idea(idea_uuid uuid, user_uuid uuid)
  RETURNS boolean
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path=""
+ SET search_path TO ''
 AS $function$
 BEGIN
     RETURN EXISTS (
@@ -636,130 +602,163 @@ BEGIN
 END;
 $function$;
 
-ALTER FUNCTION "public"."user_has_liked_idea"(idea_uuid uuid, user_uuid uuid) OWNER TO "postgres";
-
-
 -- ============================
 -- トリガー定義
 -- ============================
 
-CREATE TRIGGER set_ideas_updated_at BEFORE UPDATE ON public.ideas FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+CREATE TRIGGER set_ideas_updated_at
+    BEFORE UPDATE
+    ON public.ideas
+    FOR EACH ROW
+    EXECUTE FUNCTION handle_updated_at();
 
-CREATE TRIGGER trigger_create_idea_move_notification AFTER UPDATE ON public.ideas FOR EACH ROW EXECUTE FUNCTION create_idea_move_notification();
+CREATE TRIGGER trigger_create_idea_move_notification
+    AFTER UPDATE
+    ON public.ideas
+    FOR EACH ROW
+    EXECUTE FUNCTION create_idea_move_notification();
 
-CREATE TRIGGER trigger_create_idea_notification AFTER INSERT ON public.ideas FOR EACH ROW EXECUTE FUNCTION create_idea_notification();
+CREATE TRIGGER trigger_create_idea_notification
+    AFTER INSERT
+    ON public.ideas
+    FOR EACH ROW
+    EXECUTE FUNCTION create_idea_notification();
 
-CREATE TRIGGER set_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+CREATE TRIGGER set_profiles_updated_at
+    BEFORE UPDATE
+    ON public.profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION handle_updated_at();
 
-CREATE TRIGGER set_proposals_updated_at BEFORE UPDATE ON public.proposals FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+CREATE TRIGGER set_proposals_updated_at
+    BEFORE UPDATE
+    ON public.proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION handle_updated_at();
 
-CREATE TRIGGER trigger_create_proposal_adopted_notification AFTER UPDATE ON public.proposals FOR EACH ROW EXECUTE FUNCTION create_proposal_adopted_notification();
+CREATE TRIGGER trigger_create_proposal_adopted_notification
+    AFTER UPDATE
+    ON public.proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION create_proposal_adopted_notification();
 
-CREATE TRIGGER trigger_create_proposal_notification AFTER INSERT ON public.proposals FOR EACH ROW EXECUTE FUNCTION create_proposal_notification();
+CREATE TRIGGER trigger_create_proposal_notification
+    AFTER INSERT
+    ON public.proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION create_proposal_notification();
 
-CREATE TRIGGER set_workspaces_updated_at BEFORE UPDATE ON public.workspaces FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
-
+CREATE TRIGGER set_workspaces_updated_at
+    BEFORE UPDATE
+    ON public.workspaces
+    FOR EACH ROW
+    EXECUTE FUNCTION handle_updated_at();
 
 -- ============================
 -- 外部キー制約
 -- ============================
 
-ALTER TABLE ONLY "public"."activity_logs"
-    ADD CONSTRAINT "activity_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id");
+ALTER TABLE ONLY public.activity_logs
+    ADD CONSTRAINT activity_logs_user_id_fkey FOREIGN KEY (user_id)
+    REFERENCES public.profiles(id);
 
-ALTER TABLE ONLY "public"."activity_logs"
-    ADD CONSTRAINT "activity_logs_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.activity_logs
+    ADD CONSTRAINT activity_logs_workspace_id_fkey FOREIGN KEY (workspace_id)
+    REFERENCES public.workspaces(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."ai_usage_quotas"
-    ADD CONSTRAINT "ai_usage_quotas_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.ai_usage_quotas
+    ADD CONSTRAINT ai_usage_quotas_user_id_fkey FOREIGN KEY (user_id)
+    REFERENCES public.profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."idea_likes"
-    ADD CONSTRAINT "idea_likes_idea_id_fkey" FOREIGN KEY ("idea_id") REFERENCES "public"."ideas"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.idea_likes
+    ADD CONSTRAINT idea_likes_idea_id_fkey FOREIGN KEY (idea_id)
+    REFERENCES public.ideas(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."idea_likes"
-    ADD CONSTRAINT "idea_likes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.idea_likes
+    ADD CONSTRAINT idea_likes_user_id_fkey FOREIGN KEY (user_id)
+    REFERENCES public.profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."ideas"
-    ADD CONSTRAINT "ideas_creator_id_fkey" FOREIGN KEY ("creator_id") REFERENCES "public"."profiles"("id");
+ALTER TABLE ONLY public.ideas
+    ADD CONSTRAINT ideas_creator_id_fkey FOREIGN KEY (creator_id)
+    REFERENCES public.profiles(id);
 
-ALTER TABLE ONLY "public"."ideas"
-    ADD CONSTRAINT "ideas_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.ideas
+    ADD CONSTRAINT ideas_workspace_id_fkey FOREIGN KEY (workspace_id)
+    REFERENCES public.workspaces(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."invitation_tokens"
-    ADD CONSTRAINT "invitation_tokens_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "public"."profiles"("id");
+ALTER TABLE ONLY public.invitation_tokens
+    ADD CONSTRAINT invitation_tokens_created_by_fkey FOREIGN KEY (created_by)
+    REFERENCES public.profiles(id);
 
-ALTER TABLE ONLY "public"."invitation_tokens"
-    ADD CONSTRAINT "invitation_tokens_used_by_fkey" FOREIGN KEY ("used_by") REFERENCES "public"."profiles"("id");
+ALTER TABLE ONLY public.invitation_tokens
+    ADD CONSTRAINT invitation_tokens_used_by_fkey FOREIGN KEY (used_by)
+    REFERENCES public.profiles(id);
 
-ALTER TABLE ONLY "public"."invitation_tokens"
-    ADD CONSTRAINT "invitation_tokens_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id");
+ALTER TABLE ONLY public.invitation_tokens
+    ADD CONSTRAINT invitation_tokens_workspace_id_fkey FOREIGN KEY (workspace_id)
+    REFERENCES public.workspaces(id);
 
-ALTER TABLE ONLY "public"."notifications"
-    ADD CONSTRAINT "notifications_actor_user_id_fkey" FOREIGN KEY ("actor_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT notifications_workspace_id_fkey FOREIGN KEY (workspace_id)
+    REFERENCES public.workspaces(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."notifications"
-    ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+-- Note: notifications テーブルのuser_idとactor_user_idはauth.usersを参照していたが、
+-- profilesテーブルとのリレーションがより適切なため、以下に修正（必要に応じて）
+-- ALTER TABLE ONLY public.notifications
+--     ADD CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id)
+--     REFERENCES auth.users(id) ON DELETE CASCADE;
+-- ALTER TABLE ONLY public.notifications
+--     ADD CONSTRAINT notifications_actor_user_id_fkey FOREIGN KEY (actor_user_id)
+--     REFERENCES auth.users(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."notifications"
-    ADD CONSTRAINT "notifications_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.profiles
+    ADD CONSTRAINT profiles_default_workspace_id_fkey FOREIGN KEY (default_workspace_id)
+    REFERENCES public.workspaces(id);
 
-ALTER TABLE ONLY "public"."profiles"
-    ADD CONSTRAINT "profiles_default_workspace_id_fkey" FOREIGN KEY ("default_workspace_id") REFERENCES "public"."workspaces"("id");
+ALTER TABLE ONLY public.profiles
+    ADD CONSTRAINT profiles_last_workspace_id_fkey FOREIGN KEY (last_workspace_id)
+    REFERENCES public.workspaces(id);
 
-ALTER TABLE ONLY "public"."profiles"
-    ADD CONSTRAINT "profiles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+-- profiles テーブルのidはauth.users.idを参照
+-- ALTER TABLE ONLY public.profiles
+--     ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id)
+--     REFERENCES auth.users(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."profiles"
-    ADD CONSTRAINT "profiles_last_workspace_id_fkey" FOREIGN KEY ("last_workspace_id") REFERENCES "public"."workspaces"("id");
+ALTER TABLE ONLY public.proposal_likes
+    ADD CONSTRAINT proposal_likes_proposal_id_fkey FOREIGN KEY (proposal_id)
+    REFERENCES public.proposals(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."proposal_likes"
-    ADD CONSTRAINT "proposal_likes_proposal_id_fkey" FOREIGN KEY ("proposal_id") REFERENCES "public"."proposals"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.proposal_likes
+    ADD CONSTRAINT proposal_likes_user_id_fkey FOREIGN KEY (user_id)
+    REFERENCES public.profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."proposal_likes"
-    ADD CONSTRAINT "proposal_likes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.proposals
+    ADD CONSTRAINT proposals_adopted_by_fkey FOREIGN KEY (adopted_by)
+    REFERENCES public.profiles(id);
 
-ALTER TABLE ONLY "public"."proposals"
-    ADD CONSTRAINT "proposals_adopted_by_fkey" FOREIGN KEY ("adopted_by") REFERENCES "public"."profiles"("id");
+ALTER TABLE ONLY public.proposals
+    ADD CONSTRAINT proposals_idea_id_fkey FOREIGN KEY (idea_id)
+    REFERENCES public.ideas(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."proposals"
-    ADD CONSTRAINT "proposals_idea_id_fkey" FOREIGN KEY ("idea_id") REFERENCES "public"."ideas"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.proposals
+    ADD CONSTRAINT proposals_proposer_id_fkey FOREIGN KEY (proposer_id)
+    REFERENCES public.profiles(id);
 
-ALTER TABLE ONLY "public"."proposals"
-    ADD CONSTRAINT "proposals_proposer_id_fkey" FOREIGN KEY ("proposer_id") REFERENCES "public"."profiles"("id");
+ALTER TABLE ONLY public.workspace_members
+    ADD CONSTRAINT workspace_members_invited_by_fkey FOREIGN KEY (invited_by)
+    REFERENCES public.profiles(id);
 
-ALTER TABLE ONLY "public"."workspace_members"
-    ADD CONSTRAINT "workspace_members_invited_by_fkey" FOREIGN KEY ("invited_by") REFERENCES "public"."profiles"("id");
+ALTER TABLE ONLY public.workspace_members
+    ADD CONSTRAINT workspace_members_user_id_fkey FOREIGN KEY (user_id)
+    REFERENCES public.profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."workspace_members"
-    ADD CONSTRAINT "workspace_members_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY public.workspace_members
+    ADD CONSTRAINT workspace_members_workspace_id_fkey FOREIGN KEY (workspace_id)
+    REFERENCES public.workspaces(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY "public"."workspace_members"
-    ADD CONSTRAINT "workspace_members_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE CASCADE;
-
-ALTER TABLE ONLY "public"."workspaces"
-    ADD CONSTRAINT "workspaces_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "public"."profiles"("id");
-
-
--- ============================
--- 主な変更点（前回との差分）
--- ============================
-
--- 1. 新規追加関数:
---    - delete_idea_by_owner(idea_uuid uuid, user_uuid uuid) 
---      アイデアオーナーによる論理削除機能
-
--- 2. search_path設定の統一:
---    - 全関数でSET search_path=""に統一
---    - セキュリティ向上のため
-
--- 3. 関数重複の発見:
---    - generate_notification_message関数の2つのオーバーロード版が存在
---    - パラメータの順序が異なる2つのバージョン
-
--- 4. 外部キー制約の重要な注意点:
---    - notifications テーブルの user_id, actor_user_id は auth.users を参照
---    - profiles テーブルの id は auth.users.id と1対1対応
---    - CASCADE削除設定により、関連データの整合性を保持
+ALTER TABLE ONLY public.workspaces
+    ADD CONSTRAINT workspaces_owner_id_fkey FOREIGN KEY (owner_id)
+    REFERENCES public.profiles(id);
 
 -- ============================
 -- 注記
@@ -773,5 +772,9 @@ ALTER TABLE ONLY "public"."workspaces"
 -- 5. 通知メッセージ生成 (generate_notification_message)
 -- 6. データクリーンアップ (cleanup_old_notifications)
 -- 
--- 全関数にSECURITY DEFINERとsearch_path=""設定を適用し、
+-- 全関数にSECURITY DEFINERとsearch_path設定を適用し、
 -- セキュリティを強化。PostgreSQLのFunction Search Path脆弱性対策済み。
+-- 
+-- generate_notification_message関数は引数の順序が異なる2つのオーバーロード版が存在。
+-- notifications テーブルの外部キー制約はauth.usersを参照する可能性があるため、
+-- コメントアウトした代替定義を含む。
