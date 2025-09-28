@@ -842,7 +842,7 @@ $app-ease-in-out:        ease-in-out;
   
   .zone-title {
     @include app-title-style;
-    font-size: $app-font-subtitle; margin-bottom: $app-padding-mobile;
+    margin-bottom: $app-padding-mobile;
     color: $app-text-color; border-bottom: 2px solid $app-btn-primary; padding-bottom: 0.5rem;
   }
   

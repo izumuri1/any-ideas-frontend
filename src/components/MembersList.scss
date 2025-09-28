@@ -7,14 +7,14 @@
   .members-title {
     // $app-font-theme を確実に適用するための修正
     font-family: $app-font-theme; // 明示的に指定
-    font-size: $app-font-subtitle;
+    font-size: $app-font-title;  // ← ここを変更
     font-weight: $app-weight-bold; // app-title-styleと同じウェイト
     color: $app-text-color;
     margin: 0 0 $app-padding-mobile 0;
     line-height: 1.3;
     border-bottom: 2px solid $app-text-color;
     padding-bottom: 0.5rem;
-  }
+    }
 
     .members-list {
     min-height: 60px;
