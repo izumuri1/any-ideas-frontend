@@ -13,6 +13,7 @@ import IdeaCard from '../components/IdeaCard/IdeaCard' // ← 新規import（Ide
 import { NotificationBell } from '../components/NotificationBell' // ← 追加
 import { sortByWhenText } from '../utils/dateUtils'
 import { handleError } from '../utils/errorUtils'
+import { sanitizeHtml } from '../utils/sanitize'
 import './Home.scss'
 
 // 型定義（元のまま完全維持）
@@ -517,11 +518,11 @@ export default function Home() {
             <>
               <div className="workspace-name">
                 <span className="label">ワークスペース名：</span>
-                <span className="value">{workspaceInfo.name}</span>
+                <span className="value">{sanitizeHtml(workspaceInfo.name)}</span>
               </div>
               <div className="workspace-owner">
                 <span className="label">ワークスペースオーナー：</span>
-                <span className="value">{workspaceInfo.owner_username}</span>
+                <span className="value">{sanitizeHtml(workspaceInfo.owner_username)}</span>
               </div>
             </>
           )}

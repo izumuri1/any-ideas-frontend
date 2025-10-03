@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { sanitizeHtml } from "../utils/sanitize";
 import "./CreateWorkspace.scss";
 
 ////////////////////////////////////////////////////////////////
@@ -441,17 +442,12 @@ export function CreateWorkspace() {
                     onClick={() => handleWorkspaceSelect(workspace)}
                   >
                     <div className="workspace-info">
-                      <h3 className="workspace-name">{workspace.name}</h3>
+                      <h3 className="workspace-name">{sanitizeHtml(workspace.name)}</h3>
                       <div className="workspace-meta">
                         <span className="workspace-owner">
                           {workspace.owner_id === user?.id
-                            ? "オーナー"
+                            ? "あなた（オーナー）"
                             : "メンバー"}
-                        </span>
-                        <span className="workspace-created">
-                          {new Date(workspace.created_at).toLocaleDateString(
-                            "ja-JP"
-                          )}
                         </span>
                       </div>
                     </div>
