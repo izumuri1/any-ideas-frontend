@@ -2,6 +2,7 @@
 import React from 'react';
 import { LikeButton, type LikeableItem } from '../LikeButton';
 import { DeleteButton } from '../DeleteButton';
+import { sanitizeHtml } from '../../utils/sanitize';
 import './IdeaCard.scss';
 
 // アイデアの型定義（LikeableItemを拡張）
@@ -99,8 +100,8 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
     <div className={`idea-card ${isSimpleLayout ? 'idea-card--simple' : ''} ${className}`}>
       {/* アイデアヘッダー（常に表示） */}
       <div className="idea-header">
-        <h3 className="idea-name">{idea.idea_name}</h3>
-        <span className="idea-owner">by {idea.profiles.username}</span>
+        <h3 className="idea-name">{sanitizeHtml(idea.idea_name)}</h3>
+        <span className="idea-owner">by {sanitizeHtml(idea.profiles.username)}</span>
       </div>
 
       {/* アイデア詳細（条件付き表示） */}
@@ -108,18 +109,18 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
         <div className="idea-details">
           {idea.when_text && (
             <div className="idea-detail">
-              <span className="detail-value">{idea.when_text}</span>
+              <span className="detail-value">{sanitizeHtml(idea.when_text)}</span>
             </div>
           )}
           
           {idea.who_text && (
             <div className="idea-detail">
-              <span className="detail-value">{idea.who_text}</span>
+              <span className="detail-value">{sanitizeHtml(idea.who_text)}</span>
             </div>
           )}
           
           <div className="idea-detail">
-            <span className="detail-value">{idea.what_text}</span>
+            <span className="detail-value">{sanitizeHtml(idea.what_text)}</span>
           </div>
         </div>
       )}

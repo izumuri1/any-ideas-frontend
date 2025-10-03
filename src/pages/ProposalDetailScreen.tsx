@@ -5,6 +5,7 @@ import { HamburgerMenu } from '../components/HamburgerMenu'
 import { supabase } from '../lib/supabase'
 import PageHeader from '../components/PageHeader'
 import { formatPeriodWithDayOfWeek } from '../utils/dateUtils';
+import { sanitizeHtml } from '../utils/sanitize'
 import './ProposalDetailScreen.scss'
 
 interface Idea {
@@ -213,11 +214,11 @@ export function ProposalDetailScreen() {
         <div className="idea-info">
         <div className="idea-name">
             <span className="label">アイデア名：</span>
-            <span className="value">{idea.idea_name}</span>
+            <span className="value">{sanitizeHtml(idea.idea_name)}</span>
         </div>
         <div className="idea-owner">
             <span className="label">アイデアオーナー：</span>
-            <span className="value">{idea.profiles?.username || 'Unknown User'}</span>
+            <span className="value">{sanitizeHtml(idea.profiles?.username || 'Unknown User')}</span>
         </div>
         </div>
     </PageHeader>
@@ -240,13 +241,13 @@ export function ProposalDetailScreen() {
                         .map(proposal => (
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
-                            <p>{proposal.start_date && proposal.end_date ? 
-                                formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date)) : 
-                                proposal.content}
-                            </p>
+                              <p>{proposal.start_date && proposal.end_date ?
+                                formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date)) :
+                                sanitizeHtml(proposal.content)}
+                              </p>
                             </div>
                             <div className="proposal-header">
-                            <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown'}</span>
+                              <span className="proposal-owner">by {sanitizeHtml(proposal.profiles?.username || 'Unknown')}</span>
                             </div>
                         </div>
                         ))}
@@ -265,10 +266,10 @@ export function ProposalDetailScreen() {
                         .map(proposal => (
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
-                            <p>{proposal.todo_text || proposal.content}</p>
+                              <p>{sanitizeHtml(proposal.todo_text || proposal.content)}</p>
                             </div>
                             <div className="proposal-header">
-                            <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown'}</span>
+                              <span className="proposal-owner">by {sanitizeHtml(proposal.profiles?.username || 'Unknown')}</span>
                             </div>
                         </div>
                         ))}
@@ -287,10 +288,10 @@ export function ProposalDetailScreen() {
                         .map(proposal => (
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
-                            <p>{proposal.not_todo_text || proposal.content}</p>
+                              <p>{sanitizeHtml(proposal.not_todo_text || proposal.content)}</p>
                             </div>
                             <div className="proposal-header">
-                            <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown'}</span>
+                              <span className="proposal-owner">by {sanitizeHtml(proposal.profiles?.username || 'Unknown')}</span>
                             </div>
                         </div>
                         ))}
@@ -309,10 +310,10 @@ export function ProposalDetailScreen() {
                         .map(proposal => (
                         <div key={proposal.id} className="proposal-card adopted-card">
                             <div className="proposal-content">
-                            <p>{proposal.budget_text || proposal.content}</p>
+                              <p>{sanitizeHtml(proposal.budget_text || proposal.content)}</p>
                             </div>
                             <div className="proposal-header">
-                            <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown'}</span>
+                              <span className="proposal-owner">by {sanitizeHtml(proposal.profiles?.username || 'Unknown')}</span>
                             </div>
                         </div>
                         ))}
@@ -341,11 +342,11 @@ export function ProposalDetailScreen() {
                       <div className="proposal-content">
                         <p>{proposal.start_date && proposal.end_date ?
                         formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date)) :
-                        proposal.content}
+                        sanitizeHtml(proposal.content)}
                         </p>
                       </div>
                       <div className="proposal-header">
-                        <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown User'}</span>
+                        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles?.username || 'Unknown User')}</span>
                       </div>
                     </div>
                   ))}
@@ -364,10 +365,10 @@ export function ProposalDetailScreen() {
                   .map(proposal => (
                     <div key={proposal.id} className="proposal-card adopted-card non-adopted-card">
                       <div className="proposal-content">
-                        <p>{proposal.todo_text || proposal.content}</p>
+                        <p>{sanitizeHtml(proposal.todo_text || proposal.content)}</p>
                       </div>
                       <div className="proposal-header">
-                        <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown User'}</span>
+                        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles?.username || 'Unknown User')}</span>
                       </div>
                     </div>
                   ))}
@@ -386,10 +387,10 @@ export function ProposalDetailScreen() {
                   .map(proposal => (
                     <div key={proposal.id} className="proposal-card adopted-card non-adopted-card">
                       <div className="proposal-content">
-                        <p>{proposal.not_todo_text || proposal.content}</p>
+                        <p>{sanitizeHtml(proposal.not_todo_text || proposal.content)}</p>
                       </div>
                       <div className="proposal-header">
-                        <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown User'}</span>
+                        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles?.username || 'Unknown User')}</span>
                       </div>
                     </div>
                   ))}
@@ -408,10 +409,10 @@ export function ProposalDetailScreen() {
                   .map(proposal => (
                     <div key={proposal.id} className="proposal-card adopted-card non-adopted-card">
                       <div className="proposal-content">
-                        <p>{proposal.budget_text || proposal.content}</p>
+                        <p>{sanitizeHtml(proposal.budget_text || proposal.content)}</p>
                       </div>
                       <div className="proposal-header">
-                        <span className="proposal-owner">by {proposal.profiles?.username || 'Unknown User'}</span>
+                        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles?.username || 'Unknown User')}</span>
                       </div>
                     </div>
                   ))}

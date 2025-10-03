@@ -11,6 +11,7 @@ import FormField from '../components/common/FormField'  // 追加
 import { useForm } from '../hooks/useForm'  // 追加
 import BudgetProposalForm from '../components/BudgetProposalForm'
 import { formatPeriodWithDayOfWeek } from '../utils/dateUtils';
+import { sanitizeHtml } from '../utils/sanitize';
 import './DiscussionScreen.scss'
 
 // 型定義（元のまま）
@@ -76,22 +77,28 @@ function ProposalCard({
 
   // 提案内容の表示を取得
   const getProposalContent = () => {
+  let content: string;
   switch (proposal.proposal_type) {
     case 'period':
       if (proposal.start_date && proposal.end_date) {
         return formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date))
       }
-      return proposal.content
-      case 'todo':
-        return proposal.todo_text || proposal.content
-      case 'not_todo':
-        return proposal.not_todo_text || proposal.content
-      case 'budget':
-        return proposal.budget_text || proposal.content
-      default:
-        return proposal.content
-    }
+      content = proposal.content;
+      break;
+    case 'todo':
+      content = proposal.todo_text || proposal.content;
+      break;
+    case 'not_todo':
+      content = proposal.not_todo_text || proposal.content;
+      break;
+    case 'budget':
+      content = proposal.budget_text || proposal.content;
+      break;
+    default:
+      content = proposal.content;
   }
+  return sanitizeHtml(content);
+}
 
   return (
     <div className="proposal-card">
@@ -100,7 +107,7 @@ function ProposalCard({
       </div>
       
       <div className="proposal-header">
-        <span className="proposal-owner">by {proposal.profiles.username}</span>
+        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles.username)}</span>
       </div>
       
       <div className="proposal-actions">
@@ -582,11 +589,11 @@ export default function DiscussionScreen() {
         <div className="idea-info">
         <div className="idea-name">
             <span className="label">アイデア名：</span>
-            <span className="value">{ideaInfo.idea_name}</span>
+            <span className="value">{sanitizeHtml(ideaInfo.idea_name)}</span>
         </div>
         <div className="idea-owner">
             <span className="label">アイデアオーナー：</span>
-            <span className="value">{ideaInfo.profiles.username}</span>
+            <span className="value">{sanitizeHtml(ideaInfo.profiles.username)}</span>
         </div>
         </div>
     </PageHeader>
@@ -854,11 +861,11 @@ export default function DiscussionScreen() {
                       <div className="proposal-content">
                         <p>{proposal.start_date && proposal.end_date ? 
                         formatPeriodWithDayOfWeek(new Date(proposal.start_date), new Date(proposal.end_date)) :
-                        proposal.content}
+                        sanitizeHtml(proposal.content)}
                         </p>
                       </div>
                       <div className="proposal-header">
-                        <span className="proposal-owner">by {proposal.profiles.username}</span>
+                        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles.username)}</span>
                       </div>
                       
                       <div className="proposal-actions adopted-actions">
@@ -899,10 +906,10 @@ export default function DiscussionScreen() {
                   .map(proposal => (
                     <div key={proposal.id} className="proposal-card adopted-card">
                       <div className="proposal-content">
-                        <p>{proposal.todo_text || proposal.content}</p>
+                        <p>{sanitizeHtml(proposal.todo_text || proposal.content)}</p>
                       </div>
                       <div className="proposal-header">
-                        <span className="proposal-owner">by {proposal.profiles.username}</span>
+                        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles.username)}</span>
                       </div>
                       
                       <div className="proposal-actions adopted-actions">
@@ -941,10 +948,10 @@ export default function DiscussionScreen() {
                   .map(proposal => (
                     <div key={proposal.id} className="proposal-card adopted-card">
                       <div className="proposal-content">
-                        <p>{proposal.not_todo_text || proposal.content}</p>
+                        <p>{sanitizeHtml(proposal.not_todo_text || proposal.content)}</p>
                       </div>
                       <div className="proposal-header">
-                        <span className="proposal-owner">by {proposal.profiles.username}</span>
+                        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles.username)}</span>
                       </div>
                       
                       <div className="proposal-actions adopted-actions">
@@ -983,10 +990,10 @@ export default function DiscussionScreen() {
                   .map(proposal => (
                     <div key={proposal.id} className="proposal-card adopted-card">
                       <div className="proposal-content">
-                        <p>{proposal.budget_text || proposal.content}</p>
+                        <p>{sanitizeHtml(proposal.budget_text || proposal.content)}</p>
                       </div>
                       <div className="proposal-header">
-                        <span className="proposal-owner">by {proposal.profiles.username}</span>
+                        <span className="proposal-owner">by {sanitizeHtml(proposal.profiles.username)}</span>
                       </div>
                       
                       <div className="proposal-actions adopted-actions">
