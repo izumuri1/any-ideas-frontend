@@ -481,13 +481,12 @@
 // 追加：特定のstepの下に横線を引く
 .tutorial-step.with-divider {
   position: relative;
-  margin-bottom: $app-padding-large;
-  padding-bottom: $app-padding-large;
+  margin-bottom: calc($app-padding-large * 2);
   
   &::after {
     content: '';
     position: absolute;
-    bottom: calc($app-padding-large / 2);
+    bottom: calc(-1 * $app-padding-large);
     left: -$app-padding-large;
     right: -$app-padding-large;
     height: 1px;
