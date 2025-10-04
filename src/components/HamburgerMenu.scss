@@ -417,7 +417,7 @@
 }
 
 .tutorial-section-title {
-  @include app-text-style;
+  font-family: $app-font-theme;
   font-weight: $app-weight-bold;
   color: $app-btn-primary;
   margin-bottom: $app-padding-mobile;
