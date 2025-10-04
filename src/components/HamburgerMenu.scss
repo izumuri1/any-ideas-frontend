@@ -482,11 +482,12 @@
 .tutorial-step.with-divider {
   position: relative;
   margin-bottom: $app-padding-large;
+  padding-bottom: $app-padding-large;
   
   &::after {
     content: '';
     position: absolute;
-    bottom: calc(-1 * $app-padding-large / 2);
+    bottom: calc($app-padding-large / 2);
     left: -$app-padding-large;
     right: -$app-padding-large;
     height: 1px;
