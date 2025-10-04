@@ -605,7 +605,7 @@ export default function DiscussionScreen() {
             <img src="/icons/icon-48x48.png" alt="" />
             How about？
         </h2>
-        <p className="section-description">具体的な提案を登録しよう</p>
+        <p className="section-description">みんなで実現方法を提案しよう！</p>
           
           {/* タブメニュー（元のまま） */}
           <div className="tab-menu">
@@ -739,7 +739,7 @@ export default function DiscussionScreen() {
     {/* 提案一覧セクション（元のまま） */}
     <section className="proposals-section">
     <h3 className="proposals-title">Which one should we pick?</h3>
-    <p className="proposals-description">提案を採用しよう</p>
+    <p className="proposals-description">みんなの反響があった提案を採用しよう！</p>
     
     {/* タブ別提案表示 */}
     <div className="proposals-by-type">
@@ -847,7 +847,7 @@ export default function DiscussionScreen() {
     {/* 採用された提案セクション（元のまま） */}
         <section className="adopted-proposals-section">
         <h3 className="adopted-proposals-title">Let's go with that!</h3>
-          <p className="adopted-proposals-description">採用された提案を実行しよう</p>
+          <p className="adopted-proposals-description">採用した提案を実行しよう！</p>
           
           <div className="adopted-proposals-by-type">
             {/* 採用された実施時期の提案 */}

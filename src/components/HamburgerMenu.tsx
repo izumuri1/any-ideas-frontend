@@ -220,7 +220,7 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
                 <div className="tutorial-step">
                   <span className="tutorial-step-number">4</span>
                   <div className="tutorial-step-content">
-                    <span className="tutorial-step-text">みんなでやりたいことを提案しよう！</span>
+                    <span className="tutorial-step-text">みんなで実現方法を提案しよう！</span>
                     <span className="tutorial-step-tip">提案をクリック。複数の案があってもOK</span>
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export function HamburgerMenu({ currentPage = 'other' }: HamburgerMenuProps) {
                 <div className="tutorial-step">
                   <span className="tutorial-step-number">6</span>
                   <div className="tutorial-step-content">
-                    <span className="tutorial-step-text">採用した提案を決定しよう！</span>
+                    <span className="tutorial-step-text">採用した提案を実行しよう！</span>
                     <span className="tutorial-step-tip"><span style={{ fontWeight: 'bold', textDecoration: 'underline' }}>アイデアオーナーは</span>決定して実行するをクリック</span>
                   </div>
                 </div>
