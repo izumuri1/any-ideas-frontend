@@ -1,6 +1,6 @@
 -- ============================
 -- Supabase Schema Export (Part 1: Tables, RLS, Indexes)
--- Date: 2025-09-28
+-- Date: 2025-10-04
 -- Description: Any Ideas アプリケーション - テーブル定義とRLS設定
 -- ============================
 
@@ -9,42 +9,42 @@
 -- ============================
 
 CREATE TABLE public.activity_logs (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     workspace_id uuid NOT NULL,
     user_id uuid NOT NULL,
     action_type character varying(100) NOT NULL,
     target_type character varying(50) NOT NULL,
     target_id uuid NOT NULL,
     metadata jsonb,
-    created_at timestamp without time zone NOT NULL DEFAULT now()
+    created_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 CREATE TABLE public.ai_usage_quotas (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
     usage_date date NOT NULL,
-    daily_count integer NOT NULL DEFAULT 0,
+    daily_count integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
 );
 
 CREATE TABLE public.idea_likes (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     idea_id uuid NOT NULL,
     user_id uuid NOT NULL,
-    created_at timestamp without time zone NOT NULL DEFAULT now()
+    created_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 CREATE TABLE public.ideas (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     workspace_id uuid NOT NULL,
     creator_id uuid NOT NULL,
     when_text character varying(500),
     who_text character varying(500),
     what_text character varying(500) NOT NULL,
-    status character varying(50) NOT NULL DEFAULT 'our_ideas'::character varying,
-    created_at timestamp without time zone NOT NULL DEFAULT now(),
-    updated_at timestamp without time zone NOT NULL DEFAULT now(),
+    status character varying(50) DEFAULT 'our_ideas'::character varying NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
     moved_to_thinking_at timestamp without time zone,
     moved_to_trying_at timestamp without time zone,
     deleted_at timestamp without time zone,
@@ -52,29 +52,29 @@ CREATE TABLE public.ideas (
 );
 
 CREATE TABLE public.invitation_tokens (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     token character varying(64) NOT NULL,
     workspace_id uuid NOT NULL,
     created_by uuid NOT NULL,
     expires_at timestamp without time zone NOT NULL,
-    max_uses integer NOT NULL DEFAULT 1,
-    used_count integer NOT NULL DEFAULT 0,
+    max_uses integer DEFAULT 1 NOT NULL,
+    used_count integer DEFAULT 0 NOT NULL,
     used_by uuid,
     used_at timestamp without time zone,
-    is_active boolean NOT NULL DEFAULT true,
-    created_at timestamp without time zone NOT NULL DEFAULT now()
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 CREATE TABLE public.notifications (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     workspace_id uuid NOT NULL,
     user_id uuid NOT NULL,
     actor_user_id uuid NOT NULL,
     type text NOT NULL,
     message text NOT NULL,
     related_id uuid,
-    is_read boolean NOT NULL DEFAULT false,
-    created_at timestamp with time zone NOT NULL DEFAULT now()
+    is_read boolean DEFAULT false NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 CREATE TABLE public.profiles (
@@ -83,19 +83,19 @@ CREATE TABLE public.profiles (
     last_workspace_id uuid,
     default_workspace_id uuid,
     last_workspace_accessed_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL DEFAULT now(),
-    updated_at timestamp without time zone NOT NULL DEFAULT now()
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 CREATE TABLE public.proposal_likes (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     proposal_id uuid NOT NULL,
     user_id uuid NOT NULL,
-    created_at timestamp without time zone NOT NULL DEFAULT now()
+    created_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 CREATE TABLE public.proposals (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     idea_id uuid NOT NULL,
     proposer_id uuid NOT NULL,
     proposal_type character varying(50) NOT NULL,
@@ -105,30 +105,30 @@ CREATE TABLE public.proposals (
     todo_text character varying(500),
     not_todo_text character varying(500),
     budget_text character varying(500),
-    is_adopted boolean NOT NULL DEFAULT false,
-    created_at timestamp without time zone NOT NULL DEFAULT now(),
-    updated_at timestamp without time zone NOT NULL DEFAULT now(),
+    is_adopted boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
     adopted_at timestamp without time zone,
     adopted_by uuid,
     deleted_at timestamp without time zone
 );
 
 CREATE TABLE public.workspace_members (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     workspace_id uuid NOT NULL,
     user_id uuid NOT NULL,
-    role character varying(50) NOT NULL DEFAULT 'member'::character varying,
-    joined_at timestamp without time zone NOT NULL DEFAULT now(),
+    role character varying(50) DEFAULT 'member'::character varying NOT NULL,
+    joined_at timestamp without time zone DEFAULT now() NOT NULL,
     invited_by uuid
 );
 
 CREATE TABLE public.workspaces (
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     name character varying(255) NOT NULL,
     owner_id uuid NOT NULL,
-    is_active boolean NOT NULL DEFAULT true,
-    created_at timestamp without time zone NOT NULL DEFAULT now(),
-    updated_at timestamp without time zone NOT NULL DEFAULT now()
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 -- ============================
@@ -176,14 +176,14 @@ CREATE INDEX idx_activity_logs_action_type ON public.activity_logs USING btree (
 CREATE INDEX idx_activity_logs_created_at ON public.activity_logs USING btree (created_at);
 CREATE INDEX idx_activity_logs_user_id ON public.activity_logs USING btree (user_id);
 CREATE INDEX idx_activity_logs_workspace_id ON public.activity_logs USING btree (workspace_id);
+CREATE UNIQUE INDEX ai_usage_quotas_user_id_usage_date_key ON public.ai_usage_quotas USING btree (user_id, usage_date);
 CREATE INDEX idx_ai_usage_quotas_user_date ON public.ai_usage_quotas USING btree (user_id, usage_date);
+CREATE UNIQUE INDEX idea_likes_idea_id_user_id_key ON public.idea_likes USING btree (idea_id, user_id);
 CREATE INDEX idx_idea_likes_created_at ON public.idea_likes USING btree (created_at DESC);
 CREATE INDEX idx_idea_likes_idea_id ON public.idea_likes USING btree (idea_id);
 CREATE INDEX idx_idea_likes_user_id ON public.idea_likes USING btree (user_id);
 CREATE INDEX idx_ideas_creator_id ON public.ideas USING btree (creator_id);
 CREATE INDEX idx_ideas_deleted_at ON public.ideas USING btree (deleted_at);
--- idx_ideas_idea_name は削除済み（使用回数0のため）
--- idx_ideas_status は削除済み（使用回数0のため）
 CREATE INDEX idx_ideas_workspace_id ON public.ideas USING btree (workspace_id);
 CREATE INDEX idx_ideas_workspace_status_deleted ON public.ideas USING btree (workspace_id, status) WHERE (deleted_at IS NULL);
 CREATE INDEX idx_invitation_tokens_created_by ON public.invitation_tokens USING btree (created_by);
@@ -191,8 +191,8 @@ CREATE INDEX idx_invitation_tokens_expires_at ON public.invitation_tokens USING 
 CREATE INDEX idx_invitation_tokens_is_active ON public.invitation_tokens USING btree (is_active);
 CREATE INDEX idx_invitation_tokens_token ON public.invitation_tokens USING btree (token);
 CREATE INDEX idx_invitation_tokens_workspace_id ON public.invitation_tokens USING btree (workspace_id);
+CREATE UNIQUE INDEX invitation_tokens_token_key ON public.invitation_tokens USING btree (token);
 CREATE INDEX idx_notifications_created_at ON public.notifications USING btree (created_at);
--- idx_notifications_unread は削除済み（idx_notifications_user_readと重複のため）
 CREATE INDEX idx_notifications_user_read ON public.notifications USING btree (user_id, is_read);
 CREATE INDEX idx_notifications_user_workspace ON public.notifications USING btree (user_id, workspace_id);
 CREATE INDEX idx_notifications_user_workspace_created ON public.notifications USING btree (user_id, workspace_id, created_at DESC);
@@ -200,17 +200,18 @@ CREATE INDEX idx_notifications_workspace ON public.notifications USING btree (wo
 CREATE INDEX idx_profiles_default_workspace_id ON public.profiles USING btree (default_workspace_id);
 CREATE INDEX idx_profiles_last_workspace_id ON public.profiles USING btree (last_workspace_id);
 CREATE INDEX idx_profiles_username ON public.profiles USING btree (username);
+CREATE UNIQUE INDEX profiles_username_key ON public.profiles USING btree (username);
 CREATE INDEX idx_proposal_likes_proposal_id ON public.proposal_likes USING btree (proposal_id);
 CREATE INDEX idx_proposal_likes_user_id ON public.proposal_likes USING btree (user_id);
+CREATE UNIQUE INDEX proposal_likes_proposal_id_user_id_key ON public.proposal_likes USING btree (proposal_id, user_id);
 CREATE INDEX idx_proposals_deleted_at ON public.proposals USING btree (deleted_at);
 CREATE INDEX idx_proposals_idea_adopted_deleted ON public.proposals USING btree (idea_id, is_adopted) WHERE (deleted_at IS NULL);
 CREATE INDEX idx_proposals_idea_deleted ON public.proposals USING btree (idea_id) WHERE (deleted_at IS NULL);
 CREATE INDEX idx_proposals_idea_id ON public.proposals USING btree (idea_id);
--- idx_proposals_is_adopted は削除済み（使用回数0のため）
--- idx_proposals_proposal_type は削除済み（使用回数0のため）
 CREATE INDEX idx_proposals_proposer_id ON public.proposals USING btree (proposer_id);
 CREATE INDEX idx_workspace_members_user_id ON public.workspace_members USING btree (user_id);
 CREATE INDEX idx_workspace_members_workspace_id ON public.workspace_members USING btree (workspace_id);
+CREATE UNIQUE INDEX workspace_members_workspace_id_user_id_key ON public.workspace_members USING btree (workspace_id, user_id);
 CREATE INDEX idx_workspaces_is_active ON public.workspaces USING btree (is_active);
 CREATE INDEX idx_workspaces_owner_id ON public.workspaces USING btree (owner_id);
 

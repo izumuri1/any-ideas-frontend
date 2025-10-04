@@ -1,6 +1,6 @@
 -- ============================
 -- Supabase Schema Export (Part 2: Functions, Triggers, Foreign Keys)
--- Date: 2025-09-28
+-- Date: 2025-10-04
 -- Description: Any Ideas アプリケーション - 関数、トリガー、外部キー制約
 -- ============================
 
@@ -100,27 +100,25 @@ $function$;
 CREATE OR REPLACE FUNCTION public.create_idea_notification()
  RETURNS trigger
  LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO ''
 AS $function$
 DECLARE
     member_record RECORD;
-    actor_name TEXT;
     notification_message TEXT;
+    idea_creator_username TEXT;
 BEGIN
-    -- 投稿者の表示名を取得
-    SELECT COALESCE(username, 'Unknown User') INTO actor_name
-    FROM public.profiles 
+    -- 作成者のユーザー名を取得
+    SELECT username INTO idea_creator_username
+    FROM public.profiles
     WHERE id = NEW.creator_id;
-    
+
     -- 通知メッセージを生成
-    notification_message := actor_name || 'さんが新しいアイデア「' || NEW.idea_name || '」を投稿しました';
-    
-    -- ワークスペースの全メンバー（投稿者以外）に通知を作成
-    FOR member_record IN 
-        SELECT user_id 
-        FROM public.workspace_members 
-        WHERE workspace_id = NEW.workspace_id 
+    notification_message := idea_creator_username || 'さんが新しいアイデア「' || NEW.idea_name || '」を作成しました';
+
+    -- ワークスペースの全メンバーに通知を作成（作成者自身を除く）
+    FOR member_record IN
+        SELECT user_id
+        FROM public.workspace_members
+        WHERE workspace_id = NEW.workspace_id
         AND user_id != NEW.creator_id
     LOOP
         INSERT INTO public.notifications (
@@ -143,7 +141,7 @@ BEGIN
             NOW()
         );
     END LOOP;
-    
+
     RETURN NEW;
 END;
 $function$;
@@ -374,7 +372,6 @@ BEGIN
 END;
 $function$;
 
--- generate_notification_message (オーバーロード版1)
 CREATE OR REPLACE FUNCTION public.generate_notification_message(p_type character varying, p_actor_name text, p_target_name text)
  RETURNS text
  LANGUAGE plpgsql
@@ -399,7 +396,6 @@ BEGIN
 END;
 $function$;
 
--- generate_notification_message (オーバーロード版2)
 CREATE OR REPLACE FUNCTION public.generate_notification_message(p_actor_name text, p_type text, p_target_name text DEFAULT NULL::text)
  RETURNS text
  LANGUAGE plpgsql
@@ -527,7 +523,7 @@ BEGIN
       w.owner_id as user_id,
       'owner'::TEXT as role,
       w.created_at::TIMESTAMP as joined_at,
-      p.username::TEXT as username -- 明示的にTEXTにキャスト
+      p.username::TEXT as username
     FROM workspaces w
     JOIN profiles p ON w.owner_id = p.id
     WHERE w.id = workspace_id_param
@@ -538,9 +534,9 @@ BEGIN
     SELECT 
       wm.id,
       wm.user_id,
-      COALESCE(wm.role, 'member'::TEXT)::TEXT as role, -- 明示的にTEXTにキャスト
+      COALESCE(wm.role, 'member'::TEXT)::TEXT as role,
       wm.joined_at::TIMESTAMP as joined_at,
-      p.username::TEXT as username -- 明示的にTEXTにキャスト
+      p.username::TEXT as username
     FROM workspace_members wm
     JOIN profiles p ON wm.user_id = p.id
     JOIN workspaces w ON wm.workspace_id = w.id
@@ -702,15 +698,6 @@ ALTER TABLE ONLY public.notifications
     ADD CONSTRAINT notifications_workspace_id_fkey FOREIGN KEY (workspace_id)
     REFERENCES public.workspaces(id) ON DELETE CASCADE;
 
--- Note: notifications テーブルのuser_idとactor_user_idはauth.usersを参照していたが、
--- profilesテーブルとのリレーションがより適切なため、以下に修正（必要に応じて）
--- ALTER TABLE ONLY public.notifications
---     ADD CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id)
---     REFERENCES auth.users(id) ON DELETE CASCADE;
--- ALTER TABLE ONLY public.notifications
---     ADD CONSTRAINT notifications_actor_user_id_fkey FOREIGN KEY (actor_user_id)
---     REFERENCES auth.users(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY public.profiles
     ADD CONSTRAINT profiles_default_workspace_id_fkey FOREIGN KEY (default_workspace_id)
     REFERENCES public.workspaces(id);
@@ -718,11 +705,6 @@ ALTER TABLE ONLY public.profiles
 ALTER TABLE ONLY public.profiles
     ADD CONSTRAINT profiles_last_workspace_id_fkey FOREIGN KEY (last_workspace_id)
     REFERENCES public.workspaces(id);
-
--- profiles テーブルのidはauth.users.idを参照
--- ALTER TABLE ONLY public.profiles
---     ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id)
---     REFERENCES auth.users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.proposal_likes
     ADD CONSTRAINT proposal_likes_proposal_id_fkey FOREIGN KEY (proposal_id)
@@ -776,5 +758,3 @@ ALTER TABLE ONLY public.workspaces
 -- セキュリティを強化。PostgreSQLのFunction Search Path脆弱性対策済み。
 -- 
 -- generate_notification_message関数は引数の順序が異なる2つのオーバーロード版が存在。
--- notifications テーブルの外部キー制約はauth.usersを参照する可能性があるため、
--- コメントアウトした代替定義を含む。
