@@ -598,7 +598,7 @@ export default function Home() {
         {/* IdeaCard使用（元のEnhancedIdeaCardの表示形式を維持） */}
         <section className="ideas-zone our-ideas">
           <h2 className="zone-title">Our ideas</h2>
-          <p className="zone-description">みんなの反響があったアイデアを検討しよう！</p>
+          <p className="zone-description">反響があったアイデアを検討しよう！</p>
           <div className="ideas-cards">
             {loadingIdeas ? (
               <p>アイデア読み込み中...</p>

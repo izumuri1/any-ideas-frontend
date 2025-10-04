@@ -157,7 +157,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({
               className="btn-proceed"
               onClick={() => onDiscussion(idea.id)}
             >
-              具体的に検討する
+              提案する
             </button>
           )}
 
