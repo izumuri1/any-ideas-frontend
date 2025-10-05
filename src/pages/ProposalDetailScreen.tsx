@@ -225,9 +225,9 @@ export function ProposalDetailScreen() {
 
       {/* メインコンテンツ */}
         <main className="proposal-detail-main">
-        {/* Ideas we're trying セクション */}
+        {/* Ideas in action セクション */}
         <section className="adopted-proposals-section">
-            <h3 className="adopted-proposals-title">Ideas we're trying</h3>
+            <h3 className="adopted-proposals-title">Ideas in action</h3>
             <p className="adopted-proposals-description">採用された提案</p>
             
             <div className="adopted-proposals-by-type">
@@ -327,7 +327,7 @@ export function ProposalDetailScreen() {
         
         {/* 採用されなかった提案セクション */}
         <section className="adopted-proposals-section">
-          <h3 className="adopted-proposals-title">Ideas we're trying</h3>
+          <h3 className="adopted-proposals-title">Ideas in action</h3>
           <p className="adopted-proposals-description">採用されなかった提案</p>
           
           <div className="adopted-proposals-by-type">
