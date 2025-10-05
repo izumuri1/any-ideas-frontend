@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { sanitizeHtml } from '../utils/sanitize';
 
 interface BudgetProposalFormProps {
   budgetForm: any; // 既存のuseFormフック
@@ -16,7 +17,7 @@ interface AIFormData {
   duration: string;      // 最大30文字
   location: string;      // 最大50文字
   budget_range: string;  // 最大50文字
-  preferences: string;   // 最大200文字
+  preferences: string;   // 最大300文字
 }
 
 interface LimitMessage {
@@ -177,12 +178,12 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            planType: aiFormData.planType,
-            participants: aiFormData.participants, 
-            duration: aiFormData.duration,
-            location: aiFormData.location,
-            budget_range: aiFormData.budget_range,
-            preferences: aiFormData.preferences,
+            planType: sanitizeHtml(aiFormData.planType),
+            participants: sanitizeHtml(aiFormData.participants), 
+            duration: sanitizeHtml(aiFormData.duration),
+            location: sanitizeHtml(aiFormData.location),
+            budget_range: sanitizeHtml(aiFormData.budget_range),
+            preferences: sanitizeHtml(aiFormData.preferences),
             userId: user.id
             })
       });
