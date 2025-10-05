@@ -16,10 +16,6 @@ const sanitize = (text) => {
 };
 
 export default async function handler(req, res) {
-  console.log('=== API Called ===');
-  console.log('Method:', req.method);
-  console.log('Body:', req.body);
-  console.log('Env OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
   
   // CORS設定
   res.setHeader('Access-Control-Allow-Origin', '*');

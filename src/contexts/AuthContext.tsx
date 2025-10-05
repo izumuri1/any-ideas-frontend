@@ -166,8 +166,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 // supabase.auth.signUpでemail、password、username（オプション）を取得、errorに格納、戻り値としてerrorを返す
 // サインアップ成功時のdataは返さない。onAuthStateChangeでユーザー情報を取得するため
   const signUp = async (email: string, password: string, username: string) => {
-  console.log('=== AuthContext signUp 関数開始 ===')
-  console.log('パラメータ:', { email, passwordLength: password.length, username })
   
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -179,15 +177,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     })
     
-    console.log('=== Supabase signUp 結果 ===')
-    console.log('データ:', data)
-    console.log('エラー:', error)
     
     // メール確認が有効な場合の重複ユーザーチェック
     if (!error && data.user) {
       // ユーザーが作成されたが、identitiesが空の場合は既存ユーザー
       if (data.user.identities && data.user.identities.length === 0) {
-        console.log('=== 既存ユーザー検出（identitiesが空） ===')
         return { 
           error: {
             code: 'user_already_exists',
@@ -205,8 +199,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         // 作成時刻が5秒以上前の場合は既存ユーザーの可能性
         if (timeDiff > 5000) {
-          console.log('=== 既存ユーザー検出（作成時刻チェック） ===')
-          console.log('作成時刻:', data.user.created_at, '現在時刻差:', timeDiff)
           return { 
             error: {
               code: 'user_already_exists',

@@ -6,10 +6,7 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  console.log('=== Get Usage Quota API Called ===');
-  console.log('SUPABASE_URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
-  console.log('SERVICE_ROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
-  console.log('User ID:', req.query.userId);
+
   // CORS設定
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
