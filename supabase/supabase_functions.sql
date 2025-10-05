@@ -8,6 +8,78 @@
 -- 関数定義
 -- ============================
 
+CREATE OR REPLACE FUNCTION public.check_idea_creation_rate_limit()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  IF NOT check_rate_limit(NEW.creator_id, 'idea_creation', 5, 1) THEN
+    RAISE EXCEPTION 'レート制限: アイデアの作成が多すぎます。しばらく待ってから再試行してください。';
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.check_like_rate_limit()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  IF NOT check_rate_limit(NEW.user_id, 'like_action', 30, 1) THEN
+    RAISE EXCEPTION 'レート制限: いいねが多すぎます。しばらく待ってから再試行してください。';
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.check_proposal_creation_rate_limit()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  IF NOT check_rate_limit(NEW.proposer_id, 'proposal_creation', 10, 1) THEN
+    RAISE EXCEPTION 'レート制限: 提案の作成が多すぎます。しばらく待ってから再試行してください。';
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.check_rate_limit(p_user_id uuid, p_action_type text, p_max_requests integer, p_window_minutes integer)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+  v_window_start TIMESTAMPTZ;
+  v_current_count INTEGER;
+BEGIN
+  -- 現在のウィンドウの開始時刻を計算
+  v_window_start := DATE_TRUNC('minute', NOW()) - 
+                    (EXTRACT(MINUTE FROM NOW())::INTEGER % p_window_minutes) * INTERVAL '1 minute';
+  
+  -- 現在のウィンドウでのリクエスト数を取得
+  SELECT COALESCE(request_count, 0)
+  INTO v_current_count
+  FROM public.rate_limits
+  WHERE user_id = p_user_id
+    AND action_type = p_action_type
+    AND window_start = v_window_start;
+  
+  -- リクエスト数が制限を超えているかチェック
+  IF v_current_count >= p_max_requests THEN
+    RETURN FALSE;
+  END IF;
+  
+  -- リクエストを記録
+  INSERT INTO public.rate_limits (user_id, action_type, request_count, window_start)
+  VALUES (p_user_id, p_action_type, 1, v_window_start)
+  ON CONFLICT (user_id, action_type, window_start)
+  DO UPDATE SET request_count = public.rate_limits.request_count + 1;
+  
+  RETURN TRUE;
+END;
+$function$;
+
 CREATE OR REPLACE FUNCTION public.cleanup_old_notifications()
  RETURNS integer
  LANGUAGE plpgsql
@@ -22,6 +94,16 @@ BEGIN
   
   GET DIAGNOSTICS deleted_count = ROW_COUNT;
   RETURN deleted_count;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.cleanup_old_rate_limits()
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  DELETE FROM public.rate_limits
+  WHERE window_start < NOW() - INTERVAL '1 hour';
 END;
 $function$;
 
@@ -372,6 +454,27 @@ BEGIN
 END;
 $function$;
 
+CREATE OR REPLACE FUNCTION public.generate_notification_message(p_actor_name text, p_type text, p_target_name text DEFAULT NULL::text)
+ RETURNS text
+ LANGUAGE plpgsql
+ SET search_path TO ''
+AS $function$
+BEGIN
+  CASE p_type
+    WHEN 'idea_created' THEN
+      RETURN p_actor_name || 'さんが「' || COALESCE(p_target_name, 'アイデア') || '」を投稿しました';
+    WHEN 'idea_moved' THEN
+      RETURN p_actor_name || 'さんが「' || COALESCE(p_target_name, 'アイデア') || '」のステータスを変更しました';
+    WHEN 'proposal_added' THEN
+      RETURN p_actor_name || 'さんが「' || COALESCE(p_target_name, 'アイデア') || '」に提案を追加しました';
+    WHEN 'member_joined' THEN
+      RETURN p_actor_name || 'さんがワークスペースに参加しました';
+    ELSE
+      RETURN p_actor_name || 'さんが活動しました';
+  END CASE;
+END;
+$function$;
+
 CREATE OR REPLACE FUNCTION public.generate_notification_message(p_type character varying, p_actor_name text, p_target_name text)
  RETURNS text
  LANGUAGE plpgsql
@@ -388,27 +491,6 @@ BEGIN
       RETURN p_actor_name || 'さんが「' || COALESCE(p_target_name, 'アイデア') || '」に提案を追加しました';
     WHEN 'proposal_adopted' THEN
       RETURN p_actor_name || 'さんが提案を採用しました';
-    WHEN 'member_joined' THEN
-      RETURN p_actor_name || 'さんがワークスペースに参加しました';
-    ELSE
-      RETURN p_actor_name || 'さんが活動しました';
-  END CASE;
-END;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.generate_notification_message(p_actor_name text, p_type text, p_target_name text DEFAULT NULL::text)
- RETURNS text
- LANGUAGE plpgsql
- SET search_path TO ''
-AS $function$
-BEGIN
-  CASE p_type
-    WHEN 'idea_created' THEN
-      RETURN p_actor_name || 'さんが「' || COALESCE(p_target_name, 'アイデア') || '」を投稿しました';
-    WHEN 'idea_moved' THEN
-      RETURN p_actor_name || 'さんが「' || COALESCE(p_target_name, 'アイデア') || '」のステータスを変更しました';
-    WHEN 'proposal_added' THEN
-      RETURN p_actor_name || 'さんが「' || COALESCE(p_target_name, 'アイデア') || '」に提案を追加しました';
     WHEN 'member_joined' THEN
       RETURN p_actor_name || 'さんがワークスペースに参加しました';
     ELSE
@@ -584,6 +666,162 @@ BEGIN
 END;
 $function$;
 
+CREATE OR REPLACE FUNCTION public.sanitize_dangerous_patterns(input_text text)
+ RETURNS text
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+BEGIN
+  IF input_text IS NULL THEN
+    RETURN NULL;
+  END IF;
+  
+  -- JavaScriptイベントハンドラを除去
+  RETURN regexp_replace(
+    regexp_replace(
+      regexp_replace(
+        regexp_replace(
+          input_text,
+          'javascript:', '', 'gi'
+        ),
+        'on\w+\s*=', '', 'gi'  -- onclick, onload など
+      ),
+      'eval\s*\(', '', 'gi'
+    ),
+    'expression\s*\(', '', 'gi'  -- CSS expression
+  );
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.sanitize_html(input_text text)
+ RETURNS text
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+BEGIN
+  IF input_text IS NULL THEN
+    RETURN NULL;
+  END IF;
+  
+  -- HTMLタグを除去（<script>、<img>、<a>など）
+  RETURN regexp_replace(
+    regexp_replace(
+      regexp_replace(
+        input_text,
+        '<script[^>]*>.*?</script>', '', 'gi'
+      ),
+      '<[^>]+>', '', 'g'
+    ),
+    '&[a-z]+;', '', 'gi'  -- HTMLエンティティも除去
+  );
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.sanitize_idea_before_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NEW.idea_name IS NOT NULL THEN
+    NEW.idea_name := public.sanitize_text(NEW.idea_name);
+  END IF;
+  IF NEW.when_text IS NOT NULL THEN
+    NEW.when_text := public.sanitize_text(NEW.when_text);
+  END IF;
+  IF NEW.who_text IS NOT NULL THEN
+    NEW.who_text := public.sanitize_text(NEW.who_text);
+  END IF;
+  IF NEW.what_text IS NOT NULL THEN
+    NEW.what_text := public.sanitize_text(NEW.what_text);
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.sanitize_notification_before_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NEW.message IS NOT NULL THEN
+    NEW.message := public.sanitize_text(NEW.message);
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.sanitize_profile_before_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NEW.username IS NOT NULL THEN
+    NEW.username := public.sanitize_text(NEW.username);
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.sanitize_proposal_before_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NEW.content IS NOT NULL THEN
+    NEW.content := public.sanitize_text(NEW.content);
+  END IF;
+  IF NEW.todo_text IS NOT NULL THEN
+    NEW.todo_text := public.sanitize_text(NEW.todo_text);
+  END IF;
+  IF NEW.not_todo_text IS NOT NULL THEN
+    NEW.not_todo_text := public.sanitize_text(NEW.not_todo_text);
+  END IF;
+  IF NEW.budget_text IS NOT NULL THEN
+    NEW.budget_text := public.sanitize_text(NEW.budget_text);
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.sanitize_text(input_text text)
+ RETURNS text
+ LANGUAGE plpgsql
+ IMMUTABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+BEGIN
+    -- NULLチェック
+    IF input_text IS NULL THEN
+        RETURN NULL;
+    END IF;
+    
+    -- XSS対策: HTMLタグを除去
+    RETURN regexp_replace(input_text, '<[^>]*>', '', 'g');
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.sanitize_workspace_before_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NEW.name IS NOT NULL THEN
+    NEW.name := public.sanitize_text(NEW.name);
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
 CREATE OR REPLACE FUNCTION public.user_has_liked_idea(idea_uuid uuid, user_uuid uuid)
  RETURNS boolean
  LANGUAGE plpgsql
@@ -601,6 +839,30 @@ $function$;
 -- ============================
 -- トリガー定義
 -- ============================
+
+CREATE TRIGGER idea_like_rate_limit_trigger
+    BEFORE INSERT
+    ON public.idea_likes
+    FOR EACH ROW
+    EXECUTE FUNCTION check_like_rate_limit();
+
+CREATE TRIGGER idea_creation_rate_limit_trigger
+    BEFORE INSERT
+    ON public.ideas
+    FOR EACH ROW
+    EXECUTE FUNCTION check_idea_creation_rate_limit();
+
+CREATE TRIGGER sanitize_idea_trigger
+    BEFORE UPDATE
+    ON public.ideas
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_idea_before_insert();
+
+CREATE TRIGGER sanitize_idea_trigger
+    BEFORE INSERT
+    ON public.ideas
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_idea_before_insert();
 
 CREATE TRIGGER set_ideas_updated_at
     BEFORE UPDATE
@@ -620,11 +882,59 @@ CREATE TRIGGER trigger_create_idea_notification
     FOR EACH ROW
     EXECUTE FUNCTION create_idea_notification();
 
+CREATE TRIGGER sanitize_notification_trigger
+    BEFORE INSERT
+    ON public.notifications
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_notification_before_insert();
+
+CREATE TRIGGER sanitize_notification_trigger
+    BEFORE UPDATE
+    ON public.notifications
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_notification_before_insert();
+
+CREATE TRIGGER sanitize_profile_trigger
+    BEFORE UPDATE
+    ON public.profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_profile_before_insert();
+
+CREATE TRIGGER sanitize_profile_trigger
+    BEFORE INSERT
+    ON public.profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_profile_before_insert();
+
 CREATE TRIGGER set_profiles_updated_at
     BEFORE UPDATE
     ON public.profiles
     FOR EACH ROW
     EXECUTE FUNCTION handle_updated_at();
+
+CREATE TRIGGER proposal_like_rate_limit_trigger
+    BEFORE INSERT
+    ON public.proposal_likes
+    FOR EACH ROW
+    EXECUTE FUNCTION check_like_rate_limit();
+
+CREATE TRIGGER proposal_creation_rate_limit_trigger
+    BEFORE INSERT
+    ON public.proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION check_proposal_creation_rate_limit();
+
+CREATE TRIGGER sanitize_proposal_trigger
+    BEFORE INSERT
+    ON public.proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_proposal_before_insert();
+
+CREATE TRIGGER sanitize_proposal_trigger
+    BEFORE UPDATE
+    ON public.proposals
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_proposal_before_insert();
 
 CREATE TRIGGER set_proposals_updated_at
     BEFORE UPDATE
@@ -643,6 +953,18 @@ CREATE TRIGGER trigger_create_proposal_notification
     ON public.proposals
     FOR EACH ROW
     EXECUTE FUNCTION create_proposal_notification();
+
+CREATE TRIGGER sanitize_workspace_trigger
+    BEFORE UPDATE
+    ON public.workspaces
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_workspace_before_insert();
+
+CREATE TRIGGER sanitize_workspace_trigger
+    BEFORE INSERT
+    ON public.workspaces
+    FOR EACH ROW
+    EXECUTE FUNCTION sanitize_workspace_before_insert();
 
 CREATE TRIGGER set_workspaces_updated_at
     BEFORE UPDATE
@@ -747,14 +1069,19 @@ ALTER TABLE ONLY public.workspaces
 -- ============================
 
 -- このファイルには以下の機能が含まれます：
--- 1. 通知システム関数 (create_*_notification系)
--- 2. ワークスペースメンバー管理 (get_workspace_members系)
--- 3. アイデア関連操作 (delete_idea_by_owner, get_idea_like_count等)
--- 4. ユーザー管理 (handle_new_user, handle_updated_at)
--- 5. 通知メッセージ生成 (generate_notification_message)
--- 6. データクリーンアップ (cleanup_old_notifications)
+-- 1. レート制限機能 (check_rate_limit, cleanup_old_rate_limits)
+-- 2. 通知システム関数 (create_*_notification系)
+-- 3. ワークスペースメンバー管理 (get_workspace_members系)
+-- 4. アイデア関連操作 (delete_idea_by_owner, get_idea_like_count等)
+-- 5. ユーザー管理 (handle_new_user, handle_updated_at)
+-- 6. 通知メッセージ生成 (generate_notification_message)
+-- 7. XSS対策サニタイズ関数 (sanitize_*)
+-- 8. データクリーンアップ (cleanup_old_notifications)
 -- 
--- 全関数にSECURITY DEFINERとsearch_path設定を適用し、
--- セキュリティを強化。PostgreSQLのFunction Search Path脆弱性対策済み。
+-- セキュリティ強化内容：
+-- - 全関数にSECURITY DEFINERとsearch_path設定を適用
+-- - PostgreSQLのFunction Search Path脆弱性対策済み
+-- - XSS対策としてユーザー入力を自動サニタイズ
+-- - レート制限によるDoS攻撃対策
 -- 
 -- generate_notification_message関数は引数の順序が異なる2つのオーバーロード版が存在。
