@@ -11,12 +11,12 @@ interface BudgetProposalFormProps {
 }
 
 interface AIFormData {
-  planType: string;
-  participants: string;
-  duration: string;
-  location: string;
-  budget_range: string;
-  preferences: string;
+  planType: string;      // 最大100文字
+  participants: string;  // 最大50文字
+  duration: string;      // 最大30文字
+  location: string;      // 最大50文字
+  budget_range: string;  // 最大50文字
+  preferences: string;   // 最大200文字
 }
 
 interface LimitMessage {
@@ -327,7 +327,9 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
                   onChange={(e) => handleAIFormChange('planType', e.target.value)}
                   placeholder="例: 一泊二日の温泉旅行、日帰りBBQ、三泊四日の沖縄旅行"
                   className="form-input"
+                  maxLength={100}
                 />
+                <small className="char-count">{aiFormData.planType.length}/100文字</small>
               </div>
               
               <div className="form-row">
@@ -339,7 +341,9 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
                   onChange={(e) => handleAIFormChange('participants', e.target.value)}
                   placeholder="例: 夫婦2人、家族4人（大人2人・子供2人）、友人6人"
                   className="form-input"
+                  maxLength={50}
                 />
+                <small className="char-count">{aiFormData.participants.length}/50文字</small>
               </div>
               
               <div className="form-row">
@@ -349,21 +353,25 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
                   type="text"
                   value={aiFormData.duration}
                   onChange={(e) => handleAIFormChange('duration', e.target.value)}
-                  placeholder="例: 1泊2日、2泊3日、日帰り、3泊4日"
+                  placeholder="例: 10月上旬に1泊2日、年末年始またいで2泊3日、日帰り、3泊4日"
                   className="form-input"
+                  maxLength={30}
                 />
+                <small className="char-count">{aiFormData.duration.length}/30文字</small>
               </div>
               
               <div className="form-row">
-                <label htmlFor="location">場所・エリア *</label>
+                <label htmlFor="location">場所 *</label>
                 <input
                   id="location"
                   type="text"
                   value={aiFormData.location}
                   onChange={(e) => handleAIFormChange('location', e.target.value)}
-                  placeholder="例: 箱根温泉、沖縄本島、京都市内、軽井沢"
+                  placeholder="例: 沖縄の離島、箱根の温泉、北海道、東京ディズニーリゾート"
                   className="form-input"
+                  maxLength={50}
                 />
+                <small className="char-count">{aiFormData.location.length}/50文字</small>
               </div>
               
               <div className="form-row">
@@ -386,15 +394,17 @@ const BudgetProposalForm: React.FC<BudgetProposalFormProps> = ({
               </div>
               
               <div className="form-row">
-                <label htmlFor="preferences">特別な希望・要望</label>
+                <label htmlFor="preferences">特別な要望（任意）</label>
                 <textarea
                   id="preferences"
                   value={aiFormData.preferences}
                   onChange={(e) => handleAIFormChange('preferences', e.target.value)}
-                  placeholder="例: 高級旅館希望、節約重視、子供向けアクティビティ重視、グルメ中心など"
-                  className="form-textarea"
+                  placeholder="例: オーシャンビューの部屋、朝食付き、ペット同伴可、など"
+                  className="form-input"
                   rows={3}
+                  maxLength={300}
                 />
+                <small className="char-count">{aiFormData.preferences.length}/300文字</small>
               </div>
             </div>
             
