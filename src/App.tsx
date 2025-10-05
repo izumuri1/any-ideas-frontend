@@ -34,6 +34,7 @@ import { Login } from './components/Login'
 import { SignUp } from './components/SignUp'
 import { PasswordReset } from './components/PasswordReset'
 import { PasswordResetConfirm } from './components/PasswordResetConfirm'
+import { EmailConfirmationWaiting } from './components/EmailConfirmationWaiting'
 import { CreateWorkspace } from './components/CreateWorkspace'
 import { InviteHandler } from './components/InviteHandler'
 import Home from './pages/Home'
@@ -74,6 +75,9 @@ function App() {
         {/* パスワードリセット関連 - 認証状態に関係なく常にアクセス可能 */}
         <Route path="/password-reset" element={<PasswordReset />} />
         <Route path="/password-reset-confirm" element={<PasswordResetConfirm />} />
+
+        {/* メール確認待ち画面 - 認証状態に関係なく常にアクセス可能 */}
+        <Route path="/email-confirmation-waiting" element={<EmailConfirmationWaiting />} />
         
         {/* 認証が必要なルート */}
         {/* 認証されているユーザー（userが存在）なら、これらのページに移動できる */}

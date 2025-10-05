@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
 import FormField from './common/FormField'  // 追加
 import { useForm } from '../hooks/useForm'   // 追加（React Hook Form → 自作useFormに変更）
 import './Login.scss'
@@ -138,10 +137,15 @@ export function SignUp() {
         }
         return
       } else {
-        // 招待トークンがある場合の処理
-        if (isInviteMode && inviteToken) {
-          await handleInviteTokenProcessing()
-        }
+        // 登録成功 - メール確認待ち画面へ遷移
+        // 招待トークン情報も一緒に渡す
+        navigate('/email-confirmation-waiting', { 
+          state: { 
+            email: signUpForm.values.email,
+            inviteToken: inviteToken || null,
+            workspaceName: workspaceName || null
+          } 
+        })
       }
           
     } catch (err) {
@@ -149,92 +153,6 @@ export function SignUp() {
       setSubmitError('アカウント登録中に予期しないエラーが発生しました。')
     } finally {
       signUpForm.setSubmitting(false)
-    }
-  }
-
-  // 招待トークン処理関数
-  const handleInviteTokenProcessing = async () => {
-    try {
-      // 現在のユーザーを取得（新規登録直後なのでAuthContextから取得）
-      const { data: { user: currentUser } } = await supabase.auth.getUser()
-      
-      if (!currentUser) {
-        setSubmitError('ユーザー情報の取得に失敗しました')
-        return
-      }
-
-      // 招待トークンの検証と取得
-      const { data: tokenData, error: tokenError } = await supabase
-        .from('invitation_tokens')
-        .select(`
-          id,
-          workspace_id,
-          used_count,
-          max_uses,
-          expires_at,
-          is_active
-        `)
-        .eq('token', inviteToken)
-        .eq('is_active', true)
-        .single()
-
-      if (tokenError) {
-        console.error('招待トークン取得エラー:', tokenError)
-        setSubmitError('招待リンクが無効です')
-        return
-      }
-
-      // トークンの有効性チェック
-      const now = new Date()
-      const expiresAt = new Date(tokenData.expires_at)
-      
-      if (now > expiresAt) {
-        setSubmitError('招待リンクの有効期限が切れています')
-        return
-      }
-
-      if (tokenData.used_count >= tokenData.max_uses) {
-        setSubmitError('この招待リンクは既に使用されています')
-        return
-      }
-
-      // ワークスペースメンバーとして追加
-      const { error: memberError } = await supabase
-        .from('workspace_members')
-        .insert({
-          workspace_id: tokenData.workspace_id,
-          user_id: currentUser.id,
-          role: 'member'
-        })
-
-      if (memberError) {
-        console.error('メンバー追加エラー:', memberError)
-        setSubmitError('ワークスペースへの参加に失敗しました')
-        return
-      }
-
-      // トークンを使用済みに更新
-      const { error: tokenUpdateError } = await supabase
-        .from('invitation_tokens')
-        .update({
-          used_count: tokenData.used_count + 1,
-          used_by: currentUser.id,
-          used_at: new Date().toISOString(),
-          is_active: tokenData.used_count + 1 >= tokenData.max_uses ? false : true
-        })
-        .eq('id', tokenData.id)
-
-      if (tokenUpdateError) {
-        console.warn('トークン更新エラー:', tokenUpdateError)
-        // トークン更新失敗は致命的ではないので続行
-      }
-
-      // ワークスペースに直接遷移
-      navigate(`/workspace/${tokenData.workspace_id}`)
-
-    } catch (error: any) {
-      console.error('招待トークン処理エラー:', error)
-      setSubmitError('ワークスペースへの参加処理中にエラーが発生しました')
     }
   }
 
