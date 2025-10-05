@@ -702,7 +702,7 @@ export default function DiscussionScreen() {
                   <div className="form-row">
                     <FormField
                       type="textarea"
-                      placeholder="やらなくても良いことを記入"
+                      placeholder="やらなくても良いことを記入（できたら理由も記入）"
                       className="input-field textarea-field"
                       rows={4}
                       maxLength={500}

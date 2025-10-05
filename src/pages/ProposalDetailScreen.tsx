@@ -380,7 +380,7 @@ export function ProposalDetailScreen() {
 
             {/* やらなくても良いこと */}
             <div className="proposal-type-section">
-              <h4 className="proposal-type-title">やらなくても良いこと（理由も記載があるといいかも）</h4>
+              <h4 className="proposal-type-title">やらなくても良いこと</h4>
               <div className="proposal-cards">
                 {proposals
                   .filter(p => p.proposal_type === 'not_todo' && !p.is_adopted)
