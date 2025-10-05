@@ -124,6 +124,30 @@ export function InviteHandler() {
       setLoading(true);
 
       // 既にメンバーかチェック
+      // プロフィールの存在確認(念のため)
+      const { data: profile, error: profileCheckError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user!.id)
+        .single();
+
+      // プロフィールが存在しない場合のみ作成(通常はトリガーで作成されるため、ここには来ない)
+      if (!profile && !profileCheckError) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user!.id,
+            username: user!.email?.split('@')[0] || 'user',
+            email: user!.email
+          });
+
+        if (profileError) {
+          console.error('プロフィール作成エラー:', profileError);
+          throw profileError;
+        }
+      }
+
+      // 既にメンバーかチェック
       const { data: existingMember } = await supabase
         .from('workspace_members')
         .select('id')
