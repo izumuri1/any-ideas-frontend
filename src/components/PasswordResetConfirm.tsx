@@ -30,7 +30,7 @@ export function PasswordResetConfirm() {
       password: {
         custom: (value) => {
           if (!value.trim()) return 'パスワードは必須です'
-          if (value.length < 6) return 'パスワードは6文字以上で入力してください'
+          if (value.length < 8) return 'パスワードは8文字以上で入力してください'
           return undefined
         }
       },
